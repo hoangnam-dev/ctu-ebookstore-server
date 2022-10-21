@@ -35,7 +35,6 @@ const getDirectoryByID = (req, res, next) => {
 
 const store = (req, res, next) => {
     let directory = req.body;
-    console.log(directory.directoryName);
 
     Directory.create({
         DIRECTORYNAME: directory.directoryName,

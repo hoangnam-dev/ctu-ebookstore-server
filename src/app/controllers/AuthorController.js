@@ -56,7 +56,6 @@ const store = (req, res, next) => {
 const update = (req, res, next) => {
     let author = req.body;
     let authorID = req.params.id;
-    console.log(author);
 
     Author.update({
         AUTHORNAME: author.authorName,

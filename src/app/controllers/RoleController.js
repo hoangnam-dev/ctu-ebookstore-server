@@ -55,8 +55,6 @@ const store = (req, res, next) => {
 const update = (req, res, next) => {
     let role = req.body;
     let roleID = req.params.id;
-    console.log(roleID);
-    console.log(role);
 
     Role.update({
         ROLENAME: role.roleName,
