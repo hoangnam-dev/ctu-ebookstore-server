@@ -15,11 +15,11 @@ const allAuthor = (req, res, next) => {
 };
 
 const getAuthorByID = (req, res, next) => {
-    let authorId = req.params.id;
+    let authorID = req.params.id;
 
     Author.findOne({
         where: {
-            AUTHORID : authorId
+            AUTHORID : authorID
         }
     })
     .then(data => {
@@ -55,7 +55,7 @@ const store = (req, res, next) => {
 
 const update = (req, res, next) => {
     let author = req.body;
-    let authorId = req.params.id;
+    let authorID = req.params.id;
     console.log(author);
 
     Author.update({
@@ -65,7 +65,7 @@ const update = (req, res, next) => {
         AUTHORGENDER: author.authorGender,
     }, {
         where: {
-            AUTHORID: authorId
+            AUTHORID: authorID
         }
     })
     .then(data => {
@@ -80,11 +80,11 @@ const update = (req, res, next) => {
 };
 
 const destroy = (req, res, next) => {
-    let authorId = req.params.id;
+    let authorID = req.params.id;
 
     Author.destroy({
         where: {
-            AUTHORID : authorId
+            AUTHORID : authorID
         }
     })
     .then(data => {
