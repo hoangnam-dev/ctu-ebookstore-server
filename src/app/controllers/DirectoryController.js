@@ -15,11 +15,11 @@ const allDirectory = (req, res, next) => {
 };
 
 const getDirectoryByID = (req, res, next) => {
-    let directoryId = req.params.id;
+    let directoryID = req.params.id;
 
     Directory.findOne({
         where: {
-            DIRECTORYID : directoryId
+            DIRECTORYID : directoryID
         }
     })
     .then(data => {
@@ -54,7 +54,7 @@ const store = (req, res, next) => {
 
 const update = (req, res, next) => {
     let directory = req.body;
-    let directoryId = req.params.id;
+    let directoryID = req.params.id;
     console.log(directory);
 
     Directory.update({
@@ -62,7 +62,7 @@ const update = (req, res, next) => {
         DIRECTORYDESCRIPTION: directory.directoryDescription,
     }, {
         where: {
-            DIRECTORYID: directoryId
+            DIRECTORYID: directoryID
         }
     })
     .then(data => {
@@ -77,11 +77,11 @@ const update = (req, res, next) => {
 };
 
 const destroy = (req, res, next) => {
-    let directoryId = req.params.id;
+    let directoryID = req.params.id;
 
     Directory.destroy({
         where: {
-            DIRECTORYID : directoryId
+            DIRECTORYID : directoryID
         }
     })
     .then(data => {
