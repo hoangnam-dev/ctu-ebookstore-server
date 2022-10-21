@@ -2,6 +2,7 @@ const directoryRouter = require('./directory');
 const authorRouter = require('./author');
 const userRouter = require('./user');
 const roleRouter = require('./role');
+const permissionRouter = require('./permission');
 
 function route(app) {
     app.get('/test', function(req, res) {
@@ -19,5 +20,8 @@ function route(app) {
 
     // Role routes
     app.use('/roles', roleRouter);
+
+    // Permission routes
+    app.use('/permissions', permissionRouter);
 }
 module.exports = route;
