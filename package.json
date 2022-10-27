@@ -2,16 +2,24 @@
   "name": "ctu-ebookstore",
   "version": "1.0.0",
   "description": "Thesis Ebookstore",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --inspect ./src/index.js"
+    "start": "node ./bin/www",
+    "start_local": "nodemon --inspect ./bin/www"
   },
   "author": "Nguyen Hoang Nam",
   "license": "ISC",
   "dependencies": {
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "debug": "^4.3.4",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
     "express": "^4.18.2",
+    "http-errors": "^2.0.0",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
     "sequelize": "^6.25.2"
   },

@@ -5,3 +5,11 @@ node_modules/
 .history
 
 src/public/css/
+
+resources
+
+.env
+
+./routes/temp.js
+./app/controllers/temp.js
+./config/db/index.example
