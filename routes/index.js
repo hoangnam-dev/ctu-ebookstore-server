@@ -15,13 +15,10 @@ const provinceRouter = require('./province');
 const roleRouter = require('./role');
 const saleRouter = require('./sale');
 const supplierRouter = require('./supplier');
-const tempRouter = require('./temp');
 const userRouter = require('./user');
 const wardRouter = require('./ward');
 
 function route(app) {
-    app.use('/', tempRouter);
-    
     // Author routes
     app.use('/authors', authorRouter);
     
