@@ -10,7 +10,16 @@ const allAuthor = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      res.json(authors);
+      var authorPre = authors.map((author) => {
+        return {
+          authorID: author.AUTHORID,
+          authorName: author.AUTHORNAME,
+          authorStory: author.AUTHORSTORY,
+          authorGender: author.AUTHORGENDER,
+          authorBirthdate: author.AUTHORBIRTHDATE,
+        };
+      });
+      res.json(authorPre);
     }
   });
 };
@@ -43,6 +52,31 @@ const store = function (req, res) {
   }
 };
 
+// Search authors
+const search = function (req, res) {
+  var authorName = req.query.name;
+  Author.search(authorName, function (err, author) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy tác giả",
+      });
+    } else {
+      var authorPre = author.map((author) => {
+        return {
+          authorID: author.AUTHORID,
+          authorName: author.AUTHORNAME,
+          authorStory: author.AUTHORSTORY,
+          authorGender: author.AUTHORGENDER,
+          authorBirthdate: author.AUTHORBIRTHDATE,
+        };
+      });
+      res.json(authorPre);
+    }
+  });
+};
+
 // Get author by ID
 const getAuthorByID = function (req, res) {
   var authorID = req.params.id;
@@ -54,10 +88,19 @@ const getAuthorByID = function (req, res) {
         message: "Lỗi! Không tìm thấy tác giả",
       });
     } else {
-      res.json(author);
+      var authorPre = author.map((author) => {
+        return {
+          authorID: author.AUTHORID,
+          authorName: author.AUTHORNAME,
+          authorStory: author.AUTHORSTORY,
+          authorGender: author.AUTHORGENDER,
+          authorBirthdate: author.AUTHORBIRTHDATE,
+        };
+      });
+      res.json(authorPre);
     }
-  })
-}
+  });
+};
 
 // Store new author
 const update = function (req, res) {
@@ -89,9 +132,10 @@ const update = function (req, res) {
 };
 
 module.exports = {
-    allAuthor,
-    getAuthorByID,
-    store,
-    update,
-    // destroy,
-}
+  allAuthor,
+  getAuthorByID,
+  search,
+  store,
+  update,
+  // destroy,
+};

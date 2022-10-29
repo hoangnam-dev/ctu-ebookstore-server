@@ -45,15 +45,27 @@ Author.store = function storeAuthor(newAuthor, result) {
 };
 
 // Update author
-Author.update = function updateAuthor(authorID, author, result) {
+Author.update = function updateAuthor(author, result) {
     console.log(authorID);
     db.query("UPDATE author SET authorname = ?, authorstory = ?, authorbirthdate = ?, authorgender = ? WHERE authorid = ?",
-    [author.authorname, author.authorstory, author.authorbirthdate, author.authorgender, authorID],
+    [author.authorname, author.authorstory, author.authorbirthdate, author.authorgender, author.authorid],
     function(err, res) {
         if(err) {
             result(null, err);
         }
         else{
+            result(null, res);
+        }
+    });
+};
+
+// Search author
+Author.search = function searchAuthor(authorName, result) {
+    const sql = "SELECT * FROM author WHERE authorname LIKE '%" + authorName + "%'";
+    db.query(sql, function(err, res) {
+        if(err) {
+            result(err, null);
+        } else {
             result(null, res);
         }
     });
