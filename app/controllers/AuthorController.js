@@ -135,7 +135,6 @@ const destroy = function (req, res) {
 // Store new author
 const update = function (req, res) {
   var newAuthor = new Author(req.body);
-  var authorID = req.params.id;
   if (!newAuthor.authorname) {
     res.json({
       error: true,
@@ -143,7 +142,7 @@ const update = function (req, res) {
       message: "Tên tác giả không được để trống",
     });
   } else {
-    Author.update(authorID, newAuthor, function (err, author) {
+    Author.update(newAuthor, function (err, author) {
       if (err) {
         res.json({
           error: true,
