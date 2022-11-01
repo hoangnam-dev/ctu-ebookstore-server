@@ -55,6 +55,7 @@ const store = function (req, res) {
 // Search authors
 const search = function (req, res) {
   var authorName = req.query.name;
+  console.log(authorName);
   Author.search(authorName, function (err, author) {
     if (err) {
       res.json({
