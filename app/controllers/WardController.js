@@ -10,7 +10,15 @@ const allWard = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      res.json(wards);
+      var wardPre = wards.map((ward) => {
+        return {
+          wardID: ward.wardid,
+          wardName: ward.wardname,
+          wardType: ward.wardtype,
+          wardID: ward.wardid,
+        };
+      });
+      res.json(wardPre);
     }
   });
 };
@@ -44,6 +52,30 @@ const store = function (req, res) {
 };
 
 // Get ward by ID
+const getWardByDistrictID = function (req, res) {
+  var districtID = req.body.districtID;;
+  Ward.getWardByDistrictID(districtID, function (err, wards) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy phường/xã",
+      });
+    } else {
+      var wardPre = wards.map((ward) => {
+        return {
+          wardID: ward.wardid,
+          wardName: ward.wardname,
+          wardType: ward.wardtype,
+          wardID: ward.wardid,
+        };
+      });
+      res.json(wardPre);
+    }
+  })
+}
+
+// Get ward by ID
 const getWardByID = function (req, res) {
   var wardID = req.params.id;
   Ward.getWardByID(wardID, function (err, ward) {
@@ -54,7 +86,15 @@ const getWardByID = function (req, res) {
         message: "Lỗi! Không tìm thấy phường/xã",
       });
     } else {
-      res.json(ward);
+      var wardPre = wards.map((ward) => {
+        return {
+          wardID: ward.wardid,
+          wardName: ward.wardname,
+          wardType: ward.wardtype,
+          wardID: ward.wardid,
+        };
+      });
+      res.json(wardPre);
     }
   })
 }
@@ -91,6 +131,7 @@ const update = function (req, res) {
 module.exports = {
     allWard,
     getWardByID,
+    getWardByDistrictID,
     store,
     update,
     // destroy,

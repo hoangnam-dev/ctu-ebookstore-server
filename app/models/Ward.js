@@ -9,7 +9,7 @@ const Ward = function(ward) {
 };
 
 // Get all ward
-Ward.getAll = function getAllProvince(result) {
+Ward.getAll = function getAllWard(result) {
     db.query("SELECT * FROM ward", function(err, res) {
         if(err) {
             result(err, null);
@@ -20,7 +20,7 @@ Ward.getAll = function getAllProvince(result) {
 };
 
 // Get ward by ID
-Ward.getProvinceByID = function getProvinceByID(wardID, result) {
+Ward.getWardByID = function getWardByID(wardID, result) {
     db.query("SELECT * FROM ward WHERE wardid = ?", wardID, function(err, res) {
         if(err) {
             result(err, null);
@@ -30,9 +30,20 @@ Ward.getProvinceByID = function getProvinceByID(wardID, result) {
     });
 };
 
+// Get ward by district ID
+Ward.getWardByDistrictID = function getWardByDistrictID(districtID, result) {
+    db.query("SELECT * FROM ward WHERE districtid = ?", districtID, function(err, res) {
+        if(err) {
+            result(err, null);
+        } else {
+            result(null, res);
+        }
+    });
+};
+
 // Store ward
-Ward.store = function storeProvince(newProvince, result) {
-    db.query("INSERT INTO ward set ?", newProvince, function (err, res) {
+Ward.store = function storeWard(newWard, result) {
+    db.query("INSERT INTO ward set ?", newWard, function (err, res) {
 
         if(err) {
             result(err, null);
@@ -44,7 +55,7 @@ Ward.store = function storeProvince(newProvince, result) {
 };
 
 // Update ward
-Ward.update = function updateProvince(wardID, ward, result) {
+Ward.update = function updateWard(wardID, ward, result) {
     console.log(wardID);
     db.query("UPDATE ward SET wardname = ?, wardtype = ?, districtid = ? WHERE wardid = ?",
     [ward.wardname, ward.wardtype, ward.districtID, wardID],
@@ -59,7 +70,7 @@ Ward.update = function updateProvince(wardID, ward, result) {
 };
 
 // Delete ward
-Ward.delete = function deleteProvince(wardID, result) {
+Ward.delete = function deleteWard(wardID, result) {
     db.query("DELETE FROM ward WHERE wardid = ?", wardID, function(err, res) {
         if(err) {
             result(null, err);

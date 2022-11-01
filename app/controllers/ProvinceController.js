@@ -10,7 +10,15 @@ const allProvince = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      res.json(provinces);
+      var provincePre = provinces.map((province) => {
+        return {
+          provinceID: province.provinceid,
+          provinceName: province.provincename,
+          provinceType: province.provincetype,
+          provinceID: province.provinceid,
+        };
+      });
+      res.json(provincePre);
     }
   });
 };
@@ -54,7 +62,15 @@ const getProvinceByID = function (req, res) {
         message: "Lỗi! Không tìm thấy tỉnh/thành phố",
       });
     } else {
-      res.json(province);
+      var provincePre = provinces.map((province) => {
+        return {
+          provinceID: province.provinceid,
+          provinceName: province.provincename,
+          provinceType: province.provincetype,
+          provinceID: province.provinceid,
+        };
+      });
+      res.json(provincePre);
     }
   })
 }

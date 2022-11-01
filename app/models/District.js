@@ -9,7 +9,7 @@ const District = function(district) {
 };
 
 // Get all district
-District.getAll = function getAllProvince(result) {
+District.getAll = function getAllDistrict(result) {
     db.query("SELECT * FROM district", function(err, res) {
         if(err) {
             result(err, null);
@@ -20,7 +20,7 @@ District.getAll = function getAllProvince(result) {
 };
 
 // Get district by ID
-District.getProvinceByID = function getProvinceByID(districtID, result) {
+District.getDistrictByID = function getDistrictByID(districtID, result) {
     db.query("SELECT * FROM district WHERE districtid = ?", districtID, function(err, res) {
         if(err) {
             result(err, null);
@@ -30,9 +30,20 @@ District.getProvinceByID = function getProvinceByID(districtID, result) {
     });
 };
 
+// Get district by ID
+District.getDistrictByProvinceID = function getDistrictByProvinceID(provinceID, result) {
+    db.query("SELECT * FROM district WHERE provinceid = ?", provinceID, function(err, res) {
+        if(err) {
+            result(err, null);
+        } else {
+            result(null, res);
+        }
+    });
+};
+
 // Store district
-District.store = function storeProvince(newProvince, result) {
-    db.query("INSERT INTO district set ?", newProvince, function (err, res) {
+District.store = function storeDistrict(newDistrict, result) {
+    db.query("INSERT INTO district set ?", newDistrict, function (err, res) {
 
         if(err) {
             result(err, null);
@@ -44,7 +55,7 @@ District.store = function storeProvince(newProvince, result) {
 };
 
 // Update district
-District.update = function updateProvince(districtID, district, result) {
+District.update = function updateDistrict(districtID, district, result) {
     console.log(districtID);
     db.query("UPDATE district SET districtname = ?, districttype = ?, provinceid = ? WHERE districtid = ?",
     [district.districtname, district.districttype, district.provinceID, districtID],
@@ -59,7 +70,7 @@ District.update = function updateProvince(districtID, district, result) {
 };
 
 // Delete district
-District.delete = function deleteProvince(districtID, result) {
+District.delete = function deleteDistrict(districtID, result) {
     db.query("DELETE FROM district WHERE districtid = ?", districtID, function(err, res) {
         if(err) {
             result(null, err);

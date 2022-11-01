@@ -10,7 +10,15 @@ const allDistrict = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      res.json(districts);
+      var districtPre = districts.map((district) => {
+        return {
+          districtID: district.districtid,
+          districtName: district.districtname,
+          districtType: district.districttype,
+          provinceID: district.provinceid,
+        };
+      });
+      res.json(districtPre);
     }
   });
 };
@@ -54,10 +62,44 @@ const getDistrictByID = function (req, res) {
         message: "Lỗi! Không tìm thấy quận/huyện",
       });
     } else {
-      res.json(district);
+      var districtPre = district.map((district) => {
+        return {
+          districtID: district.districtid,
+          districtName: district.districtname,
+          districtType: district.districttype,
+          provinceID: district.provinceid,
+        };
+      });
+      res.json(districtPre);
     }
   })
 }
+
+// Get district by ID
+const getDistrictByProvinceID = function (req, res) {
+  var provinceID = req.body.provinceID;
+  console.log(provinceID);
+  District.getDistrictByProvinceID(provinceID, function (err, districts) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy quận/huyện",
+      });
+    } else {
+      var districtPre = districts.map((district) => {
+        return {
+          districtID: district.districtid,
+          districtName: district.districtname,
+          districtType: district.districttype,
+          provinceID: district.provinceid,
+        };
+      });
+      res.json(districtPre);
+    }
+  })
+}
+
 
 // Store new district
 const update = function (req, res) {
@@ -91,6 +133,7 @@ const update = function (req, res) {
 module.exports = {
     allDistrict,
     getDistrictByID,
+    getDistrictByProvinceID,
     store,
     update,
     // destroy,
