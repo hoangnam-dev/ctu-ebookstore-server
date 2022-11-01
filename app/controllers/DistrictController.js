@@ -78,7 +78,6 @@ const getDistrictByID = function (req, res) {
 // Get district by ID
 const getDistrictByProvinceID = function (req, res) {
   var provinceID = req.body.provinceID;
-  console.log(provinceID);
   District.getDistrictByProvinceID(provinceID, function (err, districts) {
     if (err) {
       res.json({
