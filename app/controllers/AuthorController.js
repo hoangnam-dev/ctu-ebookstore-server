@@ -12,11 +12,11 @@ const allAuthor = function (req, res) {
     } else {
       var authorPre = authors.map((author) => {
         return {
-          authorID: author.AUTHORID,
-          authorName: author.AUTHORNAME,
-          authorStory: author.AUTHORSTORY,
-          authorGender: author.AUTHORGENDER,
-          authorBirthdate: author.AUTHORBIRTHDATE,
+          authorID: author.authorid,
+          authorName: author.authorname,
+          authorStory: author.authorstory,
+          authorGender: author.authorgender,
+          authorBirthdate: author.authorbirthdate,
         };
       });
       res.json(authorPre);
@@ -65,11 +65,11 @@ const search = function (req, res) {
     } else {
       var authorPre = author.map((author) => {
         return {
-          authorID: author.AUTHORID,
-          authorName: author.AUTHORNAME,
-          authorStory: author.AUTHORSTORY,
-          authorGender: author.AUTHORGENDER,
-          authorBirthdate: author.AUTHORBIRTHDATE,
+          authorID: author.authorid,
+          authorName: author.authorname,
+          authorStory: author.authorstory,
+          authorGender: author.authorgender,
+          authorBirthdate: author.authorbirthdate,
         };
       });
       res.json(authorPre);
@@ -90,11 +90,11 @@ const getAuthorByID = function (req, res) {
     } else {
       var authorPre = author.map((author) => {
         return {
-          authorID: author.AUTHORID,
-          authorName: author.AUTHORNAME,
-          authorStory: author.AUTHORSTORY,
-          authorGender: author.AUTHORGENDER,
-          authorBirthdate: author.AUTHORBIRTHDATE,
+          authorID: author.authorid,
+          authorName: author.authorname,
+          authorStory: author.authorstory,
+          authorGender: author.authorgender,
+          authorBirthdate: author.authorbirthdate,
         };
       });
       res.json(authorPre);
@@ -106,7 +106,7 @@ const getAuthorByID = function (req, res) {
 const destroy = function (req, res) {
   var authorID = req.params.id;
   Author.getAuthorByID(authorID, function (err, author) {
-    if (err || !author.AUTHORID) {
+    if (err || Object.keys(res).length === 0) {
       res.json({
         error: true,
         statusCode: 0,

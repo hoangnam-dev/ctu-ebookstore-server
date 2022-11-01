@@ -5,8 +5,8 @@ const Author = function (author) {
   this.authorid = author.authorID;
   this.authorname = author.authorName;
   this.authorstory = author.authorStory;
-  this.authorbirthdate = author.authorBirthdate;
   this.authorgender = author.authorGender;
+  this.authorbirthdate = author.authorBirthdate;
 };
 
 // Get all author
