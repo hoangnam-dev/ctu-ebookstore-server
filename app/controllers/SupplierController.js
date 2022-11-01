@@ -3,6 +3,7 @@ const Supplier = require("../models/Supplier");
 // Show all supplier
 const allSupplier = function (req, res) {
   Supplier.getAll(function (err, suppliers) {
+    console.log(suppliers);
     if (err) {
       res.json({
         error: true,
@@ -10,7 +11,19 @@ const allSupplier = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      res.json(suppliers);
+      var supplierPre = suppliers.map((supplier) => {
+        return {
+          supplierID: supplier.supplierid,
+          supplierName: supplier.suppliername,
+          supplierAddress: supplier.supplieraddress,
+          supplierEmail: supplier.supplieremail,
+          supplierPhone: supplier.supplierphone,
+          supplierBankNumber: supplier.supplierbanknumber,
+          supplierDeletedAt: supplier.supplierdeletedat,
+          wardID: supplier.wardid,
+        };
+      });
+      res.json(supplierPre);
     }
   });
 };
@@ -43,10 +56,10 @@ const store = function (req, res) {
   }
 };
 
-// Get supplier by ID
-const getSupplierByID = function (req, res) {
-  var supplierID = req.params.id;
-  Supplier.getSupplierByID(supplierID, function (err, supplier) {
+// Search suppliers
+const search = function (req, res) {
+  var supplierName = req.query.name;
+  Supplier.search(supplierName, function (err, supplier) {
     if (err) {
       res.json({
         error: true,
@@ -54,7 +67,47 @@ const getSupplierByID = function (req, res) {
         message: "Lỗi! Không tìm thấy nhà cung cấp",
       });
     } else {
-      res.json(supplier);
+      var supplierPre = supplier.map((supplier) => {
+        return {
+          supplierID: supplier.supplierid,
+          supplierName: supplier.suppliername,
+          supplierAddress: supplier.supplieraddress,
+          supplierEmail: supplier.supplieremail,
+          supplierPhone: supplier.supplierphone,
+          supplierBankNumber: supplier.supplierbanknumber,
+          supplierDeletedAt: supplier.supplierdeletedat,
+          wardID: supplier.wardid,
+        };
+      });
+      res.json(supplierPre);
+    }
+  });
+};
+
+// Get supplier by ID
+const getSupplierByID = function (req, res) {
+  var supplierID = req.params.id;
+  Supplier.getSupplierByID(supplierID, function (err, supplier) {
+    if (err || Object.keys(supplier).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy nhà cung cấp",
+      });
+    } else {
+      var supplierPre = supplier.map((supplier) => {
+        return {
+          supplierID: supplier.supplierid,
+          supplierName: supplier.suppliername,
+          supplierAddress: supplier.supplieraddress,
+          supplierEmail: supplier.supplieremail,
+          supplierPhone: supplier.supplierphone,
+          supplierBankNumber: supplier.supplierbanknumber,
+          supplierDeletedAt: supplier.supplierdeletedat,
+          wardID: supplier.wardid,
+        };
+      });
+      res.json(supplierPre);
     }
   })
 }
@@ -62,7 +115,7 @@ const getSupplierByID = function (req, res) {
 // Store new supplier
 const update = function (req, res) {
   var newSupplier = new Supplier(req.body);
-  var supplierID = req.params.id;
+  console.log(newSupplier);
   if (!newSupplier.suppliername || !newSupplier.supplieraddress || !newSupplier.supplierphone || !newSupplier.supplieremail || !newSupplier.supplierbanknumber || !newSupplier.wardid) {
     res.json({
       error: true,
@@ -70,7 +123,8 @@ const update = function (req, res) {
       message: "Thông tin nhà cung cấp không được để trống",
     });
   } else {
-    Supplier.update(supplierID, newSupplier, function (err, supplier) {
+    Supplier.update(newSupplier, function (err, supplier) {
+      console.log(supplier);
       if (err) {
         res.json({
           error: true,
@@ -88,10 +142,74 @@ const update = function (req, res) {
   }
 };
 
+// Soft destroy supplier
+const destroy = function (req, res) {
+  var supplierID = req.params.id;
+  Supplier.getSupplierByID(supplierID, function (err, supplier) {
+    if (err || Object.keys(supplier).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy nhà cung cấp",
+      });
+    } else {
+      Supplier.delete(supplierID, function (err, supplier) {
+        console.log(supplier);
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Xóa nhà cung cấp không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Xóa nhà cung cấp thành công",
+          });
+        }
+      });
+    }
+  });
+};
+
+// Restore supplier
+const restore = function (req, res) {
+  var supplierID = req.params.id;
+  Supplier.getSupplierByID(supplierID, function (err, supplier) {
+    if (err || Object.keys(supplier).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy nhà cung cấp",
+      });
+    } else {
+      Supplier.restore(supplierID, function (err, supplier) {
+        console.log(supplier);
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Khôi phục nhà cung cấp không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Khôi phục nhà cung cấp thành công",
+          });
+        }
+      });
+    }
+  });
+};
+
 module.exports = {
     allSupplier,
     getSupplierByID,
     store,
+    search,
     update,
-    // destroy,
+    destroy,
+    restore,
 }
