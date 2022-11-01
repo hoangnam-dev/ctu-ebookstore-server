@@ -3,7 +3,6 @@ const Supplier = require("../models/Supplier");
 // Show all supplier
 const allSupplier = function (req, res) {
   Supplier.getAll(function (err, suppliers) {
-    console.log(suppliers);
     if (err) {
       res.json({
         error: true,
@@ -115,7 +114,6 @@ const getSupplierByID = function (req, res) {
 // Store new supplier
 const update = function (req, res) {
   var newSupplier = new Supplier(req.body);
-  console.log(newSupplier);
   if (!newSupplier.suppliername || !newSupplier.supplieraddress || !newSupplier.supplierphone || !newSupplier.supplieremail || !newSupplier.supplierbanknumber || !newSupplier.wardid) {
     res.json({
       error: true,
@@ -124,7 +122,6 @@ const update = function (req, res) {
     });
   } else {
     Supplier.update(newSupplier, function (err, supplier) {
-      console.log(supplier);
       if (err) {
         res.json({
           error: true,
@@ -154,7 +151,6 @@ const destroy = function (req, res) {
       });
     } else {
       Supplier.delete(supplierID, function (err, supplier) {
-        console.log(supplier);
         if (err) {
           res.json({
             error: true,
@@ -185,7 +181,6 @@ const restore = function (req, res) {
       });
     } else {
       Supplier.restore(supplierID, function (err, supplier) {
-        console.log(supplier);
         if (err) {
           res.json({
             error: true,
