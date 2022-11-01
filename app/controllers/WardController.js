@@ -15,7 +15,7 @@ const allWard = function (req, res) {
           wardID: ward.wardid,
           wardName: ward.wardname,
           wardType: ward.wardtype,
-          wardID: ward.wardid,
+          districtID: ward.districtid,
         };
       });
       res.json(wardPre);
@@ -67,7 +67,7 @@ const getWardByDistrictID = function (req, res) {
           wardID: ward.wardid,
           wardName: ward.wardname,
           wardType: ward.wardtype,
-          wardID: ward.wardid,
+          districtID: ward.districtid,
         };
       });
       res.json(wardPre);
