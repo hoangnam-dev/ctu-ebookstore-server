@@ -24,9 +24,9 @@ Supplier.getAll = function getAllSupplier(result) {
 };
 
 // Search supplier
-Supplier.search = function searchSupplier(supplierName, result) {
+Supplier.search = function searchSupplier(col, val, result) {
   const sql =
-    "SELECT * FROM supplier WHERE suppliername LIKE '%" + supplierName + "%'";
+    "SELECT * FROM supplier WHERE " + col + " LIKE '%" + val + "%' and supplierdeletedat IS NULL";
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);

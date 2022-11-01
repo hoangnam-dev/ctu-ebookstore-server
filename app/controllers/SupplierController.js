@@ -57,8 +57,9 @@ const store = function (req, res) {
 
 // Search suppliers
 const search = function (req, res) {
-  var supplierName = req.query.name;
-  Supplier.search(supplierName, function (err, supplier) {
+  var col = req.query.type;
+  var val = req.query.input;
+  Supplier.search(col, val, function (err, supplier) {
     if (err) {
       res.json({
         error: true,
