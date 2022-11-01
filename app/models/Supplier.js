@@ -38,8 +38,11 @@ Supplier.search = function searchSupplier(col, val, result) {
 
 // Get supplier by ID
 Supplier.getSupplierByID = function getSupplierByID(supplierID, result) {
-  db.query(
-    "SELECT * FROM supplier WHERE supplierid = ?",
+  db.query(`SELECT supplier.*, district.districtid, province.provinceid 
+    FROM supplier join ward on supplier.wardid=ward.wardid
+      join district on ward.districtid=district.districtid
+      join province on district.provinceid=province.provinceid
+    WHERE supplierid = ?`,
     supplierID,
     function (err, res) {
       if (err) {
