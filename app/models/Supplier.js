@@ -1,5 +1,5 @@
 const db = require("../../config/db");
-const moment = require('moment');
+const moment = require("moment");
 
 // Constructor
 const Supplier = function (supplier) {
@@ -14,19 +14,26 @@ const Supplier = function (supplier) {
 
 // Get all supplier
 Supplier.getAll = function getAllSupplier(result) {
-  db.query("SELECT * FROM supplier WHERE supplierdeletedat IS NULL", function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      result(null, res);
+  db.query(
+    "SELECT * FROM supplier WHERE supplierdeletedat IS NULL",
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
     }
-  });
+  );
 };
 
 // Search supplier
 Supplier.search = function searchSupplier(col, val, result) {
   const sql =
-    "SELECT * FROM supplier WHERE " + col + " LIKE '%" + val + "%' and supplierdeletedat IS NULL";
+    "SELECT * FROM supplier WHERE " +
+    col +
+    " LIKE '%" +
+    val +
+    "%' and supplierdeletedat IS NULL";
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);
@@ -38,17 +45,15 @@ Supplier.search = function searchSupplier(col, val, result) {
 
 // Get supplier by ID
 Supplier.getSupplierByID = function getSupplierByID(supplierID, result) {
-  db.query(
-    "SELECT * FROM supplier WHERE supplierid = ?",
-    supplierID,
-    function (err, res) {
-      if (err) {
-        result(err, null);
-      } else {
-        result(null, res);
-      }
+  let sql =
+    "SELECT supplier.*, ward.districtid, district.provinceid FROM supplier INNER JOIN ward ON supplier.wardid = ward.wardid INNER JOIN district ON ward.districtid = district.districtid WHERE supplierid = ?";
+  db.query(sql, supplierID, function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
     }
-  );
+  });
 };
 
 // Store supplier
@@ -87,31 +92,33 @@ Supplier.update = function updateSupplier(supplier, result) {
 
 // Delete supplier
 Supplier.delete = function deleteSupplier(supplierID, result) {
-    let now  = moment().format('YYYY-MM-DD HH:mm:ss');
-    db.query("UPDATE supplier SET supplierdeletedat = ? WHERE supplierid = ?",
+  let now = moment().format("YYYY-MM-DD HH:mm:ss");
+  db.query(
+    "UPDATE supplier SET supplierdeletedat = ? WHERE supplierid = ?",
     [now, supplierID],
-    function(err, res) {
-        if(err) {
-            result(null, err);
-        }
-        else{
-            result(null, res);
-        }
-    });
+    function (err, res) {
+      if (err) {
+        result(null, err);
+      } else {
+        result(null, res);
+      }
+    }
+  );
 };
 
 // Restore supplier
 Supplier.restore = function restoreSupplier(supplierID, result) {
-    db.query("UPDATE supplier SET supplierdeletedat = NULL WHERE supplierid = ?",
+  db.query(
+    "UPDATE supplier SET supplierdeletedat = NULL WHERE supplierid = ?",
     [supplierID],
-    function(err, res) {
-        if(err) {
-            result(null, err);
-        }
-        else{
-            result(null, res);
-        }
-    });
+    function (err, res) {
+      if (err) {
+        result(null, err);
+      } else {
+        result(null, res);
+      }
+    }
+  );
 };
 
 module.exports = Supplier;

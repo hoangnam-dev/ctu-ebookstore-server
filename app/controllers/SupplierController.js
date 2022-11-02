@@ -14,12 +14,9 @@ const allSupplier = function (req, res) {
         return {
           supplierID: supplier.supplierid,
           supplierName: supplier.suppliername,
-          supplierAddress: supplier.supplieraddress,
           supplierEmail: supplier.supplieremail,
           supplierPhone: supplier.supplierphone,
-          supplierBankNumber: supplier.supplierbanknumber,
           supplierDeletedAt: supplier.supplierdeletedat,
-          wardID: supplier.wardid,
         };
       });
       res.json(supplierPre);
@@ -104,6 +101,11 @@ const getSupplierByID = function (req, res) {
           supplierPhone: supplier.supplierphone,
           supplierBankNumber: supplier.supplierbanknumber,
           supplierDeletedAt: supplier.supplierdeletedat,
+          supplierAddressSub: [
+            supplier.provinceid, 
+            supplier.districtid, 
+            supplier.wardid,
+          ],
           wardID: supplier.wardid,
         };
       });
