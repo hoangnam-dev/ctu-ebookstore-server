@@ -55,7 +55,6 @@ const store = function (req, res) {
 // Search authors
 const search = function (req, res) {
   var authorName = req.query.name;
-  console.log(authorName);
   Author.search(authorName, function (err, author) {
     if (err) {
       res.json({
@@ -103,36 +102,6 @@ const getAuthorByID = function (req, res) {
   });
 };
 
-// Delete author
-const destroy = function (req, res) {
-  var authorID = req.params.id;
-  Author.getAuthorByID(authorID, function (err, author) {
-    if (err || Object.keys(res).length === 0) {
-      res.json({
-        error: true,
-        statusCode: 0,
-        message: "Lỗi! Không tìm thấy tác giả",
-      });
-    } else {
-      Author.delete(authorID, function (err, author) {
-        if (err) {
-          res.json({
-            error: true,
-            statusCode: 0,
-            message: "Lỗi! Xóa tác giả không thành công",
-          });
-        } else {
-          res.json({
-            error: false,
-            statusCode: 1,
-            message: "Xóa tác giả thành công",
-          });
-        }
-      });
-    }
-  });
-};
-
 // Store new author
 const update = function (req, res) {
   var newAuthor = new Author(req.body);
@@ -159,6 +128,36 @@ const update = function (req, res) {
       }
     });
   }
+};
+
+// Delete author
+const destroy = function (req, res) {
+  var authorID = req.params.id;
+  Author.getAuthorByID(authorID, function (err, author) {
+    if (err || Object.keys(author).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy tác giả",
+      });
+    } else {
+      Author.delete(authorID, function (err, author) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Xóa tác giả không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Xóa tác giả thành công",
+          });
+        }
+      });
+    }
+  });
 };
 
 module.exports = {
