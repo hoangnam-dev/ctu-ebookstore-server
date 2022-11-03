@@ -1,4 +1,5 @@
 const db = require('../../config/db');
+const moment = require('moment');
 
 // Constructor
 const Directory = function(directory) {
@@ -9,13 +10,26 @@ const Directory = function(directory) {
 
 // Get all directory
 Directory.getAll = function getAllDirectory(result) {
-    db.query("SELECT * FROM directory", function(err, res) {
+    db.query("SELECT * FROM directory WHERE directorydeletedat IS NULL", function(err, res) {
         if(err) {
             result(err, null);
         } else {
             result(null, res);
         }
     });
+};
+
+// Get directory by ID
+Directory.search = function search(directoryName, result) {
+    const sql =
+    "SELECT * FROM directory WHERE directoryname LIKE '%" + directoryName + "%'";
+  db.query(sql, function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
 };
 
 // Get directory by ID
@@ -44,7 +58,6 @@ Directory.store = function storeDirectory(newDirectory, result) {
 
 // Update directory
 Directory.update = function updateDirectory(directoryID, directory, result) {
-    console.log(directoryID);
     db.query("UPDATE directory SET directoryname = ?, directorydescription = ? WHERE directoryid = ?",
     [directory.directoryname, directory.directorydescription, directoryID],
     function(err, res) {
@@ -59,14 +72,31 @@ Directory.update = function updateDirectory(directoryID, directory, result) {
 
 // Delete directory
 Directory.delete = function deleteDirectory(directoryID, result) {
-    db.query("DELETE FROM directory WHERE directoryid = ?", directoryID, function(err, res) {
+    let now = moment().format('YYYY-MM-DD');
+    db.query("UPDATE directory SET directorydeletedat = ? WHERE directoryid = ?",
+    [now, directoryID],
+    function(err, res) {
         if(err) {
             result(null, err);
         }
         else{
             result(null, res);
         }
-    })
+    });
+};
+
+// Restore directory
+Directory.restore = function restoreDirectory(directoryID, result) {
+    db.query("UPDATE directory SET directorydeletedat = NULL WHERE directoryid = ?",
+    [directoryID],
+    function(err, res) {
+        if(err) {
+            result(null, err);
+        }
+        else{
+            result(null, res);
+        }
+    });
 };
 
 module.exports = Directory;

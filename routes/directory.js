@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 
 // Import Controller
-// const {allDirectory, getDirectoryByID, store, update, destroy} = require('../app/controllers/DiretoryConotroller');
-const {allDirectory, store, getDirectoryByID, update} = require('../app/controllers/DiretoryController');
+const {allDirectory, store, getDirectoryByID, search, update, destroy, restore} = require('../app/controllers/DirectoryController');
 
-router.get('/', allDirectory);
 router.post('/', store);
+router.get('/search', search);
 router.get('/:id', getDirectoryByID);
 router.put('/:id', update);
-// router.delete('/:id', destroy);
+router.delete('/:id', destroy);
+router.put('/restore/:id', restore);
+router.get('/', allDirectory);
 
 module.exports = router;
