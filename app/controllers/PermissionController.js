@@ -10,7 +10,15 @@ const allPermission = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      res.json(permissions);
+      var permissionPre = permissions.map((permission) => {
+        return {
+          permissionID: permission.permissionid,
+          permissionCode: permission.permissioncode,
+          permissionName: permission.permissionname,
+          permissionDescription: permission.permissiondescription,
+        };
+      });
+      res.json(permissionPre);
     }
   });
 };
@@ -43,6 +51,31 @@ const store = function (req, res) {
   }
 };
 
+// Search permission
+const search = function (req, res) {
+  var col = req.query.type;
+  var val = req.query.input;
+  Permission.search(col, val, function (err, permission) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy nhà cung cấp",
+      });
+    } else {
+      var permissionPre = permission.map((permission) => {
+        return {
+          permissionID: permission.permissionid,
+          permissionCode: permission.permissioncode,
+          permissionName: permission.permissionname,
+          permissionDescription: permission.permissiondescription,
+        };
+      });
+      res.json(permissionPre);
+    }
+  });
+};
+
 // Get permission by ID
 const getPermissionByID = function (req, res) {
   var permissionID = req.params.id;
@@ -54,7 +87,15 @@ const getPermissionByID = function (req, res) {
         message: "Lỗi! Không tìm thấy quyền",
       });
     } else {
-      res.json(permission);
+      var permissionPre = permission.map((permission) => {
+        return {
+          permissionID: permission.permissionid,
+          permissionCode: permission.permissioncode,
+          permissionName: permission.permissionname,
+          permissionDescription: permission.permissiondescription,
+        };
+      });
+      res.json(permissionPre);
     }
   })
 }
@@ -62,7 +103,6 @@ const getPermissionByID = function (req, res) {
 // Store new permission
 const update = function (req, res) {
   var newPermission = new Permission(req.body);
-  var permissionID = req.params.id;
   if (!newPermission.permissioncode || !newPermission.permissionname) {
     res.json({
       error: true,
@@ -70,7 +110,7 @@ const update = function (req, res) {
       message: "Thông tin quyền không được để trống",
     });
   } else {
-    Permission.update(permissionID, newPermission, function (err, permission) {
+    Permission.update(newPermission, function (err, permission) {
       if (err) {
         res.json({
           error: true,
@@ -88,10 +128,42 @@ const update = function (req, res) {
   }
 };
 
+
+// Delete permission
+const destroy = function (req, res) {
+  var permissionID = req.params.id;
+  Permission.getPermissionByID(permissionID, function (err, permission) {
+    if (err || Object.keys(res).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy quyền",
+      });
+    } else {
+      Permission.delete(permissionID, function (err, permission) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Xóa quyền không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Xóa quyền thành công",
+          });
+        }
+      });
+    }
+  });
+};
+
 module.exports = {
     allPermission,
     getPermissionByID,
     store,
+    search,
     update,
-    // destroy,
+    destroy,
 }

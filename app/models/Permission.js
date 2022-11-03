@@ -30,6 +30,23 @@ Permission.getPermissionByID = function getPermissionByID(permissionID, result) 
     });
 };
 
+// Search permission
+Permission.search = function searchPermission(col, val, result) {
+    const sql =
+      "SELECT * FROM permission WHERE " +
+      col +
+      " LIKE '%" +
+      val +
+      "%'";
+    db.query(sql, function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    });
+  };
+
 // Store permission
 Permission.store = function storePermission(newPermission, result) {
     db.query("INSERT INTO permission set ?", newPermission, function (err, res) {
@@ -44,8 +61,8 @@ Permission.store = function storePermission(newPermission, result) {
 };
 
 // Update permission
-Permission.update = function updatePermission(permissionID, permission, result) {
-    console.log(permissionID);
+Permission.update = function updatePermission(permission, result) {
+    const permissionID = permission.permissionid
     db.query("UPDATE permission SET permissionname = ?, permissioncode = ?, permissiondescription = ? WHERE permissionid = ?",
     [permission.permissionname, permission.permissioncode, permission.permissiondescription, permissionID],
     function(err, res) {

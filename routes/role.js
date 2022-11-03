@@ -2,12 +2,17 @@ const express = require('express');
 const router = express.Router();
 
 // Import Controller
-const {allRole, getRoleByID, store, update} = require('../app/controllers/RoleController');
+const {allRole, getRoleByID, hasPermission, search, store, update, givePermissionTo, revokePermissionTo, destroy, restore} = require('../app/controllers/RoleController');
 
-router.get('/', allRole);
+router.get('/search', search);
 router.post('/', store);
-router.get('/:id', getRoleByID);
 router.put('/:id', update);
-// router.delete('/:id', destroy);
+router.get('/:id', getRoleByID);
+router.post('/hasPermission', hasPermission);
+router.post('/givePermission', givePermissionTo);
+router.post('/revokePermission', revokePermissionTo);
+router.delete('/:id', destroy);
+router.put('/restore/:id', restore);
+router.get('/', allRole);
 
 module.exports = router;
