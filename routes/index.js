@@ -1,4 +1,5 @@
 const authorRouter = require('./author');
+const categoryRouter = require('./category');
 const cartRouter = require('./cart');
 const commentRouter = require('./comment');
 const customerRouter = require('./customer');
@@ -22,6 +23,9 @@ const wardRouter = require('./ward');
 function route(app) {
     // Author routes
     app.use('/api/authors', authorRouter);
+
+    // Author routes
+    app.use('/api/categories', categoryRouter);
     
     // Carts routes
     app.use('/api/carts', cartRouter);
