@@ -3,6 +3,15 @@ const Comment = require("../models/Comment");
 // Show all comment
 const allComment = function (req, res) {
   Comment.getAll(function (err, comments) {
+    var commentPre = comments.map((comment) => {
+      return {
+        commentID: comment.commentid,
+        commentContent: comment.commentcontent,
+        commentRate: comment.commentrate,
+        ebookID: comment.ebookid,
+        customerID: comment.customerid,
+      }
+    })
     if (err) {
       res.json({
         error: true,
@@ -10,7 +19,7 @@ const allComment = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      res.json(comments);
+      res.json(commentPre);
     }
   });
 };
@@ -47,6 +56,15 @@ const store = function (req, res) {
 const getCommentByID = function (req, res) {
   var commentID = req.params.id;
   Comment.getCommentByID(commentID, function (err, comment) {
+    var commentPre = comment.map((comment) => {
+      return {
+        commentID: comment.commentid,
+        commentContent: comment.comment,
+        commentRate: comment.commentrate,
+        ebookID: comment.ebookid,
+        customerID: comment.customerid,
+      }
+    })
     if (err) {
       res.json({
         error: true,
@@ -54,7 +72,7 @@ const getCommentByID = function (req, res) {
         message: "Lỗi! Không tìm thấy tác giả",
       });
     } else {
-      res.json(comment);
+      res.json(commentPre);
     }
   })
 }

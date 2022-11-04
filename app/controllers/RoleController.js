@@ -1,4 +1,30 @@
 const Role = require("../models/Role");
+const _ = require("lodash");
+
+// Handle result
+function handleResult(arrData) {
+  var resData = arrData.map((data) => {
+    // Handle permission list of the role
+    var permList = data.permissionList.map((perm) => {
+      return {
+        permissionID: perm.permissionid,
+        permissionCode: perm.permissioncode,
+        permissionName: perm.permissionname,
+        permissionDescription: perm.permissiondescription,
+      };
+    });
+    
+    // return role
+    return {
+      roleID: data.roleid,
+      roleCode: data.rolecode,
+      roleName: data.rolename,
+      roleDescription: data.roledescription,
+      permssionList: permList,
+    };
+  });
+  return resData;
+}
 
 // Show all role
 const allRole = function (req, res) {
@@ -10,15 +36,8 @@ const allRole = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      var rolePre = roles.map((role) => {
-        return {
-          roleID: role.roleid,
-          roleCode: role.rolecode,
-          roleName: role.rolename,
-          roleDescription: role.roledescription
-        };
-      });
-      res.json(rolePre);
+      var listRole = handleResult(roles);
+      res.json(listRole);
     }
   });
 };
@@ -56,22 +75,15 @@ const search = function (req, res) {
   var col = req.query.type;
   var val = req.query.input;
   Role.search(col, val, function (err, role) {
-    if (err) {
+    if (err || Object.keys(role).length === 0) {
       res.json({
         error: true,
         statusCode: 0,
-        message: "Lỗi! Không tìm thấy nhà cung cấp",
+        message: "Lỗi! Không tìm thấy vai trò",
       });
     } else {
-      var rolePre = role.map((role) => {
-        return {
-          roleID: role.roleid,
-          roleCode: role.rolecode,
-          roleName: role.rolename,
-          roleDescription: role.roledescription,
-        };
-      });
-      res.json(rolePre);
+      var listRole = handleResult(role);
+      res.json(listRole);
     }
   });
 };
@@ -104,22 +116,15 @@ const hasPermission = function (req, res) {
 const getRoleByID = function (req, res) {
   var roleID = req.params.id;
   Role.getRoleByID(roleID, function (err, role) {
-    if (err) {
+    if (err || Object.keys(role).length === 0) {
       res.json({
         error: true,
         statusCode: 0,
         message: "Lỗi! Không tìm thấy vai trò",
       });
     } else {
-      var rolePre = role.map((role) => {
-        return {
-          roleID: role.roleid,
-          roleCode: role.rolecode,
-          roleName: role.rolename,
-          roleDescription: role.roledescription,
-        };
-      });
-      res.json(rolePre);
+      var listRole = handleResult(role);
+      res.json(listRole);
     }
   });
 };

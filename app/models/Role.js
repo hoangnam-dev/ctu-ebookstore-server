@@ -9,39 +9,70 @@ const Role = function (role) {
   this.roledescription = role.roleDescription;
 };
 
+// Get list permissions of role
+async function hasPermission(roleID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT role_permission.roleid, permission.* FROM role_permission RIGHT JOIN permission ON role_permission.permissionid = permission.permissionid WHERE role_permission.roleid = ?",
+      [roleID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
+
+// Customer result,
+async function resultRole(res) {
+  let listPerm = res.map(async (res) => {
+    var permissions = [];
+    
+    await hasPermission(res.roleid)
+      .then(function (val) {
+        permissions = val;
+      })
+      .catch(function (err) {
+        result(err, null);
+      });
+    var roleInfo = {
+      ...res,
+      permissionList: permissions,
+    };
+    return roleInfo;
+  });
+
+  const roleData = await Promise.all(listPerm);
+  return roleData;
+}
+
 // Get all role
 Role.getAll = function getAllRole(result) {
   db.query(
     "SELECT * FROM role WHERE roledeletedat IS NULL",
-    function (err, res) {
+    async function (err, res) {
       if (err) {
         result(err, null);
       } else {
-        result(null, res);
+        const roleData = await resultRole(res);
+        result(null, roleData);
       }
     }
   );
 };
 
-Role.hasPermission = function hasPermission(roleID, result) {
-  const sql =
-    "SELECT role_permission.roleid, permission.* FROM role_permission RIGHT JOIN permission ON role_permission.permissionid = permission.permissionid WHERE role_permission.roleid = ?";
-  db.query(sql, [roleID],function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      result(null, res);
-    }
-  });
-};
 
 // Get role by ID
 Role.getRoleByID = function getRoleByID(roleID, result) {
-  db.query("SELECT * FROM role WHERE roleid = ?", roleID, function (err, res) {
+  db.query("SELECT * FROM role WHERE roleid = ?", roleID, async function (err, res) {
     if (err) {
       result(err, null);
     } else {
-      result(null, res);
+      const roleData = await resultRole(res);
+      result(null, roleData);
     }
   });
 };
@@ -54,11 +85,12 @@ Role.search = function searchRole(col, val, result) {
     " LIKE '%" +
     val +
     "%' and roledeletedat IS NULL";
-  db.query(sql, function (err, res) {
+  db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
     } else {
-      result(null, res);
+      const roleData = await resultRole(res);
+      result(null, roleData);
     }
   });
 };
