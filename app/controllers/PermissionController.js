@@ -56,11 +56,11 @@ const search = function (req, res) {
   var col = req.query.type;
   var val = req.query.input;
   Permission.search(col, val, function (err, permission) {
-    if (err) {
+    if (err || Object.keys(permission).length === 0) {
       res.json({
         error: true,
         statusCode: 0,
-        message: "Lỗi! Không tìm thấy nhà cung cấp",
+        message: "Lỗi! Không tìm thấy quyền",
       });
     } else {
       var permissionPre = permission.map((permission) => {
@@ -80,7 +80,7 @@ const search = function (req, res) {
 const getPermissionByID = function (req, res) {
   var permissionID = req.params.id;
   Permission.getPermissionByID(permissionID, function (err, permission) {
-    if (err) {
+    if (err || Object.keys(permission).length === 0) {
       res.json({
         error: true,
         statusCode: 0,
@@ -133,7 +133,7 @@ const update = function (req, res) {
 const destroy = function (req, res) {
   var permissionID = req.params.id;
   Permission.getPermissionByID(permissionID, function (err, permission) {
-    if (err || Object.keys(res).length === 0) {
+    if (err || Object.keys(permission).length === 0) {
       res.json({
         error: true,
         statusCode: 0,
