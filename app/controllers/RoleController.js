@@ -20,7 +20,7 @@ function handleResult(arrData) {
       roleCode: data.rolecode,
       roleName: data.rolename,
       roleDescription: data.roledescription,
-      permssionList: permList,
+      permissionList: permList,
     };
   });
   return resData;
