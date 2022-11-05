@@ -77,14 +77,27 @@ Permission.update = function updatePermission(permission, result) {
 
 // Delete permission
 Permission.delete = function deletePermission(permissionID, result) {
-    db.query("DELETE FROM permission WHERE permissionid = ?", permissionID, function(err, res) {
-        if(err) {
-            result(null, err);
+    db.query(
+      "DELETE FROM role_permission WHERE permissionid = ?",
+      permissionID,
+      function (err, res) {
+        if (err) {
+          result(null, err);
+        } else {
+          db.query(
+            "DELETE FROM permission WHERE permissionid = ?",
+            permissionID,
+            function (err, res) {
+              if (err) {
+                result(null, err);
+              } else {
+                result(null, res);
+              }
+            }
+          );
         }
-        else{
-            result(null, res);
-        }
-    })
-};
+      }
+    );
+  };
 
 module.exports = Permission;
