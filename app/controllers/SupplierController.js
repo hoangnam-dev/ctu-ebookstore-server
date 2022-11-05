@@ -27,7 +27,14 @@ const allSupplier = function (req, res) {
 // Store new supplier
 const store = function (req, res) {
   var newSupplier = new Supplier(req.body);
-  if (!newSupplier.suppliername || !newSupplier.supplieraddress || !newSupplier.supplierphone || !newSupplier.supplieremail || !newSupplier.supplierbanknumber || !newSupplier.wardid) {
+  if (
+    !newSupplier.suppliername ||
+    !newSupplier.supplieraddress ||
+    !newSupplier.supplierphone ||
+    !newSupplier.supplieremail ||
+    !newSupplier.supplierbanknumber ||
+    !newSupplier.wardid
+  ) {
     res.json({
       error: true,
       statusCode: 0,
@@ -102,8 +109,8 @@ const getSupplierByID = function (req, res) {
           supplierBankNumber: supplier.supplierbanknumber,
           supplierDeletedAt: supplier.supplierdeletedat,
           supplierAddressSub: [
-            supplier.provinceid, 
-            supplier.districtid, 
+            supplier.provinceid,
+            supplier.districtid,
             supplier.wardid,
           ],
           wardID: supplier.wardid,
@@ -111,13 +118,20 @@ const getSupplierByID = function (req, res) {
       });
       res.json(supplierPre);
     }
-  })
-}
+  });
+};
 
 // Store new supplier
 const update = function (req, res) {
   var newSupplier = new Supplier(req.body);
-  if (!newSupplier.suppliername || !newSupplier.supplieraddress || !newSupplier.supplierphone || !newSupplier.supplieremail || !newSupplier.supplierbanknumber || !newSupplier.wardid) {
+  if (
+    !newSupplier.suppliername ||
+    !newSupplier.supplieraddress ||
+    !newSupplier.supplierphone ||
+    !newSupplier.supplieremail ||
+    !newSupplier.supplierbanknumber ||
+    !newSupplier.wardid
+  ) {
     res.json({
       error: true,
       statusCode: 0,
@@ -203,11 +217,11 @@ const restore = function (req, res) {
 };
 
 module.exports = {
-    allSupplier,
-    getSupplierByID,
-    store,
-    search,
-    update,
-    destroy,
-    restore,
-}
+  allSupplier,
+  getSupplierByID,
+  store,
+  search,
+  update,
+  destroy,
+  restore,
+};
