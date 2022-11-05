@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 // Import Controller
-const {allSale, getSaleByID, store, update} = require('../app/controllers/SaleController');
+const {allSale, getSaleByID, store, update, destroy, search} = require('../app/controllers/SaleController');
 
-router.get('/', allSale);
-router.post('/', store);
+router.get('/search', search);
 router.get('/:id', getSaleByID);
+router.get('/', allSale);
 router.put('/:id', update);
-// router.delete('/:id', destroy);
+router.post('/', store);
+router.delete('/:id', destroy);
 
 module.exports = router;
