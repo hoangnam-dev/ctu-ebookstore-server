@@ -2,12 +2,14 @@ const express = require('express');
 const router = express.Router();
 
 // Import Controller
-const {allInputInfo, getInputInfoByID, store, update} = require('../app/controllers/InputInfoController');
+const {allInputInfo, getInputInfoByID, search, store, update, destroy, restore} = require('../app/controllers/InputInfoController');
 
+router.get('/search', search);
+router.get('/:id', getInputInfoByID);
 router.get('/', allInputInfo);
 router.post('/', store);
-router.get('/:id', getInputInfoByID);
 router.put('/:id', update);
-// router.delete('/:id', destroy);
+router.delete('/:id', destroy);
+router.delete('/restore/:id', restore);
 
 module.exports = router;

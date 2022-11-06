@@ -18,7 +18,7 @@ const allInputInfo = function (req, res) {
 // Store new inputinfo
 const store = function (req, res) {
   var newInputInfo = new InputInfo(req.body);
-  if (!newInputInfo.inputinfototalmoney || !newInputInfo.supplierid || !newInputInfo.userid || !newInputInfo.outputinfoid) {
+  if (!newInputInfo.inputinfototalmoney || !newInputInfo.inputinfostatus || !newInputInfo.supplierid || !newInputInfo.userid || !newInputInfo.outputinfoid) {
     res.json({
       error: true,
       statusCode: 0,
@@ -30,13 +30,13 @@ const store = function (req, res) {
         res.json({
           error: true,
           statusCode: 0,
-          message: "Lỗi! Thêm tác giả không thành công",
+          message: "Lỗi! Thêm phiếu nhập không thành công",
         });
       } else {
         res.json({
           error: false,
           statusCode: 1,
-          message: "Thêm tác giả thành công",
+          message: "Thêm phiếu nhập thành công",
         });
       }
     });
@@ -47,11 +47,11 @@ const store = function (req, res) {
 const getInputInfoByID = function (req, res) {
   var inputinfoID = req.params.id;
   InputInfo.getInputInfoByID(inputinfoID, function (err, inputinfo) {
-    if (err) {
+    if (err || Object.keys(inputinfo).length === 0) {
       res.json({
         error: true,
         statusCode: 0,
-        message: "Lỗi! Không tìm thấy tác giả",
+        message: "Lỗi! Không tìm thấy phiếu nhập",
       });
     } else {
       res.json(inputinfo);
@@ -59,11 +59,29 @@ const getInputInfoByID = function (req, res) {
   })
 }
 
+// Search inputinfo
+const search = function (req, res) {
+  var col = req.query.type;
+  var val = req.query.input;
+  InputInfo.search(col, val, function (err, inputinfo) {
+    if (err || Object.keys(inputinfo).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy phiếu nhập",
+      });
+    } else {
+      var listInputInfo = handleResult(inputinfo);
+      res.json(listInputInfo);
+    }
+  });
+};
+
 // Store new inputinfo
 const update = function (req, res) {
   var newInputInfo = new InputInfo(req.body);
   var inputinfoID = req.params.id;
-  if (!newInputInfo.inputinfototalmoney || !newInputInfo.supplierid || !newInputInfo.userid || !newInputInfo.outputinfoid) {
+  if (!newInputInfo.inputinfototalmoney || !newInputInfo.inputinfostatus || !newInputInfo.supplierid || !newInputInfo.userid || !newInputInfo.outputinfoid) {
     res.json({
       error: true,
       statusCode: 0,
@@ -75,23 +93,85 @@ const update = function (req, res) {
         res.json({
           error: true,
           statusCode: 0,
-          message: "Lỗi! Cập nhật tác giả không thành công",
+          message: "Lỗi! Cập nhật phiếu nhập không thành công",
         });
       } else {
         res.json({
           error: false,
           statusCode: 1,
-          message: "Cập nhật tác giả thành công",
+          message: "Cập nhật phiếu nhập thành công",
         });
       }
     });
   }
 };
 
+// Soft destroy
+const destroy = function (req, res) {
+  var inputInfoID = req.params.id;
+  InputInfo.getInputInfoByID(inputInfoID, function (err, inputInfo) {
+    if (err || Object.keys(inputInfo).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy phiếu nhập",
+      });
+    } else {
+      InputInfo.delete(inputInfoID, function (err, inputInfo) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Xóa phiếu nhập không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Xóa phiếu nhập thành công",
+          });
+        }
+      });
+    }
+  });
+};
+
+// Restore inputInfo
+const restore = function (req, res) {
+  var inputInfoID = req.params.id;
+  InputInfo.getInputInfoByID(inputInfoID, function (err, inputInfo) {
+    if (err || Object.keys(inputInfo).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy phiếu nhập",
+      });
+    } else {
+      InputInfo.restore(inputInfoID, function (err, inputInfo) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Khôi phục phiếu nhập không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Khôi phục phiếu nhập thành công",
+          });
+        }
+      });
+    }
+  });
+};
+
 module.exports = {
     allInputInfo,
     getInputInfoByID,
+    search,
     store,
     update,
-    // destroy,
+    destroy,
+    restore,
 }
