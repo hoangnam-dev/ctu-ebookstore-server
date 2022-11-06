@@ -6,6 +6,7 @@ const customerRouter = require('./customer');
 const directoryRouter = require('./directory');
 const districtRouter = require('./district');
 const ebookRouter = require('./ebook');
+const ebookStatusRouter = require('./ebookstatus');
 const inputInfoRouter = require('./inputinfo');
 const licenseRouter = require('./license');
 const orderRouter = require('./order');
@@ -44,6 +45,9 @@ function route(app) {
     
     // Ebook routes
     app.use('/api/ebooks', ebookRouter);
+    
+    // Ebook routes
+    app.use('/api/ebookstatus', ebookStatusRouter);
     
     // InputInffo routes
     app.use('/api/inputinfos', inputInfoRouter);
