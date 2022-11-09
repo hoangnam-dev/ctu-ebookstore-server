@@ -50,7 +50,7 @@ Payment.update = function updatePayment(paymentID, payment, result) {
     [payment.paymentname, payment.paymentnumber, payment.paymenttypeid, paymentID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -62,7 +62,7 @@ Payment.update = function updatePayment(paymentID, payment, result) {
 Payment.delete = function deletePayment(paymentID, result) {
     db.query("DELETE FROM payment WHERE paymentid = ?", paymentID, function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);

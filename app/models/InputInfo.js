@@ -82,7 +82,7 @@ InputInfo.update = function updateInputInfo(inputinfoID, inputinfo, result) {
     ],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -98,7 +98,7 @@ InputInfo.delete = function deleteInputInfo(inputinfoID, result) {
       [now, inputinfoID],
       function (err, res) {
         if (err) {
-          result(null, err);
+          result(err, null);
         } else {
           result(null, res);
         }
@@ -113,7 +113,7 @@ InputInfo.delete = function deleteInputInfo(inputinfoID, result) {
       [inputinfoID],
       function (err, res) {
         if (err) {
-          result(null, err);
+          result(err, null);
         } else {
           result(null, res);
         }

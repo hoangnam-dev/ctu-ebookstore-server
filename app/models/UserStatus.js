@@ -76,7 +76,7 @@ UserStatus.update = function updateUserStatus(userstatus, result) {
     ],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -92,7 +92,7 @@ UserStatus.delete = function deleteUserStatus(userstatusID, result) {
     [now, userstatusID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -107,7 +107,7 @@ UserStatus.restore = function restoreUserStatus(userstatusID, result) {
     [userstatusID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }

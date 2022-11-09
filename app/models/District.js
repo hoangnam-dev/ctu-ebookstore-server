@@ -61,7 +61,7 @@ District.update = function updateDistrict(districtID, district, result) {
     [district.districtname, district.districttype, district.provinceID, districtID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -73,7 +73,7 @@ District.update = function updateDistrict(districtID, district, result) {
 District.delete = function deleteDistrict(districtID, result) {
     db.query("DELETE FROM district WHERE districtid = ?", districtID, function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);

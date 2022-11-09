@@ -62,7 +62,7 @@ Directory.update = function updateDirectory(directoryID, directory, result) {
     [directory.directoryname, directory.directorydescription, directoryID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -77,7 +77,7 @@ Directory.delete = function deleteDirectory(directoryID, result) {
     [now, directoryID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -91,7 +91,7 @@ Directory.restore = function restoreDirectory(directoryID, result) {
     [directoryID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);

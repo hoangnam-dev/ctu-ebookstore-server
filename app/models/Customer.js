@@ -80,7 +80,7 @@ Customer.update = function updateCustomer(customerID, customer, result) {
     ],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -96,7 +96,7 @@ Customer.delete = function deleteCustomer(customerID, result) {
     [now, customerID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -111,7 +111,7 @@ Customer.restore = function restoreCustomer(customerID, result) {
     [customerID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }

@@ -51,7 +51,7 @@ Comment.update = function updateComment(commentID, comment, result) {
     [comment.commentcontent, comment.commentrate, comment.ebookid, comment.customerid, commentID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -63,7 +63,7 @@ Comment.update = function updateComment(commentID, comment, result) {
 Comment.delete = function deleteComment(commentID, result) {
     db.query("DELETE FROM comment WHERE commentid = ?", commentID, function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);

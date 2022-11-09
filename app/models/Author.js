@@ -59,7 +59,7 @@ Author.update = function updateAuthor(author, result) {
     ],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -87,14 +87,14 @@ Author.delete = function deleteAuthor(authorID, result) {
     authorID,
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         db.query(
           "DELETE FROM author WHERE authorid = ?",
           authorID,
           function (err, res) {
             if (err) {
-              result(null, err);
+              result(err, null);
             } else {
               result(null, res);
             }

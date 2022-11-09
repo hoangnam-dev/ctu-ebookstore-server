@@ -75,7 +75,7 @@ Category.update = function updateCategory(categoryID, category, result) {
     [category.categoryname, category.categorydescription, category.directoryid, categoryID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -91,7 +91,7 @@ Category.delete = function deleteCategory(categoryID, result) {
     [now, categoryID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -105,7 +105,7 @@ Category.restore = function restoreCategory(categoryID, result) {
     [categoryID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);

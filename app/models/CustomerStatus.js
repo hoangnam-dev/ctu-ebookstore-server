@@ -76,7 +76,7 @@ CustomerStatus.update = function updateCustomerStatus(customerstatus, result) {
     ],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -92,7 +92,7 @@ CustomerStatus.delete = function deleteCustomerStatus(customerstatusID, result) 
     [now, customerstatusID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -107,7 +107,7 @@ CustomerStatus.restore = function restoreCustomerStatus(customerstatusID, result
     [customerstatusID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }

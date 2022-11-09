@@ -49,7 +49,7 @@ Province.update = function updateProvince(provinceID, province, result) {
     [province.provincename, province.provincetype, provinceID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -61,7 +61,7 @@ Province.update = function updateProvince(provinceID, province, result) {
 Province.delete = function deleteProvince(provinceID, result) {
     db.query("DELETE FROM province WHERE provinceid = ?", provinceID, function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);

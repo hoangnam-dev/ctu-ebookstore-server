@@ -48,7 +48,7 @@ PaymentType.update = function updatePaymentType(paymenttypeID, paymenttype, resu
     [paymenttype.paymenttypename, paymenttypeID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -60,7 +60,7 @@ PaymentType.update = function updatePaymentType(paymenttypeID, paymenttype, resu
 PaymentType.delete = function deletePaymentType(paymenttypeID, result) {
     db.query("DELETE FROM paymenttype WHERE paymenttypeid = ?", paymenttypeID, function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);

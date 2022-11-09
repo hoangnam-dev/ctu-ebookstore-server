@@ -76,7 +76,7 @@ EbookStatus.update = function updateEbookStatus(ebookstatus, result) {
     ],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -92,7 +92,7 @@ EbookStatus.delete = function deleteEbookStatus(ebookstatusID, result) {
     [now, ebookstatusID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -107,7 +107,7 @@ EbookStatus.restore = function restoreEbookStatus(ebookstatusID, result) {
     [ebookstatusID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }

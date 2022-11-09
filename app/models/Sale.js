@@ -93,7 +93,7 @@ Sale.update = function updateSale(saleID, sale, result) {
     ],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -108,14 +108,14 @@ Sale.delete = function deleteSale(saleID, result) {
       saleID,
       function (err, res) {
         if (err) {
-          result(null, err);
+          result(err, null);
         } else {
           db.query(
             "DELETE FROM sale WHERE saleid = ?",
             saleID,
             function (err, res) {
               if (err) {
-                result(null, err);
+                result(err, null);
               } else {
                 result(null, res);
               }

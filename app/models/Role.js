@@ -116,7 +116,7 @@ Role.update = function updateRole(role, result) {
     [role.rolecode, role.rolename, role.roledescription, roleID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -166,7 +166,7 @@ Role.delete = function deleteRole(roleID, result) {
     [now, roleID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -181,7 +181,7 @@ Role.restore = function restoreRole(roleID, result) {
     [roleID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }

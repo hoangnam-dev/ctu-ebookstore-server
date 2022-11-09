@@ -67,7 +67,7 @@ Permission.update = function updatePermission(permission, result) {
     [permission.permissionname, permission.permissioncode, permission.permissiondescription, permissionID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -82,14 +82,14 @@ Permission.delete = function deletePermission(permissionID, result) {
       permissionID,
       function (err, res) {
         if (err) {
-          result(null, err);
+          result(err, null);
         } else {
           db.query(
             "DELETE FROM permission WHERE permissionid = ?",
             permissionID,
             function (err, res) {
               if (err) {
-                result(null, err);
+                result(err, null);
               } else {
                 result(null, res);
               }

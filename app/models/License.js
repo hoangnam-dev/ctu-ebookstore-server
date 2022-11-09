@@ -51,7 +51,7 @@ License.update = function updateLicense(licenseID, license, result) {
     [license.licenseisrent, license.licenseexpires, license.ebookid, license.customerid, licenseID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -63,7 +63,7 @@ License.update = function updateLicense(licenseID, license, result) {
 License.delete = function deleteLicense(licenseID, result) {
     db.query("DELETE FROM license WHERE licenseid = ?", licenseID, function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);

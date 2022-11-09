@@ -52,7 +52,7 @@ OutputInfo.update = function updateOutputInfo(outputinfoID, outputinfo, result) 
     [outputinfo.outputinfototalmoney, outputinfo.outputinfodescription, outputinfo.userid, outputinfo.supplierid, outputinfoID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -64,7 +64,7 @@ OutputInfo.update = function updateOutputInfo(outputinfoID, outputinfo, result) 
 OutputInfo.delete = function deleteOutputInfo(outputinfoID, result) {
     db.query("DELETE FROM outputinfo WHERE outputinfoid = ?", outputinfoID, function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);

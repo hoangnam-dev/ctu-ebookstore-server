@@ -82,7 +82,7 @@ Supplier.update = function updateSupplier(supplier, result) {
     ],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -98,7 +98,7 @@ Supplier.delete = function deleteSupplier(supplierID, result) {
     [now, supplierID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }
@@ -113,7 +113,7 @@ Supplier.restore = function restoreSupplier(supplierID, result) {
     [supplierID],
     function (err, res) {
       if (err) {
-        result(null, err);
+        result(err, null);
       } else {
         result(null, res);
       }

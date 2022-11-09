@@ -52,7 +52,7 @@ Order.update = function updateOrder(orderID, order, result) {
     [order.orderstatus, orderID],
     function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
@@ -64,7 +64,7 @@ Order.update = function updateOrder(orderID, order, result) {
 Order.delete = function deleteOrder(orderID, result) {
     db.query("DELETE FROM order_tbl WHERE orderid = ?", orderID, function(err, res) {
         if(err) {
-            result(null, err);
+            result(err, null);
         }
         else{
             result(null, res);
