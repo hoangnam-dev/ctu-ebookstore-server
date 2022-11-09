@@ -160,8 +160,8 @@ const update = function (req, res) {
 // Give permission to the role
 const givePermissionTo = function (req, res) {
   var roleID = req.body.roleID;
-  var permisisonID = req.body.permisisonID;
-  Role.givePermissionTo(roleID, permisisonID, function (err, result) {
+  var permissionID = req.body.permissionID;
+  Role.givePermissionTo(roleID, permissionID, function (err, result) {
     if (err) {
       res.json({
         error: true,
@@ -181,8 +181,8 @@ const givePermissionTo = function (req, res) {
 // Revoke permission to the role
 const revokePermissionTo = function (req, res) {
   var roleID = req.body.roleID;
-  var permisisonID = req.body.permisisonID;
-  Role.revokePermissionTo(roleID, permisisonID, function (err, result) {
+  var permissionID = req.body.permissionID;
+  Role.revokePermissionTo(roleID, permissionID, function (err, result) {
     if (err) {
       res.json({
         error: true,

@@ -30,7 +30,7 @@ async function hasPermission(roleID) {
 async function resultRole(res) {
   let listPerm = res.map(async (res) => {
     var permissions = [];
-    
+
     await hasPermission(res.roleid)
       .then(function (val) {
         permissions = val;
@@ -64,27 +64,25 @@ Role.getAll = function getAllRole(result) {
   );
 };
 
-
 // Get role by ID
 Role.getRoleByID = function getRoleByID(roleID, result) {
-  db.query("SELECT * FROM role WHERE roleid = ?", roleID, async function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      const roleData = await resultRole(res);
-      result(null, roleData);
+  db.query(
+    "SELECT * FROM role WHERE roleid = ?",
+    roleID,
+    async function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        const roleData = await resultRole(res);
+        result(null, roleData);
+      }
     }
-  });
+  );
 };
 
 // Search role
 Role.search = function searchRole(col, val, result) {
-  const sql =
-    "SELECT * FROM role WHERE " +
-    col +
-    " LIKE '%" +
-    val +
-    "%' and roledeletedat IS NULL";
+  const sql = `SELECT * FROM role WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND roledeletedat IS NULL`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
@@ -126,17 +124,19 @@ Role.update = function updateRole(role, result) {
 
 // Give permission to role
 Role.givePermissionTo = function givePermissionTo(roleID, permissonID, result) {
-  db.query(
-    "INSERT INTO role_permission SET roleid = ?, permissionid = ?",
-    [roleID, permissonID],
-    function (err, res) {
-      if (err) {
-        result(err, null);
-      } else {
-        result(null, res.insertId);
-      }
+  const sql = "INSERT INTO role_permission (roleid, permissionid) VALUES ?";
+  var values = [];
+  permissonID.forEach((permID) => {
+    values.push([roleID, permID]);
+  });
+  db.query(sql, [values], function (err, res) {
+    if (err) {
+      result(err, null);
+      console.log(err);
+    } else {
+      result(null, res);
     }
-  );
+  });
 };
 
 // Revoke permission to role
