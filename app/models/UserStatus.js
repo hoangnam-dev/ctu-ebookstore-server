@@ -25,12 +25,7 @@ UserStatus.getAll = function getAllUserStatus(result) {
 
 // Search userstatus
 UserStatus.search = function searchUserStatus(col, val, result) {
-  const sql =
-    "SELECT * FROM userstatus WHERE " +
-    col +
-    " LIKE '%" +
-    val +
-    "%' and userstatusdeletedat IS NULL";
+  const sql = `SELECT * FROM userstatus WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND userstatusdeletedat IS NULL`;
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);

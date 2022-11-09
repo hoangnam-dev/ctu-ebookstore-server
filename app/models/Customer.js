@@ -40,12 +40,8 @@ Customer.getCustomerByID = function getCustomerByID(customerID, result) {
 
 // Search customer
 Customer.search = function searchCustomer(col, val, result) {
-  const sql =
-    "SELECT * FROM customer WHERE " +
-    col +
-    " LIKE '%" +
-    val +
-    "%' and customerdeletedat IS NULL";
+  const sql = `SELECT * FROM customer WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND customerdeletedat IS NULL`;
+
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);

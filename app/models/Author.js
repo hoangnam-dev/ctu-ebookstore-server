@@ -70,7 +70,7 @@ Author.update = function updateAuthor(author, result) {
 // Search author
 Author.search = function searchAuthor(authorName, result) {
   const sql =
-    "SELECT * FROM author WHERE authorname LIKE '%" + authorName + "%'";
+    "SELECT * FROM author WHERE REPLACE(authorname, 'Đ', 'D') LIKE '%" + authorName + "%'";
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);

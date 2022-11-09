@@ -21,8 +21,7 @@ Directory.getAll = function getAllDirectory(result) {
 
 // Get directory by ID
 Directory.search = function search(directoryName, result) {
-    const sql =
-    "SELECT * FROM directory WHERE directoryname LIKE '%" + directoryName + "%'";
+    const sql = `SELECT * FROM directory WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND directorydeletedat IS NULL`;
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);

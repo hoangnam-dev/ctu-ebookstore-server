@@ -38,12 +38,7 @@ Sale.getSaleByID = function getSaleByID(saleID, result) {
 
 // Search sale
 Sale.search = function searchSale(col, val, result) {
-    const sql =
-      "SELECT * FROM sale WHERE " +
-      col +
-      " LIKE '%" +
-      val +
-      "%'";
+  const sql = `SELECT * FROM sale WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%'`;
     db.query(sql, function (err, res) {
       if (err) {
         result(err, null);

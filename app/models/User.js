@@ -127,12 +127,7 @@ User.getUserByID = function getUserByID(userID, result) {
 
 // Search user
 User.search = function searchUser(col, val, result) {
-    const sql =
-      "SELECT userid, username, userphone FROM user WHERE " +
-      col +
-      " LIKE '%" +
-      val +
-      "%' and userdeletedat IS NULL";
+  const sql = `SELECT * FROM user WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND userdeletedat IS NULL`;
     db.query(sql, async function (err, res) {
       if (err) {
         result(err, null);

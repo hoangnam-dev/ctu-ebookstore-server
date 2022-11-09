@@ -23,7 +23,7 @@ Category.getAll = function getAllCategory(result) {
 // Get category by ID
 Category.search = function search(categoryName, result) {
     const sql =
-    "SELECT * FROM category WHERE categoryname LIKE '%" + categoryName + "%' AND categorydeletedat IS NULL";
+    "SELECT * FROM category WHERE REPLACE(categoryname, 'Đ', 'D') LIKE '%" + categoryName + "%' AND categorydeletedat IS NULL";
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);

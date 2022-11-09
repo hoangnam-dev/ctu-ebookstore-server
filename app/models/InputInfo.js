@@ -40,12 +40,7 @@ InputInfo.getInputInfoByID = function getInputInfoByID(inputinfoID, result) {
 
 // Search inputinfo
 InputInfo.search = function searchInputInfo(col, val, result) {
-    const sql =
-      "SELECT * FROM inputinfo WHERE " +
-      col +
-      " LIKE '%" +
-      val +
-      "%' and inputinfodeletedat IS NULL";
+  const sql = `SELECT * FROM inputinfo WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND inputinfodeletedat IS NULL`;
     db.query(sql, async function (err, res) {
       if (err) {
         result(err, null);

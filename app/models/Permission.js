@@ -32,12 +32,7 @@ Permission.getPermissionByID = function getPermissionByID(permissionID, result) 
 
 // Search permission
 Permission.search = function searchPermission(col, val, result) {
-    const sql =
-      "SELECT * FROM permission WHERE " +
-      col +
-      " LIKE '%" +
-      val +
-      "%'";
+  const sql = `SELECT * FROM permission WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND permissiondeletedat IS NULL`;
     db.query(sql, function (err, res) {
       if (err) {
         result(err, null);
