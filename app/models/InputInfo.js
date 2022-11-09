@@ -45,8 +45,7 @@ InputInfo.search = function searchInputInfo(col, val, result) {
       if (err) {
         result(err, null);
       } else {
-        const inputinfoData = await resultInputInfo(res);
-        result(null, inputinfoData);
+        result(null, res);
       }
     });
   };

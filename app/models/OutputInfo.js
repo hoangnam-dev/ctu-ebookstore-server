@@ -12,7 +12,7 @@ const OutputInfo = function(outputinfo) {
 
 // Get all outputinfo
 OutputInfo.getAll = function getAllOutputInfo(result) {
-    db.query("SELECT * FROM outputinfo", function(err, res) {
+    db.query("SELECT * FROM outputinfo WHERE outputinfodeletedat IS NULL", function(err, res) {
         if(err) {
             result(err, null);
         } else {
@@ -31,6 +31,18 @@ OutputInfo.getOutputInfoByID = function getOutputInfoByID(outputinfoID, result) 
         }
     });
 };
+
+// Search outputinfo
+OutputInfo.search = function searchOutputInfo(col, val, result) {
+    const sql = `SELECT * FROM outputinfo WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND outputinfodeletedat IS NULL`;
+      db.query(sql, async function (err, res) {
+        if (err) {
+          result(err, null);
+        } else {
+          result(null, res);
+        }
+      });
+    };
 
 // Store outputinfo
 OutputInfo.store = function storeOutputInfo(newOutputInfo, result) {
@@ -62,14 +74,33 @@ OutputInfo.update = function updateOutputInfo(outputinfoID, outputinfo, result) 
 
 // Delete outputinfo
 OutputInfo.delete = function deleteOutputInfo(outputinfoID, result) {
-    db.query("DELETE FROM outputinfo WHERE outputinfoid = ?", outputinfoID, function(err, res) {
-        if(err) {
-            result(err, null);
+    let now = moment().format("YYYY-MM-DD HH:mm:ss");
+    db.query(
+      "UPDATE outputinfo SET outputinfodeletedat = ? WHERE outputinfoid = ?",
+      [now, outputinfoID],
+      function (err, res) {
+        if (err) {
+          result(err, null);
+        } else {
+          result(null, res);
         }
-        else{
-            result(null, res);
+      }
+    );
+  };
+  
+  // Restore outputinfo
+  OutputInfo.restore = function restoreOutputInfo(outputinfoID, result) {
+    db.query(
+      "UPDATE outputinfo SET outputinfodeletedat = NULL WHERE outputinfoid = ?",
+      [outputinfoID],
+      function (err, res) {
+        if (err) {
+          result(err, null);
+        } else {
+          result(null, res);
         }
-    })
-};
+      }
+    );
+  };
 
 module.exports = OutputInfo;
