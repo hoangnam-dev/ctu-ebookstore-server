@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 // Import Controller
-const {allUser, getUserByID, store, update} = require('../app/controllers/UserController');
+const {allUser, checkUserNameIsset, getUserByID, search, store, update, destroy, restore} = require('../app/controllers/UserController');
 
-router.get('/', allUser);
-router.post('/', store);
+router.get('/checkUsername/:userUsername', checkUserNameIsset);
+router.get('/search', search);
 router.get('/:id', getUserByID);
+router.post('/', store);
 router.put('/:id', update);
-// router.delete('/:id', destroy);
+router.delete('/:id', destroy);
+router.put('/restore/:id', restore);
+router.get('/', allUser);
 
 module.exports = router;
