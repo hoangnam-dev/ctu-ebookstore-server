@@ -25,12 +25,7 @@ EbookStatus.getAll = function getAllEbookStatus(result) {
 
 // Search ebookstatus
 EbookStatus.search = function searchEbookStatus(col, val, result) {
-  const sql =
-    "SELECT * FROM ebookstatus WHERE " +
-    col +
-    " LIKE '%" +
-    val +
-    "%' and ebookstatusdeletedat IS NULL";
+  const sql = `SELECT * FROM ebookstatus WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND ebookstatusdeletedat IS NULL`;
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);
