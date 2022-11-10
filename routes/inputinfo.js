@@ -10,6 +10,6 @@ router.get('/', allInputInfo);
 router.post('/', store);
 router.put('/:id', update);
 router.delete('/:id', destroy);
-router.delete('/restore/:id', restore);
+router.put('/restore/:id', restore);
 
 module.exports = router;
