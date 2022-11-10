@@ -1,5 +1,27 @@
 const Directory = require("../models/Directory");
 
+// Handle result
+function handleResult(arrData) {
+  var resData = arrData.map((data) => {
+    // Handle category list of the role
+    var categoryList = data.categoryList.map((category) => {
+      return {
+        categoryID: category.categoryid,
+        categoryName: category.categoryname,
+        categoryDescription: category.categorydescription,
+      };
+    });
+
+    // return role
+    return {
+      directoryID: data.directoryid,
+      directoryName: data.directoryname,
+      directoryDescription: data.directorydescription,
+      categoryList: categoryList,
+    };
+  });
+  return resData;
+}
 // Show all directory
 const allDirectory = function (req, res) {
   Directory.getAll(function (err, directories) {
@@ -10,14 +32,8 @@ const allDirectory = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      var directoryPre = directories.map((directory) => {
-        return {
-          directoryID: directory.directoryid,
-          directoryName: directory.directoryname,
-          directoryDescription: directory.directorydescription,
-        };
-      });
-      res.json(directoryPre);
+      var listDirectory = handleResult(directories);
+      res.json(listDirectory);
     }
   });
 };
@@ -28,7 +44,7 @@ const store = function (req, res) {
   if (!newDirectory.directoryname) {
     res.json({
       error: true,
-      statusCode:0,
+      statusCode: 0,
       message: "Tên danh mục không được để trống",
     });
   } else {
@@ -53,8 +69,7 @@ const store = function (req, res) {
 // Search directorys
 const search = function (req, res) {
   var directoryName = req.query.name;
-  console.log(directoryName);
-  Directory.search(directoryName, function (err, directory) {
+  Directory.search(directoryName, function (err, directories) {
     if (err) {
       res.json({
         error: true,
@@ -62,14 +77,8 @@ const search = function (req, res) {
         message: "Lỗi! Không tìm thấy danh mục",
       });
     } else {
-      var directoryPre = directory.map((directory) => {
-        return {
-          directoryID: directory.directoryid,
-          directoryName: directory.directoryname,
-          directoryDescription: directory.directorydescription,
-        };
-      });
-      res.json(directoryPre);
+      var listDirectory = handleResult(directories);
+      res.json(listDirectory);
     }
   });
 };
@@ -85,17 +94,11 @@ const getDirectoryByID = function (req, res) {
         message: "Lỗi! Không tìm thấy danh mục",
       });
     } else {
-      var directoryPre = directory.map((directory) => {
-        return {
-          directoryID: directory.directoryid,
-          directoryName: directory.directoryname,
-          directoryDescription: directory.directorydescription,
-        };
-      });
-      res.json(directoryPre);
+      var listDirectory = handleResult(directory);
+      res.json(listDirectory);
     }
-  })
-}
+  });
+};
 
 // Store new directory
 const update = function (req, res) {
@@ -187,11 +190,11 @@ const destroy = function (req, res) {
 };
 
 module.exports = {
-    allDirectory,
-    getDirectoryByID,
-    search,
-    store,
-    update,
-    destroy,
-    restore,
-}
+  allDirectory,
+  getDirectoryByID,
+  search,
+  store,
+  update,
+  destroy,
+  restore,
+};
