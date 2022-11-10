@@ -82,7 +82,6 @@ const allInputInfo = function (req, res) {
 // Store new inputinfo
 const store = function (req, res) {
   var newInputInfo = new InputInfo(req.body);
-  console.log(newInputInfo);
   if (
     !newInputInfo.inputinfototalmoney ||
     !newInputInfo.inputinfostatus ||
@@ -125,7 +124,6 @@ const getInputInfoByID = function (req, res) {
         message: "Lỗi! Không tìm thấy phiếu nhập",
       });
     } else {
-      console.log(inputinfo);
       var data = handleResult(inputinfo);
       res.json(data);
     }

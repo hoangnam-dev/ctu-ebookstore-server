@@ -36,7 +36,7 @@ function handleResult(arrData) {
       outputinfoCreatedAt: data.outputinfocreatedat,
       user: user,
       supplier: supplier,
-      inputinfoList: inputinfo
+      inputinfoList: inputinfo,
     };
   });
   return resData;

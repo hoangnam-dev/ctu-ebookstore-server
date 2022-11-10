@@ -12,7 +12,6 @@ const InputInfo = function (inputinfo) {
   this.outputinfoid = inputinfo.outputinfoID;
 };
 
-
 // Get list ebook of outputinfo
 async function hasEbook(roleID) {
   return new Promise((resolve, reject) => {
@@ -125,7 +124,7 @@ async function resultOutputInfo(res) {
       ebookList: ebooks,
       userList: user,
       supplierList: supplier,
-      outputinfoList: outputinfo
+      outputinfoList: outputinfo,
     };
     return inputInfo;
   });
@@ -136,13 +135,16 @@ async function resultOutputInfo(res) {
 
 // Get all inputinfo
 InputInfo.getAll = function getAllInputInfo(result) {
-  db.query("SELECT * FROM inputinfo WHERE inputinfodeletedat IS NULL", function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      result(null, res);
+  db.query(
+    "SELECT * FROM inputinfo WHERE inputinfodeletedat IS NULL",
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
     }
-  });
+  );
 };
 
 // Get inputinfo by ID
@@ -164,14 +166,14 @@ InputInfo.getInputInfoByID = function getInputInfoByID(inputinfoID, result) {
 // Search inputinfo
 InputInfo.search = function searchInputInfo(col, val, result) {
   const sql = `SELECT * FROM inputinfo WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND inputinfodeletedat IS NULL`;
-    db.query(sql, async function (err, res) {
-      if (err) {
-        result(err, null);
-      } else {
-        result(null, res);
-      }
-    });
-  };
+  db.query(sql, async function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
 
 // Store inputinfo
 InputInfo.store = function storeInputInfo(newInputInfo, result) {
@@ -187,7 +189,6 @@ InputInfo.store = function storeInputInfo(newInputInfo, result) {
 
 // Update inputinfo
 InputInfo.update = function updateInputInfo(inputinfoID, inputinfo, result) {
-  console.log(inputinfoID);
   db.query(
     "UPDATE inputinfo SET inputinfototalmoney = ?, inputinfostatus = ?, outputinfoid = ?, userid = ?, supplierid = ? WHERE inputinfoid = ?",
     [
@@ -210,35 +211,33 @@ InputInfo.update = function updateInputInfo(inputinfoID, inputinfo, result) {
 
 // Delete inputinfo
 InputInfo.delete = function deleteInputInfo(inputinfoID, result) {
-    let now = moment().format("YYYY-MM-DD HH:mm:ss");
-    db.query(
-      "UPDATE inputinfo SET inputinfodeletedat = ? WHERE inputinfoid = ?",
-      [now, inputinfoID],
-      function (err, res) {
-        if (err) {
-          result(err, null);
-        } else {
-          result(null, res);
-        }
+  let now = moment().format("YYYY-MM-DD HH:mm:ss");
+  db.query(
+    "UPDATE inputinfo SET inputinfodeletedat = ? WHERE inputinfoid = ?",
+    [now, inputinfoID],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
       }
-    );
-  };
-  
-  // Restore inputinfo
-  InputInfo.restore = function restoreInputInfo(inputinfoID, result) {
-    db.query(
-      "UPDATE inputinfo SET inputinfodeletedat = NULL WHERE inputinfoid = ?",
-      [inputinfoID],
-      function (err, res) {
-        if (err) {
-          result(err, null);
-        } else {
-          result(null, res);
-        }
+    }
+  );
+};
+
+// Restore inputinfo
+InputInfo.restore = function restoreInputInfo(inputinfoID, result) {
+  db.query(
+    "UPDATE inputinfo SET inputinfodeletedat = NULL WHERE inputinfoid = ?",
+    [inputinfoID],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
       }
-    );
-  };
-  
-  
+    }
+  );
+};
 
 module.exports = InputInfo;
