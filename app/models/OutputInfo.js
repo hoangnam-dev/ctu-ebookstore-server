@@ -15,7 +15,7 @@ const OutputInfo = function (outputinfo) {
 async function hasInputInfo(outputinfoID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT inputinfo.* FROM inputinfo WHERE inputinfo.outputinfoid = ?",
+      "SELECT inputinfo.* FROM inputinfo WHERE inputinfo.outputinfoid = ? AND inputinfo.inputinfodeletedat IS NULL",
       [outputinfoID],
       async function (err, resSub) {
         if (err) {
@@ -31,7 +31,7 @@ async function hasInputInfo(outputinfoID) {
 async function hasUser(outputinfoID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT user.userid, user.username FROM outputinfo INNER JOIN user ON outputinfo.userid = user.userid WHERE outputinfo.outputinfoid = ?",
+      "SELECT user.userid, user.username FROM outputinfo INNER JOIN user ON outputinfo.userid = user.userid WHERE outputinfo.outputinfoid = ? AND user.userdeletedat IS NULL",
       [outputinfoID],
       async function (err, resSub) {
         if (err) {
@@ -48,7 +48,7 @@ async function hasUser(outputinfoID) {
 async function hasSupplier(outputinfoID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT supplier.* FROM outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE outputinfo.outputinfoid = ?",
+      "SELECT supplier.* FROM outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE outputinfo.outputinfoid = ? AND supplier.supplierdeletedat IS NULL",
       [outputinfoID],
       async function (err, resSub) {
         if (err) {
