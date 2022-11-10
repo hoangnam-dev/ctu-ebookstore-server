@@ -18,7 +18,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const corsOptions ={
-  origin:'http://localhost:3001', 
+  origin: '*', 
   credentials:true,            //access-control-allow-credentials:true
   optionSuccessStatus:200,
 }
