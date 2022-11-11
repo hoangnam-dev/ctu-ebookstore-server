@@ -15,7 +15,7 @@ const User = function (user) {
   this.useremail = user.userEmail;
   this.userphone = user.userPhone;
   this.userbanknumber = user.userBankNumber;
-  this.usercreatedat = '';
+  this.usercreatedat = "";
   this.userstatusid = user.userStatusID;
   this.roleid = user.roleID;
   this.wardid = user.wardID;
@@ -42,7 +42,7 @@ async function hasRole(userID) {
 async function hasUserStatus(userID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT userstatus.* FROM user INNER JOIN userstatus ON user.userid = userstatus.userstatusid WHERE user.userid = ?",
+      "SELECT userstatus.* FROM user INNER JOIN userstatus ON user.userstatusid = userstatus.userstatusid WHERE user.userid = ?",
       [userID],
       async function (err, resSub) {
         if (err) {
@@ -91,14 +91,17 @@ async function resultUser(res) {
 
 // Get all user
 User.getAll = function getAllUser(result) {
-  db.query("SELECT userid, username, userphone FROM user WHERE userdeletedat IS NULL", async function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      const userData = await resultUser(res);
-      result(null, userData);
+  db.query(
+    "SELECT userid, username, userphone FROM user WHERE userdeletedat IS NULL",
+    async function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        const userData = await resultUser(res);
+        result(null, userData);
+      }
     }
-  });
+  );
 };
 
 // Get user by ID
@@ -108,39 +111,43 @@ User.checkUserName = function checkUserName(userName, result) {
     if (err) {
       result(err, null);
     } else {
-        result(null, res);
+      result(null, res);
     }
   });
 };
 
 // Get user by ID
 User.getUserByID = function getUserByID(userID, result) {
-  db.query("SELECT * FROM user WHERE userid = ?", userID, async function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-        const userData = await resultUser(res);
-        result(null, userData);
-    }
-  });
-};
-
-// Search user
-User.search = function searchUser(col, val, result) {
-  const sql = `SELECT * FROM user WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND userdeletedat IS NULL`;
-    db.query(sql, async function (err, res) {
+  db.query(
+    "SELECT * FROM user WHERE userid = ?",
+    userID,
+    async function (err, res) {
       if (err) {
         result(err, null);
       } else {
         const userData = await resultUser(res);
         result(null, userData);
       }
-    });
-  };
+    }
+  );
+};
+
+// Search user
+User.search = function searchUser(col, val, result) {
+  const sql = `SELECT * FROM user WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND userdeletedat IS NULL`;
+  db.query(sql, async function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      const userData = await resultUser(res);
+      result(null, userData);
+    }
+  });
+};
 
 // Store user
 User.store = function storeUser(newUser, result) {
-    newUser.usercreatedat = moment().format("YYYY-MM-DD HH:mm:ss");
+  newUser.usercreatedat = moment().format("YYYY-MM-DD HH:mm:ss");
   db.query("INSERT INTO user set ?", newUser, function (err, res) {
     if (err) {
       result(err, null);
@@ -152,15 +159,14 @@ User.store = function storeUser(newUser, result) {
 
 // Update user
 User.update = function updateUser(userID, user, result) {
+  const sql =
+    "UPDATE user SET username = ?, userbirthdate = ?, usergender = ?, useraddress = ?, usercic = ?, useremail = ?, userphone = ?, userbanknumber = ?, userstatusid = ?, roleid = ?, wardid = ? WHERE userid = ?";
   db.query(
-    "UPDATE user SET username = ?, userusername = ?, userpassword = ?, userbirthdate = ?, usergender = ?, useravatar = ?, useraddress = ?, usercic = ?, useremail = ?, userphone = ?, userbanknumber = ?, userstatusid = ?, roleid = ?, wardid = ? WHERE userid = ?",
+    sql,
     [
-      user.username,
       user.userusername,
-      user.userpassword,
       user.userbirthdate,
       user.usergender,
-      user.useravatar,
       user.useraddress,
       user.usercic,
       user.useremail,
@@ -180,37 +186,58 @@ User.update = function updateUser(userID, user, result) {
     }
   );
 };
-
+// Chagne user avatar
+User.changeAvatar = function changeAvatar(userID, userAvatar, result) {
+  const sql = "UPDATE user SET useravatar = ? WHERE userid = ?";
+  db.query(sql, [userAvatar, userID], function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+// Change user password
+User.changePassword = function changePassword(userID, userPassword, result) {
+  const sql = "UPDATE user SET userpassword = ? WHERE userid = ?";
+  db.query(sql, [userPassword, userID], function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
 
 // Delete user
 User.delete = function deleteUser(userID, result) {
-    let now = moment().format("YYYY-MM-DD HH:mm:ss");
-    db.query(
-      "UPDATE user SET userdeletedat = ? WHERE userid = ?",
-      [now, userID],
-      function (err, res) {
-        if (err) {
-          result(err, null);
-        } else {
-          result(null, res);
-        }
+  let now = moment().format("YYYY-MM-DD HH:mm:ss");
+  db.query(
+    "UPDATE user SET userdeletedat = ? WHERE userid = ?",
+    [now, userID],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
       }
-    );
-  };
-  
-  // Restore user
-  User.restore = function restoreUser(userID, result) {
-    db.query(
-      "UPDATE user SET userdeletedat = NULL WHERE userid = ?",
-      [userID],
-      function (err, res) {
-        if (err) {
-          result(err, null);
-        } else {
-          result(null, res);
-        }
+    }
+  );
+};
+
+// Restore user
+User.restore = function restoreUser(userID, result) {
+  db.query(
+    "UPDATE user SET userdeletedat = NULL WHERE userid = ?",
+    [userID],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
       }
-    );
-  };
+    }
+  );
+};
 
 module.exports = User;
