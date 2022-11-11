@@ -8,17 +8,59 @@ const Customer = function (customer) {
   this.customeremail = customer.customerEmail;
   this.customerpassword = customer.customerPassword;
   this.customeravatar = customer.customerAvatar;
-  this.customercreateat = customer.customerCreateAt;
-  this.customerstatus = customer.customerStatus;
+  this.customercreatedat = customer.customerCreatedAt;
+  this.customerstatusid = customer.customerStatusID;
 };
+
+// Get list customerstatus of customer
+async function hasCustomerStatus(customerID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT customerstatus.* FROM customer INNER JOIN customerstatus ON customer.customerstatusid = customerstatus.customerstatusid WHERE customer.customerid = ?",
+      [customerID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
+
+// Customer result,
+async function resultCustomer(res) {
+  let listInfo = res.map(async (res) => {
+    var status = [];
+
+    await hasCustomerStatus(res.customerid)
+      .then(function (resStatus) {
+        status = resStatus;
+      })
+      .catch(function (errStatus) {
+        result(errStatus, null);
+      });
+
+    var customerInfo = {
+      ...res,
+      statusList: status,
+    };
+    return customerInfo;
+  });
+
+  const resultData = await Promise.all(listInfo);
+  return resultData;
+}
 
 // Get all customer
 Customer.getAll = function getAllCustomer(result) {
-  db.query("SELECT * FROM customer", function (err, res) {
+  db.query("SELECT * FROM customer WHERE customerdeletedat IS NULL", async function (err, res) {
     if (err) {
       result(err, null);
     } else {
-      result(null, res);
+      const customerData = await resultCustomer(res);
+      result(null, customerData);
     }
   });
 };
@@ -28,11 +70,12 @@ Customer.getCustomerByID = function getCustomerByID(customerID, result) {
   db.query(
     "SELECT * FROM customer WHERE customerid = ?",
     customerID,
-    function (err, res) {
+    async function (err, res) {
       if (err) {
         result(err, null);
       } else {
-        result(null, res);
+        const customerData = await resultCustomer(res);
+        result(null, customerData);
       }
     }
   );
@@ -42,18 +85,20 @@ Customer.getCustomerByID = function getCustomerByID(customerID, result) {
 Customer.search = function searchCustomer(col, val, result) {
   const sql = `SELECT * FROM customer WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND customerdeletedat IS NULL`;
 
-  db.query(sql, function (err, res) {
+  db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
     } else {
-      result(null, res);
+      const customerData = await resultCustomer(res);
+      result(null, customerData);
     }
   });
 };
 
 // Store customer
 Customer.store = function storeCustomer(newCustomer, result) {
-  db.query("INSERT INTO customer set ?", newCustomer, function (err, res) {
+  newCustomer.customercreatedat = moment().format("YYYY-MM-DD HH:mm:ss");
+  db.query("INSERT INTO customer SET ?", newCustomer, function (err, res) {
     if (err) {
       result(err, null);
     } else {
@@ -65,12 +110,10 @@ Customer.store = function storeCustomer(newCustomer, result) {
 // Update customer
 Customer.update = function updateCustomer(customerID, customer, result) {
   db.query(
-    "UPDATE customer SET customername = ?, customeravatar = ?, customeremail = ?, customerpassword = ?, customerstatus = ?, WHERE customerid = ?",
+    "UPDATE customer SET customername = ?, customeremail = ?, customerstatus = ?, WHERE customerid = ?",
     [
       customer.customername,
-      customer.customeravatar,
       customer.customeremail,
-      customer.customerpassword,
       customer.status,
       customerID,
     ],
@@ -82,6 +125,28 @@ Customer.update = function updateCustomer(customerID, customer, result) {
       }
     }
   );
+};
+// Chagne customer avatar
+Customer.changeAvatar = function changeAvatar(customerID, customerAvatar, result) {
+  const sql = "UPDATE customer SET customeravatar = ? WHERE customerid = ?";
+  db.query(sql, [customerAvatar, customerID], function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+// Change customer password
+Customer.changePassword = function changePassword(customerID, customerPassword, result) {
+  const sql = "UPDATE customer SET customerpassword = ? WHERE customerid = ?";
+  db.query(sql, [customerPassword, customerID], function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
 };
 
 // Delete customer
