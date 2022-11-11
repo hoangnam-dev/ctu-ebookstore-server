@@ -35,7 +35,7 @@ function route(app) {
     app.use('/api/comments', commentRouter);
     
     // Customer routes
-    app.use('/api/customrs', customerRouter);
+    app.use('/api/customers', customerRouter);
     
     // Directory routes
     app.use('/api/directories', directoryRouter);
