@@ -28,11 +28,11 @@ async function hasInputInfo(outputinfoID) {
   });
 }
 // Get list user of outputinfo
-async function hasUser(outputinfoID) {
+async function hasUser(userID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT user.userid, user.username FROM outputinfo INNER JOIN user ON outputinfo.userid = user.userid WHERE outputinfo.outputinfoid = ? AND user.userdeletedat IS NULL",
-      [outputinfoID],
+      "SELECT user.userid, user.username FROM user WHERE user.userid = ? AND user.userdeletedat IS NULL",
+      [userID],
       async function (err, resSub) {
         if (err) {
           reject(err);
@@ -45,11 +45,11 @@ async function hasUser(outputinfoID) {
 }
 
 // Get list supplier of outputinfo
-async function hasSupplier(outputinfoID) {
+async function hasSupplier(supplierID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT supplier.* FROM outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE outputinfo.outputinfoid = ? AND supplier.supplierdeletedat IS NULL",
-      [outputinfoID],
+      "SELECT * FROM supplier WHERE supplier.supplierid = ? AND supplier.supplierdeletedat IS NULL",
+      [supplierID],
       async function (err, resSub) {
         if (err) {
           reject(err);
@@ -68,7 +68,7 @@ async function resultOutputInfo(res) {
     var supplier = [];
     var inputinfo = [];
 
-    await hasUser(res.outputinfoid)
+    await hasUser(res.userid)
       .then(function (resUser) {
         user = resUser;
       })
@@ -76,7 +76,7 @@ async function resultOutputInfo(res) {
         result(errUser, null);
       });
 
-    await hasSupplier(res.outputinfoid)
+    await hasSupplier(res.supplierid)
       .then(function (resSupplier) {
         supplier = resSupplier;
       })
@@ -108,7 +108,7 @@ async function resultOutputInfo(res) {
 // Get all outputinfo
 OutputInfo.getAll = function getAllOutputInfo(result) {
   db.query(
-    "SELECT * FROM outputinfo WHERE outputinfodeletedat IS NULL",
+    "SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, supplier.suppliername FROM ebookstore.outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE outputinfodeletedat IS NULL",
     function (err, res) {
       if (err) {
         result(err, null);
@@ -140,7 +140,7 @@ OutputInfo.getOutputInfoByID = function getOutputInfoByID(
 
 // Search outputinfo
 OutputInfo.search = function searchOutputInfo(col, val, result) {
-  const sql = `SELECT * FROM outputinfo WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND outputinfodeletedat IS NULL`;
+  const sql = `SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, supplier.suppliername FROM ebookstore.outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND outputinfodeletedat IS NULL`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);

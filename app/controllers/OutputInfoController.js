@@ -55,11 +55,9 @@ const allOutputInfo = function (req, res) {
       var outputinfoPre = outputinfos.map((outputinfo) => {
         return {
           outputinfoID: outputinfo.outputinfoid,
-          outputinfoDescription: outputinfo.outputinfodescription,
           outputinfoTotalMoney: outputinfo.outputinfototalmoney,
           outputinfoCreatedAt: outputinfo.outputinfocreatedat,
-          userID: outputinfo.userid,
-          supplierID: outputinfo.supplierid,
+          supplierName: outputinfo.suppliername,
         };
       });
       res.json(outputinfoPre);
@@ -114,11 +112,9 @@ const search = function (req, res) {
       var outputinfoPre = outputinfo.map((outputinfo) => {
         return {
           outputinfoID: outputinfo.outputinfoid,
-          outputinfoDescription: outputinfo.outputinfodescription,
           outputinfoTotalMoney: outputinfo.outputinfototalmoney,
           outputinfoCreatedAt: outputinfo.outputinfocreatedat,
-          userID: outputinfo.userid,
-          supplierID: outputinfo.supplierid,
+          supplierName: outputinfo.suppliername,
         };
       });
       res.json(outputinfoPre);
