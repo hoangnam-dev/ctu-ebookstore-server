@@ -76,14 +76,6 @@ async function resultOutputInfo(res) {
         result(errUser, null);
       });
 
-    await hasSupplier(res.supplierid)
-      .then(function (resSupplier) {
-        supplier = resSupplier;
-      })
-      .catch(function (errSupplier) {
-        result(errSupplier, null);
-      });
-
     await hasInputInfo(res.outputinfoid)
       .then(function (resInputInfo) {
         inputinfo = resInputInfo;

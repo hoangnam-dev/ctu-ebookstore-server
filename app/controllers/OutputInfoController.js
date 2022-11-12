@@ -10,15 +10,6 @@ function handleResult(arrData) {
         userName: d.username,
       };
     });
-    // Handle supplier list of the outputinfo
-    var supplier = data.supplierList.map((d) => {
-      return {
-        supplierID: d.supplierid,
-        supplierCode: d.suppliercode,
-        supplierName: d.suppliername,
-        supplierDescription: d.supplierdescription,
-      };
-    });
     // Handle inputinfo list of the outputinfo
     var inputinfo = data.inputinfoList.map((d) => {
       return {
@@ -34,8 +25,8 @@ function handleResult(arrData) {
       outputinfoDescription: data.outputinfodescription,
       outputinfoTotalMoney: data.outputinfototalmoney,
       outputinfoCreatedAt: data.outputinfocreatedat,
+      supplierID: data.supplierid,
       user: user,
-      supplier: supplier,
       inputinfoList: inputinfo,
     };
   });
