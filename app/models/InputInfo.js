@@ -103,14 +103,6 @@ async function resultOutputInfo(res) {
         result(errUser, null);
       });
 
-    await hasSupplier(res.inputinfoid)
-      .then(function (resSupplier) {
-        supplier = resSupplier;
-      })
-      .catch(function (errSupplier) {
-        result(errSupplier, null);
-      });
-
     await hasOutputInfo(res.outputinfoid)
       .then(function (resOuputInfo) {
         outputinfo = resOuputInfo;
@@ -179,6 +171,22 @@ InputInfo.search = function searchInputInfo(col, val, result) {
 InputInfo.store = function storeInputInfo(newInputInfo, result) {
   newInputInfo.inputinfocreatedat = moment().format("YYYY-MM-DD HH:mm:ss");
   db.query("INSERT INTO inputinfo set ?", newInputInfo, function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res.insertId);
+    }
+  });
+};
+
+// Store inputinfo_detail
+InputInfo.storeDetail = function storeInputInfoDetail(inputinfoID, inputDetail, result) {
+  var values = [];
+  inputDetail.forEach((detail) => {
+    values.push([inputinfoID, detail.ebookID, detail.inputPrice]);
+  }); 
+  const sql = "INSERT INTO inputinfo_ebook (inputinfoid, ebookid, inputprice) VALUES ?";
+  db.query(sql, [values], function (err, res) {
     if (err) {
       result(err, null);
     } else {

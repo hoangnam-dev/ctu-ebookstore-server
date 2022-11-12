@@ -9,7 +9,7 @@ function handleResult(arrData) {
         ebookID: d.ebookid,
         ebookName: d.ebookname,
         ebookPrice: d.ebookprice,
-        inputPrice: d.inputprice,
+        inputPrice: d.input_price,
       };
     });
     // Handle user list of the inputinfo
@@ -17,15 +17,6 @@ function handleResult(arrData) {
       return {
         userID: d.userid,
         userName: d.username,
-      };
-    });
-    // Handle supplier list of the inputinfo
-    var supplier = data.supplierList.map((d) => {
-      return {
-        supplierID: d.supplierid,
-        supplierCode: d.suppliercode,
-        supplierName: d.suppliername,
-        supplierDescription: d.supplierdescription,
       };
     });
     // Handle outputinfo list of the inputinfo
@@ -44,9 +35,9 @@ function handleResult(arrData) {
       inputinfoTotalMoney: data.inputinfototalmoney,
       inputinfoStatus: data.inputinfostatus,
       inputinfoCreatedAt: data.inputinfocreatedat,
+      supplierID: data.supplierid,
       ebookList: ebooks,
       user: user,
-      supplier: supplier,
       outputinfo: outputinfo,
     };
   });
@@ -67,7 +58,6 @@ const allInputInfo = function (req, res) {
         return {
           inputinfoID: inputinfo.inputinfoid,
           inputinfoTotalMoney: inputinfo.inputinfototalmoney,
-          inputinfoStatus: inputinfo.inputinfostatus,
           inputinfoCreatedAt: inputinfo.inputinfocreatedat,
           outputinfoID: inputinfo.outputinfoid,
           userID: inputinfo.userid,
@@ -84,7 +74,6 @@ const store = function (req, res) {
   var newInputInfo = new InputInfo(req.body);
   if (
     !newInputInfo.inputinfototalmoney ||
-    !newInputInfo.inputinfostatus ||
     !newInputInfo.supplierid ||
     !newInputInfo.userid ||
     !newInputInfo.outputinfoid
@@ -103,14 +92,25 @@ const store = function (req, res) {
           message: "Lỗi! Thêm phiếu nhập không thành công",
         });
       } else {
-        res.json({
-          error: false,
-          statusCode: 1,
-          message: "Thêm phiếu nhập thành công",
-        });
+        InputInfo.storeDetail(inputinfo, req.body.inputDetail, function(err, inputinfo) {
+          if (err) {
+            res.json({
+              error: true,
+              statusCode: 0,
+              message: "Thêm phiếu nhập không thành công",
+            });
+          } else {
+            res.json({
+              error: false,
+              statusCode: 1,
+              message: "Thêm phiếu nhập thành công",
+            });
+          }
+        })
       }
     });
   }
+  
 };
 
 // Get inputinfo by ID
@@ -146,7 +146,6 @@ const search = function (req, res) {
         return {
           inputinfoID: inputinfo.inputinfoid,
           inputinfoTotalMoney: inputinfo.inputinfototalmoney,
-          inputinfoStatus: inputinfo.inputinfostatus,
           inputinfoCreatedAt: inputinfo.inputinfocreatedat,
           outputinfoID: inputinfo.outputinfoid,
           userID: inputinfo.userid,
