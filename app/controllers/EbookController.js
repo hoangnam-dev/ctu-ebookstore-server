@@ -1,8 +1,6 @@
-const { express } = require('express');
+const { express } = require("express");
 const Ebook = require("../models/Ebook");
 const { cloudinary } = require("../../utils/cloudinary");
-const multer = require("multer");
-const path = require("path");
 
 // Handle result
 function handleResult(arrData) {
@@ -83,45 +81,106 @@ const search = function (req, res) {
 
 // Store new ebook
 const store = async function (req, res) {
-  try {
-    // const file = req.files['ebookAvatar'][0] ;
-    // console.log(file);
-    const data = req.body;
-    console.log(data);
-    res.json(data);
-    // const fileStr = req.body.data;
-    // const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-    //     upload_preset: 'ebookstore_setups',
-    // });
-    // console.log(uploadResponse.url);
-    // res.json({ msg: 'yaya' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ err: "Something went wrong" });
+  var newEbook = new Ebook(req.body);
+  // var listCatagoryID = req.body.categoriesID;
+  var listCatagoryID = [1,2];
+  // console.log(req.avatarPathSaved);
+  // console.log(req.ePubPathSaved);
+  // console.log(req.pdfPathSaved);
+  // console.log(req.imagesPathSaved);
+
+  if (
+    !newEbook.ebookname ||
+    !newEbook.ebookprice ||
+    !newEbook.ebookstatusid ||
+    !newEbook.supplierid
+  ) {
+    res.json({
+      error: true,
+      statusCode: 0,
+      message: "Thông tin ebook không được để trống",
+    });
+  } else {
+    try {
+      // Upload Avatar
+      if (req.avatarPathSaved !== undefined) {
+        let avatarPath = req.avatarPathSaved;
+        let uploadResponse = await cloudinary.uploader.upload(avatarPath, {
+          upload_preset: "ebookstore_ebook_images",
+        });
+        newEbook.ebookavatar = uploadResponse.secure_url;
+      }
+      // Upload Images
+      var cloudPathImages = [];
+      if (req.imagesPathSaved !== undefined) {
+        for (let i = 0; i < req.imagesPathSaved.length; i++) {
+          let imagesPath = req.imagesPathSaved[i];
+          let uploadResponse = await cloudinary.uploader.upload(imagesPath, {
+            upload_preset: "ebookstore_ebook_images",
+          });
+          cloudPathImages.push(uploadResponse.secure_url);
+        }
+      }
+      // Upload epub
+      if (req.ePubPathSaved !== undefined) {
+        console.log(req.ePubPathSaved);
+        var epubPath = req.ePubPathSaved;
+        let uploadResponse = await cloudinary.uploader.upload(epubPath, {
+          upload_preset: "ebookstore_ebook_epub",
+        });
+        newEbook.ebookepub = uploadResponse.secure_url;
+        console.log(uploadResponse.secure_url);
+      } else {
+        newEbook.ebookepub = "";
+      }
+      // Upload pdf
+      if (req.pdfPathSaved !== undefined) {
+        console.log(req.pdfPathSaved);
+        var pdfPath = req.pdfPathSaved;
+        let uploadResponse = await cloudinary.uploader.upload(pdfPath, {
+          upload_preset: "ebookstore_ebook_pdf",
+        });
+        newEbook.ebookpdf = uploadResponse.secure_url;
+        console.log(uploadResponse.secure_url);
+      } else {
+        newEbook.ebookpdf = "";
+      }
+
+      // Store ebook
+      Ebook.store(newEbook, function (err, ebook) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Thêm ebook không thành công",
+          });
+        } else {
+          Ebook.storeCategory(ebook, listCatagoryID, function(err, category) {
+            if (err) {
+              res.json({
+                error: true,
+                statusCode: 0,
+                message: "Thêm ebook category không thành công",
+              });
+            } else {
+              res.json({
+                error: false,
+                statusCode: 1,
+                message: "Thêm ebook thành công",
+              });
+            }
+          })
+        }
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        error: true,
+        statusCode: 0,
+        message: "Upload không thành công",
+      });
+    }
   }
-  // if (!newEbook.ebookname || !newEbook.ebookprice || !newEbook.ebookstatus) {
-  //   res.json({
-  //     error: true,
-  //     statusCode: 0,
-  //     message: "Thông tin ebook không được để trống",
-  //   });
-  // } else {
-  //   Ebook.store(newEbook, function (err, ebook) {
-  //     if (err) {
-  //       res.json({
-  //         error: true,
-  //         statusCode: 0,
-  //         message: "Lỗi! Thêm ebook không thành công",
-  //       });
-  //     } else {
-  //       res.json({
-  //         error: false,
-  //         statusCode: 1,
-  //         message: "Thêm ebook thành công",
-  //       });
-  //     }
-  //   });
-  // }
 };
 
 // Get ebook by ID
@@ -231,57 +290,11 @@ const restore = function (req, res) {
   });
 };
 
-// Ebook uploadfile
-const handleUploadFile = async (req, res) => {
-
-  console.log(req.body);
-  console.log(req.file);
-  if (req.fileValidationError) {
-
-      return res.send(req.fileValidationError);
-  }
-  else if (!req.file) {
-      return res.send('Please select an image to upload');
-  }
-
-  // Display uploaded image for user validation
-  res.send(`You have uploaded this image: <hr/><img src="/images/${req.file.filename}" width="500"><hr /><a href="/api/uploads">Upload another image</a>`);
-  // });
-}
-
-
-const handleUploadMultipleFiles = async (req, res) => {
-  console.log(req.body);
-  console.log(req.file);
-  if (req.fileValidationError) {
-      return res.send(req.fileValidationError);
-  }
-  else if (!req.files) {
-      return res.send('Please select an image to upload');
-  }
-
-  let result = "You have uploaded these images: <hr />";
-  const files = req.files;
-  let index, len;
-
-  console.log(files);
-  // Loop through all the uploaded images and display them on frontend
-  for (index = 0, len = files.length; index < len; ++index) {
-      result += `<img src="/image/${files[index].filename}" width="300" style="margin-right: 20px;">`;
-  }
-  result += '<hr/><a href="/upload">Upload more images</a>';
-  res.send(result);
-
-}
-
-
 module.exports = {
   allEbook,
   getEbookByID,
   search,
   store,
-  handleUploadFile,
-  handleUploadMultipleFiles,
   update,
   destroy,
   restore,
