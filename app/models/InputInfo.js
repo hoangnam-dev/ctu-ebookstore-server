@@ -6,7 +6,6 @@ const InputInfo = function (inputinfo) {
   this.inputinfoid = inputinfo.inputinfoID;
   this.inputinfototalmoney = inputinfo.inputinfoTotalMoney;
   this.inputinfocreatedat = inputinfo.inputinfoCreateAt;
-  this.inputinfostatus = inputinfo.inputinfoStatus;
   this.userid = inputinfo.userID;
   this.supplierid = inputinfo.supplierID;
   this.outputinfoid = inputinfo.outputinfoID;
@@ -79,8 +78,57 @@ async function hasOutputInfo(outputinfoID) {
   });
 }
 
+// Get list outputinfo of inputinfo
+async function getTotalMomeyOutputInfo(outputinfoID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT outputinfototalmoney FROM outputinfo WHERE outputinfoid = ?",
+      [outputinfoID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
+// Get list outputinfo of inputinfo
+async function getTotalMomeyInputInfo(outputinfoID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT SUM(inputinfototalmoney) as inputinfototalmoney  FROM inputinfo WHERE outputinfoid = ?",
+      [outputinfoID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
+
+// User result,
+async function resultTotalMoney(outputinfoID) {
+  var inputTotalMoney = 0;
+
+  await getTotalMomeyInputInfo(outputinfoID)
+    .then(function (resInput) {
+      console.log(resInput);
+      inputTotalMoney = resInput[0].inputinfototalmoney;
+    })
+    .catch(function (errInput) {
+      result(errInput, null);
+    });
+
+  return inputTotalMoney;
+}
 // User result,
 async function resultOutputInfo(res) {
+  console.log(res);
   let listInfo = res.map(async (res) => {
     var ebooks = [];
     var user = [];
@@ -170,22 +218,43 @@ InputInfo.search = function searchInputInfo(col, val, result) {
 // Store inputinfo
 InputInfo.store = function storeInputInfo(newInputInfo, result) {
   newInputInfo.inputinfocreatedat = moment().format("YYYY-MM-DD HH:mm:ss");
-  db.query("INSERT INTO inputinfo set ?", newInputInfo, function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      result(null, res.insertId);
+  db.query(
+    "INSERT INTO inputinfo set ?",
+    newInputInfo,
+    async function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        var totalMoneyOutput = await resultTotalMoney(newInputInfo.outputinfoid);
+        console.log(totalMoneyOutput);
+        db.query(
+          "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
+          [totalMoneyOutput, newInputInfo.outputinfoid],
+          function (errUpdate, resUpdate) {
+            if (errUpdate) {
+              result(errUpdate, null);
+            } else {
+              result(null, res.insertId);
+            }
+          }
+        );
+      }
     }
-  });
+  );
 };
 
 // Store inputinfo_detail
-InputInfo.storeDetail = function storeInputInfoDetail(inputinfoID, inputDetail, result) {
+InputInfo.storeDetail = function storeInputInfoDetail(
+  inputinfoID,
+  inputDetail,
+  result
+) {
   var values = [];
   inputDetail.forEach((detail) => {
     values.push([inputinfoID, detail.ebookID, detail.inputPrice]);
-  }); 
-  const sql = "INSERT INTO inputinfo_ebook (inputinfoid, ebookid, inputprice) VALUES ?";
+  });
+  const sql =
+    "INSERT INTO inputinfo_ebook (inputinfoid, ebookid, inputprice) VALUES ?";
   db.query(sql, [values], function (err, res) {
     if (err) {
       result(err, null);
@@ -207,11 +276,95 @@ InputInfo.update = function updateInputInfo(inputinfoID, inputinfo, result) {
       inputinfo.supplierid,
       inputinfoID,
     ],
+    async function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        var totalMoneyOutput = await resultTotalMoney(inputinfo.outputinfoid);
+        console.log(totalMoneyOutput);
+        db.query(
+          "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
+          [totalMoneyOutput, inputinfo.outputinfoid],
+          function (errUpdate, resUpdate) {
+            if (errUpdate) {
+              result(errUpdate, null);
+            } else {
+              result(null, res.insertId);
+            }
+          }
+        );
+      }
+    }
+  );
+};
+
+// Add detail inputinfo
+InputInfo.addItemDetail = function addItemDetail(
+  inputinfoID,
+  ebookID,
+  inputPrice,
+  result
+) {
+  db.query(
+    "INSERT INTO inputinfo_ebook SET inputinfoid = ?, ebookid = ?, inputprice = ?",
+    [inputinfoID, ebookID, inputPrice],
+    function (err, res) {
+      if (err) {
+        console.log(err);
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
+};
+
+// Delete inputinfo
+InputInfo.deleteItemDetail = function deleteItemDetail(
+  inputinfoID,
+  ebookID,
+  result
+) {
+  db.query(
+    "DELETE FROM inputinfo_ebook WHERE inputinfoid = ? AND ebookid = ?",
+    [inputinfoID, ebookID],
     function (err, res) {
       if (err) {
         result(err, null);
       } else {
         result(null, res);
+      }
+    }
+  );
+};
+
+// Update inputinfo total money
+InputInfo.updateTotalMoney = function updateTotalMoney(
+  inputinfoID,
+  totalMoneyInput,
+  outputinfoID,
+  result
+) {
+  db.query(
+    "UPDATE inputinfo SET inputinfototalmoney = ? WHERE inputinfoid = ?",
+    [totalMoneyInput, inputinfoID],
+    async function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        var totalMoneyOutput = await resultTotalMoney(outputinfoID);
+        console.log(totalMoneyOutput);
+        db.query(
+          "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
+          [totalMoneyOutput, outputinfoID],
+          function (errUpdate, resUpdate) {
+            if (errUpdate) {
+              result(errUpdate, null);
+            } else {
+              result(null, res.insertId);
+            }
+          }
+        );
       }
     }
   );

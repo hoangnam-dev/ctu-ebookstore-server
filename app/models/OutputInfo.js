@@ -144,6 +144,7 @@ OutputInfo.search = function searchOutputInfo(col, val, result) {
 
 // Store outputinfo
 OutputInfo.store = function storeOutputInfo(newOutputInfo, result) {
+  newOutputInfo.outputinfototalmoney = 0;
   newOutputInfo.outputinfocreatedat = moment().format("YYYY-MM-DD HH:mm:ss");
   db.query("INSERT INTO outputinfo set ?", newOutputInfo, function (err, res) {
     if (err) {

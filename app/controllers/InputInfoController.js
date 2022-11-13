@@ -163,7 +163,6 @@ const update = function (req, res) {
   var inputinfoID = req.params.id;
   if (
     !newInputInfo.inputinfototalmoney ||
-    !newInputInfo.inputinfostatus ||
     !newInputInfo.supplierid ||
     !newInputInfo.userid ||
     !newInputInfo.outputinfoid
@@ -190,6 +189,75 @@ const update = function (req, res) {
       }
     });
   }
+};
+
+// delete Item
+const addDetail = function (req, res) {
+  var inputinfoID = req.body.inputinfoID;
+  var ebookID = req.body.ebookID;
+  var inputPrice = req.body.inputPrice;
+  var totalMoney = req.body.totalMoney;
+  var ouputinfoID = req.body.ebookID;
+
+  InputInfo.addItemDetail(inputinfoID, ebookID, inputPrice, function (err, inputInfo) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Thêm chi tiết phiếu nhập không thành công",
+      });
+    } else {
+      console.log(totalMoney);
+      InputInfo.updateTotalMoney(inputinfoID, totalMoney, ouputinfoID, function (err, inputinfo) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Cập nhật tổng tiền phiếu nhập không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Cập nhật phiếu nhập thành công",
+          });
+        }
+      });
+    }
+  });
+};
+
+// delete Item
+const deleteDetail = function (req, res) {
+  var inputinfoID = req.body.inputinfoID;
+  var ebookID = req.body.ebookID;
+  var totalMoney = req.body.totalMoney;
+  var ouputinfoID = req.body.ebookID;
+  InputInfo.deleteItemDetail(inputinfoID, ebookID, function (err, inputInfo) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Xóa chi tiết phiếu nhập không thành công",
+      });
+    } else {
+      InputInfo.updateTotalMoney(inputinfoID, totalMoney, ouputinfoID, function (err, inputinfo) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Cập nhật tổng tiền phiếu nhập không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Cập nhật phiếu nhập thành công",
+          });
+        }
+      });
+    }
+  });
 };
 
 // Soft destroy
@@ -258,6 +326,8 @@ module.exports = {
   search,
   store,
   update,
+  addDetail,
+  deleteDetail,
   destroy,
   restore,
 };
