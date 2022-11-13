@@ -82,13 +82,8 @@ const search = function (req, res) {
 // Store new ebook
 const store = async function (req, res) {
   var newEbook = new Ebook(req.body);
-  // var listCatagoryID = req.body.categoriesID;
-  var listCatagoryID = [1,2];
-  // console.log(req.avatarPathSaved);
-  // console.log(req.ePubPathSaved);
-  // console.log(req.pdfPathSaved);
-  // console.log(req.imagesPathSaved);
-
+  var categoriesID = req.body.categoriesID;
+  // var categoriesID = [1,2]; // test
   if (
     !newEbook.ebookname ||
     !newEbook.ebookprice ||
@@ -155,7 +150,7 @@ const store = async function (req, res) {
             message: "Lỗi! Thêm ebook không thành công",
           });
         } else {
-          Ebook.storeCategory(ebook, listCatagoryID, function(err, category) {
+          Ebook.storeCategory(ebook, categoriesID, function(err, category) {
             if (err) {
               res.json({
                 error: true,
@@ -163,11 +158,21 @@ const store = async function (req, res) {
                 message: "Thêm ebook category không thành công",
               });
             } else {
-              res.json({
-                error: false,
-                statusCode: 1,
-                message: "Thêm ebook thành công",
-              });
+              Ebook.storeEbookImages(ebook, cloudPathImages, function(err, images) {
+                if (err) {
+                  res.json({
+                    error: true,
+                    statusCode: 0,
+                    message: "Thêm ebook images không thành công",
+                  });
+                } else {
+                  res.json({
+                    error: false,
+                    statusCode: 1,
+                    message: "Thêm ebook thành công",
+                  });
+                }
+              })
             }
           })
         }

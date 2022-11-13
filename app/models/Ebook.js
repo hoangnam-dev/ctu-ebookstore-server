@@ -177,7 +177,21 @@ Ebook.store = function storeEbook(newEbook, result) {
   newEbook.ebookcreatedat = moment().format('YYYY-MM-DD HH:mm:ss');
   db.query("INSERT INTO ebook set ?", newEbook, function (err, res) {
     if (err) {
-      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res.insertId);
+    }
+  });
+};
+// Store ebook images
+Ebook.storeEbookImages = function storeEbookImages(ebookID, images, result) {
+  var values = [];
+  images.forEach((image) => {
+    values.push([ebookID, image]);
+  }); 
+  const sql = "INSERT INTO imageebook (ebookid, imageebooksource) VALUES ?";
+  db.query(sql, [values], function (err, res) {
+    if (err) {
       result(err, null);
     } else {
       result(null, res.insertId);
@@ -187,15 +201,12 @@ Ebook.store = function storeEbook(newEbook, result) {
 // Store ebook
 Ebook.storeCategory = function storeEbookCategory(ebookID, categoriesID, result) {
   var values = [];
-  console.log(typeof categoriesID);
   categoriesID.forEach((categoryID) => {
     values.push([ebookID, categoryID]);
   }); 
-  console.log(values);
   const sql = "INSERT INTO categoryofebook (ebookid, categoryid) VALUES ?";
   db.query(sql, [values], function (err, res) {
     if (err) {
-      console.log(err);
       result(err, null);
     } else {
       result(null, res.insertId);
@@ -205,7 +216,6 @@ Ebook.storeCategory = function storeEbookCategory(ebookID, categoriesID, result)
 
 // Update ebook
 Ebook.update = function updateEbook(ebookID, ebook, result) {
-  console.log(ebookID);
   db.query(
     "UPDATE ebook SET ebookname = ?, ebookdescription = ?, ebookprice = ?, ebookavatar = ?, ebookepub = ?, ebookpdf = ?, ebookcreateat = ?, ebookreleasedatat = ?, ebookstatusid = ?, inputinfoid = ?, supplierid = ?, WHERE ebookid = ?",
     [
