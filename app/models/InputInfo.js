@@ -117,7 +117,6 @@ async function resultTotalMoney(outputinfoID) {
 
   await getTotalMomeyInputInfo(outputinfoID)
     .then(function (resInput) {
-      console.log(resInput);
       inputTotalMoney = resInput[0].inputinfototalmoney;
     })
     .catch(function (errInput) {
@@ -128,7 +127,6 @@ async function resultTotalMoney(outputinfoID) {
 }
 // User result,
 async function resultOutputInfo(res) {
-  console.log(res);
   let listInfo = res.map(async (res) => {
     var ebooks = [];
     var user = [];
@@ -226,7 +224,6 @@ InputInfo.store = function storeInputInfo(newInputInfo, result) {
         result(err, null);
       } else {
         var totalMoneyOutput = await resultTotalMoney(newInputInfo.outputinfoid);
-        console.log(totalMoneyOutput);
         db.query(
           "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
           [totalMoneyOutput, newInputInfo.outputinfoid],
@@ -281,7 +278,6 @@ InputInfo.update = function updateInputInfo(inputinfoID, inputinfo, result) {
         result(err, null);
       } else {
         var totalMoneyOutput = await resultTotalMoney(inputinfo.outputinfoid);
-        console.log(totalMoneyOutput);
         db.query(
           "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
           [totalMoneyOutput, inputinfo.outputinfoid],
@@ -310,7 +306,6 @@ InputInfo.addItemDetail = function addItemDetail(
     [inputinfoID, ebookID, inputPrice],
     function (err, res) {
       if (err) {
-        console.log(err);
         result(err, null);
       } else {
         result(null, res);
@@ -353,7 +348,6 @@ InputInfo.updateTotalMoney = function updateTotalMoney(
         result(err, null);
       } else {
         var totalMoneyOutput = await resultTotalMoney(outputinfoID);
-        console.log(totalMoneyOutput);
         db.query(
           "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
           [totalMoneyOutput, outputinfoID],

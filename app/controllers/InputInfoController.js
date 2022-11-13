@@ -207,7 +207,6 @@ const addDetail = function (req, res) {
         message: "Lỗi! Thêm chi tiết phiếu nhập không thành công",
       });
     } else {
-      console.log(totalMoney);
       InputInfo.updateTotalMoney(inputinfoID, totalMoney, ouputinfoID, function (err, inputinfo) {
         if (err) {
           res.json({
