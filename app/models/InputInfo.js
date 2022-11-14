@@ -314,6 +314,26 @@ InputInfo.addItemDetail = function addItemDetail(
   );
 };
 
+// Update detail inputinfo
+InputInfo.updateItemDetail = function updateItemDetail(
+  inputinfoID,
+  ebookID,
+  inputPrice,
+  result
+) {
+  db.query(
+    "UPDATE inputinfo_ebook SET ebookid = ?, inputprice = ? WHERE inputinfoid = ?",
+    [ebookID, inputPrice, inputinfoID],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
+};
+
 // Delete inputinfo
 InputInfo.deleteItemDetail = function deleteItemDetail(
   inputinfoID,

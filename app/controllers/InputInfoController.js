@@ -226,6 +226,41 @@ const addDetail = function (req, res) {
   });
 };
 
+// update Item
+const updateDetail = function (req, res) {
+  var inputinfoID = req.body.inputinfoID;
+  var ebookID = req.body.ebookID;
+  var inputPrice = req.body.inputPrice;
+  var totalMoney = req.body.totalMoney;
+  var ouputinfoID = req.body.ouputinfoID;
+
+  InputInfo.updateItemDetail(inputinfoID, ebookID, inputPrice, function (err, inputInfo) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Cập nhật chi tiết phiếu nhập không thành công",
+      });
+    } else {
+      InputInfo.updateTotalMoney(inputinfoID, totalMoney, ouputinfoID, function (err, inputinfo) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Cập nhật tổng tiền phiếu nhập không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Cập nhật chi tiết phiếu nhập thành công",
+          });
+        }
+      });
+    }
+  });
+};
+
 // delete Item
 const deleteDetail = function (req, res) {
   var inputinfoID = req.body.inputinfoID;
@@ -326,6 +361,7 @@ module.exports = {
   store,
   update,
   addDetail,
+  updateDetail,
   deleteDetail,
   destroy,
   restore,
