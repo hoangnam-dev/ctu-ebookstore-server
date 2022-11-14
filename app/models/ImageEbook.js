@@ -34,8 +34,13 @@ ImageEbook.getImageEbookByID = function getImageEbookByID(imageebookID, result) 
 };
 
 // Store imageebook
-ImageEbook.store = function storeImageEbook(newImageEbook, result) {
-  db.query("INSERT INTO imageebook set ?", newImageEbook, function (err, res) {
+ImageEbook.store = function storeEbookImages(ebookID, images, result) {
+  var values = [];
+  images.forEach((image) => {
+    values.push([ebookID, image]);
+  });
+  const sql = "INSERT INTO imageebook (ebookid, imageebooksource) VALUES ?";
+  db.query(sql, [values], function (err, res) {
     if (err) {
       result(err, null);
     } else {
@@ -64,10 +69,10 @@ ImageEbook.update = function updateImageEbook(imageebook, result) {
 };
 
 // Delete imageebook
-ImageEbook.delete = function deleteImageEbook(imageebookID, result) {
+ImageEbook.delete = function deleteImageEbook(imageEbookID, ebookID, result) {
   db.query(
-    "DELETE FROM imageebook WHERE imageebookid = ?",
-    imageebookID,
+    "DELETE FROM imageebook WHERE imageebookid = ? AND ebookid = ?",
+    [imageEbookID, ebookID],
     function (err, res) {
       if (err) {
         result(err, null);

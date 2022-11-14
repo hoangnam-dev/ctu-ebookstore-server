@@ -50,7 +50,7 @@ const uploadMultiple = multer({
   fileFilter: imageFilter,
 }).array("ebookImages", 6);
 
-const uploadAvatarAndImages = async (req, res, next) => {
+const uploadFileAndImages = async (req, res, next) => {
   upload.fields([
     { name: "ebookAvatar", maxCount: 1 },
     { name: "ebookEPUB", maxCount: 1 },
@@ -76,6 +76,8 @@ const uploadAvatarAndImages = async (req, res, next) => {
       if (req.files["ebookAvatar"]) {
         // req.avatarPathSaved = "/images/" + req.files["ebookAvatar"][0].filename;
         req.avatarPathSaved = req.files["ebookAvatar"][0].path;
+      } else {
+        req.avatarPathSaved = undefined;
       }
       // If choose a epub => update
       if (req.files["ebookEPUB"]) {
@@ -102,6 +104,8 @@ const uploadAvatarAndImages = async (req, res, next) => {
           // imagesPathSaved.push(array);
           // req.imagesPathSaved.push(req.files["ebookImages"][i].path);
         }
+      } else {
+        req.imagesPathSaved = undefined;
       }
 
       // req.imagesPathSaved = imagesPathSaved;
@@ -111,4 +115,4 @@ const uploadAvatarAndImages = async (req, res, next) => {
   });
 };
 
-module.exports = { upload, uploadMultiple, uploadAvatarAndImages };
+module.exports = { upload, uploadMultiple, uploadFileAndImages };

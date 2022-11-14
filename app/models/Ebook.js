@@ -1,5 +1,5 @@
 const db = require("../../config/db");
-const moment = require('moment');
+const moment = require("moment");
 
 // Constructor
 const Ebook = function (ebook) {
@@ -8,7 +8,7 @@ const Ebook = function (ebook) {
   this.ebookdescription = ebook.ebookDescription;
   this.ebookprice = ebook.ebookPrice;
   this.ebookavatar = ebook.ebookAvatar;
-  this.ebookepub = ebook.ebookEpub;
+  this.ebookepub = ebook.ebookEPUB;
   this.ebookpdf = ebook.ebookPDF;
   this.ebookcreatedat = ebook.ebookCreatedAt;
   this.ebookreleasedat = ebook.ebookReleasedAt;
@@ -20,7 +20,7 @@ const Ebook = function (ebook) {
 async function hasAuthor(ebookID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT author.authorid FROM authorofebook INNER JOIN author ON authorofebook.authorid = author.authorid WHERE authorofebook.ebookid = ?",
+      "SELECT author.authorid, author.authorname FROM authorofebook INNER JOIN author ON authorofebook.authorid = author.authorid WHERE authorofebook.ebookid = ?",
       [ebookID],
       async function (err, resSub) {
         if (err) {
@@ -32,12 +32,11 @@ async function hasAuthor(ebookID) {
     );
   });
 }
-
 // Get list category of ebook
 async function hasCategory(ebookID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT category.categoryid FROM categoryofebook INNER JOIN category ON categoryofebook.categoryid = category.categoryid WHERE categoryofebook.ebookid = ?",
+      "SELECT category.categoryid, category.categoryname FROM categoryofebook INNER JOIN category ON categoryofebook.categoryid = category.categoryid WHERE categoryofebook.ebookid = ?",
       [ebookID],
       async function (err, resSub) {
         if (err) {
@@ -49,12 +48,27 @@ async function hasCategory(ebookID) {
     );
   });
 }
-
+// Get list sale of ebook
+async function hasSale(ebookID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT saleebook.*, sale.* FROM saleebook INNER JOIN sale ON saleebook.saleid = sale.saleid WHERE saleebook.ebookid = ?",
+      [ebookID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
 // Get list imageebook of ebook
 async function hasImages(ebookID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT imageebookid, imageebooksource FROM imageebookebook WHERE imageebookebook.ebookid = ?",
+      "SELECT imageebookid, imageebooksource FROM imageebook WHERE imageebook.ebookid = ?",
       [ebookID],
       async function (err, resSub) {
         if (err) {
@@ -66,43 +80,78 @@ async function hasImages(ebookID) {
     );
   });
 }
-
+// Get list ebookstatus of ebook
+async function hasEbookStatus(ebookID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT ebookstatus.* FROM ebook INNER JOIN ebookstatus ON ebook.ebookstatusid = ebookstatus.ebookstatusid WHERE ebook.ebookid = ?",
+      [ebookID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
 // Customer result,
 async function resultEbook(res) {
   let listInfo = res.map(async (res) => {
     var authors = [];
     var categories = [];
+    var sales = [];
     var images = [];
+    var status = [];
 
     await hasAuthor(res.ebookid)
       .then(function (resAuthor) {
         authors = resAuthor;
       })
-      .catch(function (err) {
-        result(err, null);
+      .catch(function (errAuthor) {
+        result(errAuthor, null);
       });
 
     await hasCategory(res.ebookid)
       .then(function (resCategory) {
         categories = resCategory;
       })
-      .catch(function (err) {
-        result(err, null);
+      .catch(function (errCategory) {
+        result(errCategory, null);
+      });
+
+    await hasSale(res.ebookid)
+      .then(function (resSale) {
+        sales = resSale;
+      })
+      .catch(function (errSale) {
+        result(errSale, null);
+      });
+
+    await hasEbookStatus(res.ebookid)
+      .then(function (resEbookStt) {
+        status = resEbookStt;
+      })
+      .catch(function (errEbookStt) {
+        result(errEbookStt, null);
       });
 
     await hasImages(res.ebookid)
       .then(function (resImages) {
         images = resImages;
       })
-      .catch(function (err) {
-        result(err, null);
+      .catch(function (errImages) {
+        result(errImages, null);
       });
 
     var ebookInfo = {
       ...res,
       authorList: authors,
       categoryList: categories,
-      imageList: images,
+      saleList: sales,
+      imageebookList: images,
+      ebookstatusList: status,
     };
 
     return ebookInfo;
@@ -116,11 +165,12 @@ async function resultEbook(res) {
 Ebook.getAll = function getAllEbook(result) {
   db.query(
     "SELECT ebookid, ebookname, ebookprice, ebookstatusid FROM ebook",
-    function (err, res) {
+    async function (err, res) {
       if (err) {
         result(err, null);
       } else {
-        result(null, res);
+        const ebookData = await resultEbook(res);
+        result(null, ebookData);
       }
     }
   );
@@ -163,18 +213,19 @@ Ebook.getEbookByDirectoryID = function getEbookByDirectoryID(
 // Search ebook
 Ebook.search = function searchEbook(col, val, result) {
   const sql = `SELECT * FROM ebook WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND ebookdeletedat IS NULL`;
-  db.query(sql, function (err, res) {
+  db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
     } else {
-      result(null, res);
+      const ebookData = await resultEbook(res);
+      result(null, ebookData);
     }
   });
 };
 
 // Store ebook
 Ebook.store = function storeEbook(newEbook, result) {
-  newEbook.ebookcreatedat = moment().format('YYYY-MM-DD HH:mm:ss');
+  newEbook.ebookcreatedat = moment().format("YYYY-MM-DD HH:mm:ss");
   db.query("INSERT INTO ebook set ?", newEbook, function (err, res) {
     if (err) {
       result(err, null);
@@ -183,27 +234,16 @@ Ebook.store = function storeEbook(newEbook, result) {
     }
   });
 };
-// Store ebook images
-Ebook.storeEbookImages = function storeEbookImages(ebookID, images, result) {
-  var values = [];
-  images.forEach((image) => {
-    values.push([ebookID, image]);
-  }); 
-  const sql = "INSERT INTO imageebook (ebookid, imageebooksource) VALUES ?";
-  db.query(sql, [values], function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      result(null, res.insertId);
-    }
-  });
-};
 // Store ebook
-Ebook.storeCategory = function storeEbookCategory(ebookID, categoriesID, result) {
+Ebook.storeCategory = function storeEbookCategory(
+  ebookID,
+  categoriesID,
+  result
+) {
   var values = [];
   categoriesID.forEach((categoryID) => {
     values.push([ebookID, categoryID]);
-  }); 
+  });
   const sql = "INSERT INTO categoryofebook (ebookid, categoryid) VALUES ?";
   db.query(sql, [values], function (err, res) {
     if (err) {
@@ -216,30 +256,58 @@ Ebook.storeCategory = function storeEbookCategory(ebookID, categoriesID, result)
 
 // Update ebook
 Ebook.update = function updateEbook(ebookID, ebook, result) {
-  db.query(
-    "UPDATE ebook SET ebookname = ?, ebookdescription = ?, ebookprice = ?, ebookavatar = ?, ebookepub = ?, ebookpdf = ?, ebookcreateat = ?, ebookreleasedatat = ?, ebookstatusid = ?, inputinfoid = ?, supplierid = ?, WHERE ebookid = ?",
-    [
+  var sql =
+    "UPDATE ebook SET ebookname = ?, ebookdescription = ?, ebookprice = ?, ebookavatar = ?, ebookreleasedat = ?, ebookstatusid = ?, supplierid = ? WHERE ebookid = ?";
+  var values = [
+    ebook.ebookname,
+    ebook.ebookdescription,
+    ebook.ebookprice,
+    ebook.ebookavatar,
+    ebook.ebookreleasedat,
+    ebook.ebookstatusid,
+    ebook.supplierid,
+    ebookID,
+  ];
+  if (ebook.ebookavatar === null) {
+    sql =
+      "UPDATE ebook SET ebookname = ?, ebookdescription = ?, ebookprice = ?, ebookreleasedat = ?, ebookstatusid = ?, supplierid = ? WHERE ebookid = ?";
+    values = [
       ebook.ebookname,
       ebook.ebookdescription,
       ebook.ebookprice,
-      ebook.ebookavatar,
-      ebook.ebookepub,
-      ebook.ebookpdf,
-      ebook.ebookcreateat,
       ebook.ebookreleasedat,
       ebook.ebookstatusid,
       ebook.supplierid,
-      ebook.inputinfoid,
       ebookID,
-    ],
-    function (err, res) {
-      if (err) {
-        result(err, null);
-      } else {
-        result(null, res);
-      }
+    ];
+  }
+  db.query(sql, values, function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
     }
-  );
+  });
+};
+
+// Update ebook content
+Ebook.updateEbookContent = function updateEbookContent(
+  ebookID,
+  contentType,
+  ebookContent,
+  result
+) {
+  var sql = "UPDATE ebook SET ebookepub = ? WHERE ebookid = ?";
+  if (contentType === "pdf") {
+    sql = "UPDATE ebook SET ebookpdf = ? WHERE ebookid = ?";
+  }
+  db.query(sql, [ebookContent, ebookID], function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
 };
 
 // Delete ebook
