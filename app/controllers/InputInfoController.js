@@ -157,7 +157,7 @@ const search = function (req, res) {
   });
 };
 
-// Store new inputinfo
+// Update inputinfo
 const update = function (req, res) {
   var newInputInfo = new InputInfo(req.body);
   var inputinfoID = req.params.id;
@@ -191,13 +191,13 @@ const update = function (req, res) {
   }
 };
 
-// delete Item
+// add Item
 const addDetail = function (req, res) {
   var inputinfoID = req.body.inputinfoID;
   var ebookID = req.body.ebookID;
   var inputPrice = req.body.inputPrice;
   var totalMoney = req.body.totalMoney;
-  var ouputinfoID = req.body.ebookID;
+  var ouputinfoID = req.body.ouputinfoID;
 
   InputInfo.addItemDetail(inputinfoID, ebookID, inputPrice, function (err, inputInfo) {
     if (err) {
@@ -231,7 +231,7 @@ const deleteDetail = function (req, res) {
   var inputinfoID = req.body.inputinfoID;
   var ebookID = req.body.ebookID;
   var totalMoney = req.body.totalMoney;
-  var ouputinfoID = req.body.ebookID;
+  var ouputinfoID = req.body.ouputinfoID;
   InputInfo.deleteItemDetail(inputinfoID, ebookID, function (err, inputInfo) {
     if (err) {
       res.json({
