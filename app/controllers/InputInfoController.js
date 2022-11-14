@@ -197,7 +197,7 @@ const addDetail = function (req, res) {
   var ebookID = req.body.ebookID;
   var inputPrice = req.body.inputPrice;
   var totalMoney = req.body.totalMoney;
-  var ouputinfoID = req.body.ouputinfoID;
+  var outputinfoID = req.body.outputinfoID;
 
   InputInfo.addItemDetail(inputinfoID, ebookID, inputPrice, function (err, inputInfo) {
     if (err) {
@@ -207,7 +207,7 @@ const addDetail = function (req, res) {
         message: "Lỗi! Thêm chi tiết phiếu nhập không thành công",
       });
     } else {
-      InputInfo.updateTotalMoney(inputinfoID, totalMoney, ouputinfoID, function (err, inputinfo) {
+      InputInfo.updateTotalMoney(inputinfoID, totalMoney, outputinfoID, function (err, inputinfo) {
         if (err) {
           res.json({
             error: true,
@@ -232,7 +232,8 @@ const updateDetail = function (req, res) {
   var ebookID = req.body.ebookID;
   var inputPrice = req.body.inputPrice;
   var totalMoney = req.body.totalMoney;
-  var ouputinfoID = req.body.ouputinfoID;
+  var outputinfoID = req.body.outputinfoID;
+  console.log(outputinfoID);
 
   InputInfo.updateItemDetail(inputinfoID, ebookID, inputPrice, function (err, inputInfo) {
     if (err) {
@@ -242,7 +243,7 @@ const updateDetail = function (req, res) {
         message: "Lỗi! Cập nhật chi tiết phiếu nhập không thành công",
       });
     } else {
-      InputInfo.updateTotalMoney(inputinfoID, totalMoney, ouputinfoID, function (err, inputinfo) {
+      InputInfo.updateTotalMoney(inputinfoID, totalMoney, outputinfoID, function (err, inputinfo) {
         if (err) {
           res.json({
             error: true,
@@ -266,7 +267,7 @@ const deleteDetail = function (req, res) {
   var inputinfoID = req.body.inputinfoID;
   var ebookID = req.body.ebookID;
   var totalMoney = req.body.totalMoney;
-  var ouputinfoID = req.body.ouputinfoID;
+  var outputinfoID = req.body.outputinfoID;
   InputInfo.deleteItemDetail(inputinfoID, ebookID, function (err, inputInfo) {
     if (err) {
       res.json({
@@ -275,7 +276,7 @@ const deleteDetail = function (req, res) {
         message: "Lỗi! Xóa chi tiết phiếu nhập không thành công",
       });
     } else {
-      InputInfo.updateTotalMoney(inputinfoID, totalMoney, ouputinfoID, function (err, inputinfo) {
+      InputInfo.updateTotalMoney(inputinfoID, totalMoney, outputinfoID, function (err, inputinfo) {
         if (err) {
           res.json({
             error: true,

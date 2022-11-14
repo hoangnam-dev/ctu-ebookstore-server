@@ -368,6 +368,8 @@ InputInfo.updateTotalMoney = function updateTotalMoney(
         result(err, null);
       } else {
         var totalMoneyOutput = await resultTotalMoney(outputinfoID);
+        console.log(outputinfoID);
+        console.log(totalMoneyOutput);
         db.query(
           "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
           [totalMoneyOutput, outputinfoID],
