@@ -233,7 +233,6 @@ const updateDetail = function (req, res) {
   var inputPrice = req.body.inputPrice;
   var totalMoney = req.body.totalMoney;
   var outputinfoID = req.body.outputinfoID;
-  console.log(outputinfoID);
 
   InputInfo.updateItemDetail(inputinfoID, ebookID, inputPrice, function (err, inputInfo) {
     if (err) {
