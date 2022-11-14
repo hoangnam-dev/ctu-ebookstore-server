@@ -48,6 +48,7 @@ const allOutputInfo = function (req, res) {
           outputinfoID: outputinfo.outputinfoid,
           outputinfoTotalMoney: outputinfo.outputinfototalmoney,
           outputinfoCreatedAt: outputinfo.outputinfocreatedat,
+          supplierID: outputinfo.supplierid,
           supplierName: outputinfo.suppliername,
         };
       });
@@ -105,6 +106,7 @@ const search = function (req, res) {
           outputinfoID: outputinfo.outputinfoid,
           outputinfoTotalMoney: outputinfo.outputinfototalmoney,
           outputinfoCreatedAt: outputinfo.outputinfocreatedat,
+          supplierID: outputinfo.supplierid,
           supplierName: outputinfo.suppliername,
         };
       });
