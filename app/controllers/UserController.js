@@ -24,7 +24,7 @@ function handleResult(arrData) {
         userstatusColor: userstatus.userstatuscolor,
       };
     });
-    
+
     // return user
     return {
       userID: data.userid,
@@ -81,31 +81,35 @@ const store = async function (req, res) {
       });
       if (uploadResponse.secure_url) {
         newUser.useravatar = uploadResponse.secure_url;
-        bcrypt.hash(req.body.userPassword, saltRounds, function (err, hash) {
-          if (err) {
-            res.json({
-              error: true,
-              statusCode: 0,
-              message: "Lỗi! Mã hóa password không thành công",
-            });
-          }
-          newUser.userpassword = hash;
-          User.store(newUser, function (err, user) {
+        bcrypt.hash(
+          req.body.userPassword.toString(),
+          saltRounds,
+          function (err, hash) {
             if (err) {
               res.json({
                 error: true,
                 statusCode: 0,
-                message: "Lỗi! Thêm user không thành công",
-              });
-            } else {
-              res.json({
-                error: false,
-                statusCode: 1,
-                message: "Thêm user thành công",
+                message: "Lỗi! Mã hóa password không thành công",
               });
             }
-          });
-        });
+            newUser.userpassword = hash;
+            User.store(newUser, function (err, user) {
+              if (err) {
+                res.json({
+                  error: true,
+                  statusCode: 0,
+                  message: "Lỗi! Thêm user không thành công",
+                });
+              } else {
+                res.json({
+                  error: false,
+                  statusCode: 1,
+                  message: "Thêm user thành công",
+                });
+              }
+            });
+          }
+        );
       }
     } catch (error) {
       res.json({
@@ -166,7 +170,7 @@ const getUserByID = function (req, res) {
             userstatusColor: userstatus.userstatuscolor,
           };
         });
-        
+
         // return user
         return {
           userID: data.userid,
@@ -182,6 +186,7 @@ const getUserByID = function (req, res) {
           userPhone: data.userphone,
           userBankNumber: data.userbanknumber,
           userCreatedAt: data.usercreatedat,
+          userAddressSub : data.userAddressSub,
           roleList: roleList,
           userstatusList: userstatusList,
         };
@@ -272,6 +277,7 @@ const changeAvatar = async function (req, res) {
             error: false,
             statusCode: 1,
             message: "Cập nhật user avatar thành công",
+            avatarUrl: userAvatar,
           });
         }
       });
@@ -288,31 +294,57 @@ const changeAvatar = async function (req, res) {
 // Update user password
 const changePassword = async function (req, res) {
   var userID = req.params.id;
-  var userPassword = req.body.userPassword;
-  bcrypt.hash(userPassword, saltRounds, function (err, hash) {
+  var userPassword = req.body.userPassword.toString();
+  var passwordOld = req.body.passwordOld.toString();
+  User.getPassword(userID, function (err, password) {
     if (err) {
       res.json({
         error: true,
         statusCode: 0,
-        message: "Lỗi! Mã hóa password không thành công",
+        message: "Lỗi! Không tìm thấy user",
       });
-    } else {
-      User.changePassword(userID, hash, function (err, user) {
+    }
+    bcrypt.compare(passwordOld, password, function (err, result) {
+      if (err) {
+        res.json({
+          error: true,
+          statusCode: 0,
+          message: "Lỗi! Không thể so sánh mật khẩu",
+        });
+      }
+      if (!result) {
+        res.json({
+          error: true,
+          statusCode: 0,
+          message: "Lỗi! Mật khẫu cũ không trùng khớp",
+        });
+      }
+      bcrypt.hash(userPassword, saltRounds, function (err, hash) {
         if (err) {
           res.json({
             error: true,
             statusCode: 0,
-            message: "Lỗi! Cập nhật user password không thành công",
+            message: "Lỗi! Mã hóa password không thành công",
           });
         } else {
-          res.json({
-            error: false,
-            statusCode: 1,
-            message: "Cập nhật user password thành công",
+          User.changePassword(userID, hash, function (err, user) {
+            if (err) {
+              res.json({
+                error: true,
+                statusCode: 0,
+                message: "Lỗi! Cập nhật user password không thành công",
+              });
+            } else {
+              res.json({
+                error: false,
+                statusCode: 1,
+                message: "Cập nhật user password thành công",
+              });
+            }
           });
         }
       });
-    }
+    });
   });
 };
 

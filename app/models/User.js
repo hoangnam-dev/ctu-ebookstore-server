@@ -38,6 +38,23 @@ async function hasRole(userID) {
   });
 }
 
+// Get address of user
+async function hasAddress(userID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT district.provinceid, district.districtid, ward.wardid FROM user INNER JOIN ward ON user.wardid = ward.wardid INNER JOIN district ON ward.districtid = district.districtid WHERE user.userid =?",
+      [userID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
+
 // Get list userstatus of user
 async function hasUserStatus(userID) {
   return new Promise((resolve, reject) => {
@@ -60,6 +77,7 @@ async function resultUser(res) {
   let listInfo = res.map(async (res) => {
     var role = [];
     var status = [];
+    var address;
 
     await hasRole(res.userid)
       .then(function (resRole) {
@@ -77,10 +95,22 @@ async function resultUser(res) {
         result(errStatus, null);
       });
 
+    await hasAddress(res.userid)
+      .then(function (resAddress) {
+        address = [
+          resAddress[0].provinceid,
+          resAddress[0].districtid,
+          resAddress[0].wardid,
+        ];
+      })
+      .catch(function (errAddress) {
+        result(errAddress, null);
+      });
     var userInfo = {
       ...res,
       roleList: role,
       statusList: status,
+      userAddressSub : address,
     };
     return userInfo;
   });
@@ -127,6 +157,21 @@ User.getUserByID = function getUserByID(userID, result) {
       } else {
         const userData = await resultUser(res);
         result(null, userData);
+      }
+    }
+  );
+};
+
+// Get user by ID
+User.getPassword = function getPassword(userID, result) {
+  db.query(
+    "SELECT userpassword FROM user WHERE userid = ?",
+    userID,
+    async function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res[0].userpassword);
       }
     }
   );
