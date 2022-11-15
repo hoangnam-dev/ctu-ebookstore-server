@@ -81,6 +81,21 @@ Customer.getCustomerByID = function getCustomerByID(customerID, result) {
   );
 };
 
+// Get customer by ID
+Customer.getPassword = function getPassword(customerID, result) {
+  db.query(
+    "SELECT customerpassword FROM customer WHERE customerid = ?",
+    customerID,
+    async function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res[0].customerpassword);
+      }
+    }
+  );
+};
+
 // Search customer
 Customer.search = function searchCustomer(col, val, result) {
   const sql = `SELECT * FROM customer WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND customerdeletedat IS NULL`;

@@ -212,6 +212,7 @@ const changeAvatar = async function (req, res) {
             error: false,
             statusCode: 1,
             message: "Cập nhật avatar thành công",
+            avatarUrl: customerAvatar,
           });
         }
       });
@@ -228,31 +229,57 @@ const changeAvatar = async function (req, res) {
 // Update customer password
 const changePassword = async function (req, res) {
   var customerID = req.params.id;
-  var customerPassword = req.body.customerPassword;
-  bcrypt.hash(customerPassword, saltRounds, function (err, hash) {
+  var customerPassword = req.body.customerPassword.toString();
+  var passwordOld = req.body.passwordOld.toString();
+  Customer.getPassword(customerID, function (err, password) {
     if (err) {
       res.json({
         error: true,
         statusCode: 0,
-        message: "Lỗi! Mã hóa password không thành công",
+        message: "Lỗi! Không tìm thấy khách hàng",
       });
-    } else {
-      Customer.changePassword(customerID, hash, function (err, customer) {
+    }
+    bcrypt.compare(passwordOld, password, function (err, result) {
+      if (err) {
+        res.json({
+          error: true,
+          statusCode: 0,
+          message: "Lỗi! Không thể so sánh mật khẩu",
+        });
+      }
+      if (!result) {
+        res.json({
+          error: true,
+          statusCode: 0,
+          message: "Lỗi! Mật khẫu cũ không trùng khớp",
+        });
+      }
+      bcrypt.hash(customerPassword, saltRounds, function (err, hash) {
         if (err) {
           res.json({
             error: true,
             statusCode: 0,
-            message: "Lỗi! Cập nhật password không thành công",
+            message: "Lỗi! Mã hóa password không thành công",
           });
         } else {
-          res.json({
-            error: false,
-            statusCode: 1,
-            message: "Cập nhật password thành công",
+          Customer.changePassword(customerID, hash, function (err, customer) {
+            if (err) {
+              res.json({
+                error: true,
+                statusCode: 0,
+                message: "Lỗi! Cập nhật customer password không thành công",
+              });
+            } else {
+              res.json({
+                error: false,
+                statusCode: 1,
+                message: "Cập nhật customer password thành công",
+              });
+            }
           });
         }
       });
-    }
+    });
   });
 };
 
