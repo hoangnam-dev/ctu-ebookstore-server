@@ -253,32 +253,33 @@ const changePassword = async function (req, res) {
           statusCode: 0,
           message: "Lỗi! Mật khẫu cũ không trùng khớp",
         });
+      } else {
+        bcrypt.hash(customerPassword, saltRounds, function (err, hash) {
+          if (err) {
+            res.json({
+              error: true,
+              statusCode: 0,
+              message: "Lỗi! Mã hóa password không thành công",
+            });
+          } else {
+            Customer.changePassword(customerID, hash, function (err, customer) {
+              if (err) {
+                res.json({
+                  error: true,
+                  statusCode: 0,
+                  message: "Lỗi! Cập nhật customer password không thành công",
+                });
+              } else {
+                res.json({
+                  error: false,
+                  statusCode: 1,
+                  message: "Cập nhật customer password thành công",
+                });
+              }
+            });
+          }
+        });
       }
-      bcrypt.hash(customerPassword, saltRounds, function (err, hash) {
-        if (err) {
-          res.json({
-            error: true,
-            statusCode: 0,
-            message: "Lỗi! Mã hóa password không thành công",
-          });
-        } else {
-          Customer.changePassword(customerID, hash, function (err, customer) {
-            if (err) {
-              res.json({
-                error: true,
-                statusCode: 0,
-                message: "Lỗi! Cập nhật customer password không thành công",
-              });
-            } else {
-              res.json({
-                error: false,
-                statusCode: 1,
-                message: "Cập nhật customer password thành công",
-              });
-            }
-          });
-        }
-      });
     });
   });
 };
