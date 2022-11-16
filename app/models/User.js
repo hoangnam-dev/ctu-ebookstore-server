@@ -209,7 +209,7 @@ User.update = function updateUser(userID, user, result) {
   db.query(
     sql,
     [
-      user.userusername,
+      user.username,
       user.userbirthdate,
       user.usergender,
       user.useraddress,
