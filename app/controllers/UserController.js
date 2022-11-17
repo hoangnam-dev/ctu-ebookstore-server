@@ -349,6 +349,47 @@ const changePassword = async function (req, res) {
   });
 };
 
+// Update user password
+const resetPassword = async function (req, res) {
+  var userID = req.params.id;
+  var userPassword = req.body.userPassword.toString();
+  User.getPassword(userID, function (err, password) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy user",
+      });
+    } else {
+      bcrypt.hash(userPassword, saltRounds, function (err, hash) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Mã hóa password không thành công",
+          });
+        } else {
+          User.changePassword(userID, hash, function (err, user) {
+            if (err) {
+              res.json({
+                error: true,
+                statusCode: 0,
+                message: "Lỗi! Cập nhật user password không thành công",
+              });
+            } else {
+              res.json({
+                error: false,
+                statusCode: 1,
+                message: "Cập nhật user password thành công",
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+};
+
 // Soft destroy user
 const destroy = function (req, res) {
   var userID = req.params.id;
@@ -418,6 +459,7 @@ module.exports = {
   update,
   changeAvatar,
   changePassword,
+  resetPassword,
   destroy,
   restore,
 };
