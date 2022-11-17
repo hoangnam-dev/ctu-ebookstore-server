@@ -3,6 +3,7 @@ const categoryRouter = require('./category');
 const cartRouter = require('./cart');
 const commentRouter = require('./comment');
 const customerRouter = require('./customer');
+const customerStatusRouter = require('./customerstatus');
 const directoryRouter = require('./directory');
 const districtRouter = require('./district');
 const ebookRouter = require('./ebook');
@@ -19,6 +20,7 @@ const roleRouter = require('./role');
 const saleRouter = require('./sale');
 const supplierRouter = require('./supplier');
 const userRouter = require('./user');
+const userStatusRouter = require('./userstatus');
 const wardRouter = require('./ward');
 
 function route(app) {
@@ -37,6 +39,9 @@ function route(app) {
     // Customer routes
     app.use('/api/customers', customerRouter);
     
+    // Customer routes
+    app.use('/api/customerstatus', customerStatusRouter);
+    
     // Directory routes
     app.use('/api/directories', directoryRouter);
 
@@ -45,6 +50,9 @@ function route(app) {
     
     // Ebook routes
     app.use('/api/ebooks', ebookRouter);
+    
+    // Ebook routes
+    app.use('/api/ebookstatus', ebookStatusRouter);
     
     // Ebook routes
     app.use('/api/ebookstatus', ebookStatusRouter);
@@ -84,6 +92,9 @@ function route(app) {
 
     // User routes
     app.use('/api/users', userRouter);
+
+    // User status routes
+    app.use('/api/userstatus', userStatusRouter);
 
     // Ward routes
     app.use('/api/wards', wardRouter);
