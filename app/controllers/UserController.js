@@ -30,6 +30,7 @@ function handleResult(arrData) {
       userID: data.userid,
       userName: data.username,
       userPhone: data.userphone,
+      userEmail: data.useremail,
       roleList: roleList,
       userstatusList: userstatusList,
     };

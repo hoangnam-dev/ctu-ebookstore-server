@@ -122,7 +122,7 @@ async function resultUser(res) {
 // Get all user
 User.getAll = function getAllUser(result) {
   db.query(
-    "SELECT userid, username, userphone FROM user WHERE userdeletedat IS NULL",
+    "SELECT userid, username, userphone, useremail FROM user WHERE userdeletedat IS NULL",
     async function (err, res) {
       if (err) {
         result(err, null);
