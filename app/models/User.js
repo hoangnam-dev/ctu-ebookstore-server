@@ -178,8 +178,15 @@ User.getPassword = function getPassword(userID, result) {
 };
 
 // Search user
-User.search = function searchUser(col, val, result) {
-  const sql = `SELECT * FROM user WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND userdeletedat IS NULL`;
+User.search = function searchUser(col, val, roleID, statusID, result) {
+  var subWhere = '';
+  if(roleID !== undefined) {
+    subWhere += ' AND roleid = ' + roleID;
+  }
+  if(statusID !== undefined) {
+    subWhere += ' AND userstatusid = ' + statusID;
+  }
+  const sql = `SELECT * FROM user WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' ${subWhere} AND userdeletedat IS NULL`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);

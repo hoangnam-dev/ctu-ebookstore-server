@@ -143,6 +143,26 @@ const checkUserNameIsset = function (req, res) {
 };
 
 // Get user by ID
+const checkPasswordIsset = function (req, res) {
+  var userName = req.params.userUsername;
+  User.checkUserName(userName, function (err, user) {
+    if (Object.keys(user).length === 0) {
+      res.json({
+        error: false,
+        statusCode: 1,
+        message: "Username chưa tồn tại",
+      });
+    } else {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Username đã tồn tại",
+      });
+    }
+  });
+};
+
+// Get user by ID
 const getUserByID = function (req, res) {
   var userID = req.params.id;
   User.getUserByID(userID, function (err, user) {
@@ -201,8 +221,10 @@ const getUserByID = function (req, res) {
 const search = function (req, res) {
   var col = req.query.type;
   var val = req.query.input;
-  User.search(col, val, function (err, users) {
-    if (err || Object.keys(user).length === 0) {
+  var roleID = req.query.roleID;
+  var statusID = req.query.statusID;
+  User.search(col, val, roleID, statusID, function (err, users) {
+    if (err || Object.keys(users).length === 0) {
       res.json({
         error: true,
         statusCode: 0,

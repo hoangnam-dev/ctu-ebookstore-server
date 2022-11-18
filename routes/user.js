@@ -18,8 +18,8 @@ const {
 } = require("../app/controllers/UserController");
 
 router.get("/checkUsername/:userUsername", checkUserNameIsset);
-router.get("/:id", getUserByID);
 router.get("/search", search);
+router.get("/:id", getUserByID);
 router.post("/", upload.single("userAvatar"), store);
 router.put("/:id", update);
 router.put("/changeAvatar/:id", upload.single("userAvatar"), changeAvatar);
