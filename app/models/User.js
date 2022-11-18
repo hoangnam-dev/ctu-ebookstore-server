@@ -134,7 +134,7 @@ User.getAll = function getAllUser(result) {
   );
 };
 
-// Get user by ID
+// Get username
 User.checkUserName = function checkUserName(userName, result) {
   const sql = "SELECT * FROM user WHERE userusername = '" + userName + "'";
   db.query(sql, function (err, res) {
@@ -157,21 +157,6 @@ User.getUserByID = function getUserByID(userID, result) {
       } else {
         const userData = await resultUser(res);
         result(null, userData);
-      }
-    }
-  );
-};
-
-// Get user by ID
-User.getPassword = function getPassword(userID, result) {
-  db.query(
-    "SELECT userpassword FROM user WHERE userid = ?",
-    userID,
-    async function (err, res) {
-      if (err) {
-        result(err, null);
-      } else {
-        result(null, res[0].userpassword);
       }
     }
   );

@@ -57,6 +57,8 @@ const allUser = function (req, res) {
 // Store new user
 const store = async function (req, res) {
   var newUser = new User(req.body);
+  newUser.useravatar =
+    "https://res.cloudinary.com/hoangnam14/image/upload/v1668758923/ebookstore_user/avatar-default_xbg505.png";
   if (
     !newUser.username ||
     !newUser.userusername ||
@@ -77,47 +79,79 @@ const store = async function (req, res) {
   } else {
     try {
       var userAvt = req.file.path;
-      const uploadResponse = await cloudinary.uploader.upload(userAvt, {
-        upload_preset: "ebookstore_user",
-      });
-      if (uploadResponse.secure_url) {
-        newUser.useravatar = uploadResponse.secure_url;
-        bcrypt.hash(
-          req.body.userPassword.toString(),
-          saltRounds,
-          function (err, hash) {
-            if (err) {
-              res.json({
-                error: true,
-                statusCode: 0,
-                message: "Lỗi! Mã hóa password không thành công",
-              });
-            }
-            newUser.userpassword = hash;
-            User.store(newUser, function (err, user) {
+      try {
+        const uploadResponse = await cloudinary.uploader.upload(userAvt, {
+          upload_preset: "ebookstore_user",
+        });
+        if (uploadResponse.secure_url) {
+          newUser.useravatar = uploadResponse.secure_url;
+          bcrypt.hash(
+            req.body.userPassword.toString(),
+            saltRounds,
+            function (err, hash) {
               if (err) {
                 res.json({
                   error: true,
                   statusCode: 0,
-                  message: "Lỗi! Thêm user không thành công",
-                });
-              } else {
-                res.json({
-                  error: false,
-                  statusCode: 1,
-                  message: "Thêm user thành công",
+                  message: "Lỗi! Mã hóa password không thành công",
                 });
               }
-            });
-          }
-        );
+              newUser.userpassword = hash;
+              User.store(newUser, function (err, user) {
+                if (err) {
+                  res.json({
+                    error: true,
+                    statusCode: 0,
+                    message: "Lỗi! Thêm user không thành công",
+                  });
+                } else {
+                  res.json({
+                    error: false,
+                    statusCode: 1,
+                    message: "Thêm user thành công",
+                  });
+                }
+              });
+            }
+          );
+        }
+      } catch (uploadError) {
+        res.json({
+          error: true,
+          statusCode: 0,
+          message: "Lỗi! Không thể lưu avatar",
+        });
       }
     } catch (error) {
-      res.json({
-        error: true,
-        statusCode: 0,
-        message: "Lỗi! Không thể lưu avatar",
-      });
+      bcrypt.hash(
+        req.body.userPassword.toString(),
+        saltRounds,
+        function (err, hash) {
+          if (err) {
+            res.json({
+              error: true,
+              statusCode: 0,
+              message: "Lỗi! Mã hóa password không thành công",
+            });
+          }
+          newUser.userpassword = hash;
+          User.store(newUser, function (err, user) {
+            if (err) {
+              res.json({
+                error: true,
+                statusCode: 0,
+                message: "Lỗi! Thêm user không thành công",
+              });
+            } else {
+              res.json({
+                error: false,
+                statusCode: 1,
+                message: "Thêm user thành công",
+              });
+            }
+          });
+        }
+      );
     }
   }
 };
