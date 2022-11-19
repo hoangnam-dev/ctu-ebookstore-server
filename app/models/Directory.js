@@ -64,6 +64,20 @@ Directory.getAll = function getAllDirectory(result) {
   );
 };
 
+// index
+Directory.index = function index(result) {
+  db.query(
+    "SELECT directoryid, directoryname FROM directory WHERE directorydeletedat IS NULL",
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+          result(null, res);
+      }
+    }
+  );
+};
+
 // Get directory by ID
 Directory.search = function search(directoryName, result) {
   const sql = `SELECT * FROM directory WHERE REPLACE(directoryname, 'Đ', 'D') LIKE '%${directoryName}%'`;

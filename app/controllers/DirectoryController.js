@@ -38,6 +38,28 @@ const allDirectory = function (req, res) {
   });
 };
 
+// Show all directory (id, name)
+const index = function (req, res) {
+  Directory.getAll(function (err, directories) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không truy xuất được dữ liệu",
+      });
+    } else {
+      var resData = directories.map((data) => {
+        // return data
+        return {
+          directoryID: data.directoryid,
+          directoryName: data.directoryname,
+        };
+      });
+      res.json(resData);
+    }
+  });
+};
+
 // Store new directory
 const store = function (req, res) {
   var newDirectory = new Directory(req.body);
@@ -191,6 +213,7 @@ const destroy = function (req, res) {
 
 module.exports = {
   allDirectory,
+  index,
   getDirectoryByID,
   search,
   store,
