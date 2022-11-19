@@ -18,7 +18,10 @@ const {
 } = require("../app/controllers/UserController");
 
 // Middlewares
-const { verifyToken } = require("../app/middlewares/jwt");
+// const {
+//   systemManagerPermissions,
+// } = require("../app/middlewares/systemMangerPermission");
+const jwtMiddleware = require("../app/middlewares/jwt");
 
 router.get("/checkUsername/:userUsername", checkUserNameIsset);
 router.get("/search", search);
@@ -30,6 +33,6 @@ router.put("/changePassword/:id", changePassword);
 router.put("/resetPassword/:id", resetPassword);
 router.delete("/:id", destroy);
 router.put("/restore/:id", restore);
-router.get("/", verifyToken, allUser);
+router.get("/", jwtMiddleware.systemManagerPermissions, allUser);
 
 module.exports = router;

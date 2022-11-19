@@ -111,10 +111,66 @@ UserAuth.checkUsernameLogin = function checkUsernameLogin(userName, result) {
     if (err) {
       result(err, null);
     } else {
-        const userData = await resultUser(res);
-        result(null, userData);
+      const userData = await resultUser(res);
+      result(null, userData);
     }
   });
 };
 
+// Get role and permission
+// Get list permissions of role
+async function hasPermission(roleID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT permission.* FROM role_permission RIGHT JOIN permission ON role_permission.permissionid = permission.permissionid WHERE role_permission.roleid = ?",
+      [roleID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
+
+// Customer result,
+async function resultRole(res) {
+  let listPerm = res.map(async (res) => {
+    var permissions = [];
+
+    await hasPermission(res.roleid)
+      .then(function (val) {
+        permissions = val;
+      })
+      .catch(function (err) {
+        result(err, null);
+      });
+    var roleInfo = {
+      ...res,
+      permissionList: permissions,
+    };
+    return roleInfo;
+  });
+
+  const roleData = await Promise.all(listPerm);
+  return roleData;
+}
+
+// Get all role
+UserAuth.getRoleAndPermission = function getRoleAndPermission(
+  roleCode,
+  result
+) {
+  const sql = `SELECT * FROM role WHERE rolecode = '${roleCode}' AND roledeletedat IS NULL`;
+  db.query(sql, async function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      const roleData = await resultRole(res);
+      result(null, roleData);
+    }
+  });
+};
 module.exports = UserAuth;

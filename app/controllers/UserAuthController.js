@@ -34,7 +34,7 @@ const login = (req, res) => {
               roleCode: role.rolecode,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "30s" }
+            { expiresIn: "3d" }
           );
 
           const refreshToken = jwt.sign(
@@ -53,7 +53,6 @@ const login = (req, res) => {
             path: "/",
             sameSite: "strict",
           });
-          console.log(refreshTokenList);
 
           var data = user.map((data) => {
             // Handle role list of the role
@@ -118,7 +117,6 @@ const refreshAccessToken = (req, res) => {
   }
   // Check token vailable
   if (!refreshTokenList.includes(refreshToken)) {
-    console.log(!refreshTokenList.includes(refreshToken));
     return res.json({
       error: true,
       statusCode: 0,
@@ -136,33 +134,14 @@ const refreshAccessToken = (req, res) => {
       });
     }
 
-    // refreshTokenList = refreshTokenList.filter((token) => {
-    //   token !== refreshToken;
-    // });
     const newAccessToken = jwt.sign(
       {
         id: data.id,
         roleCode: data.roleCode,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "30s" }
+      { expiresIn: "3d" }
     );
-    // const newRefreshToken = jwt.sign(
-    //   {
-    //     id: data.id,
-    //     roleCode: data.roleCode,
-    //   },
-    //   process.env.JWT_REFRESH_KEY,
-    //   { expiresIn: "30d" }
-    // );
-    // refreshTokenList.push(newRefreshToken);
-    // res.cookie("refreshToken", newRefreshToken, {
-    //   httqOnly: true,
-    //   secure: false,
-    //   path: "/",
-    //   sameSite: "strict",
-    // });
-
     res.json({
       newAccessToken,
     });
@@ -171,7 +150,7 @@ const refreshAccessToken = (req, res) => {
 
 const logout = (req, res) => {
   refreshTokenList = refreshTokenList.filter((token) => {
-    token !== refreshToken;
+    token !== req.cookies.refreshToken;
   });
   return res.json({
     error: false,
