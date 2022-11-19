@@ -20,6 +20,7 @@ const roleRouter = require('./role');
 const saleRouter = require('./sale');
 const supplierRouter = require('./supplier');
 const userRouter = require('./user');
+const userAuthRouter = require('./userAuth');
 const userStatusRouter = require('./userstatus');
 const wardRouter = require('./ward');
 
@@ -92,6 +93,9 @@ function route(app) {
 
     // User routes
     app.use('/api/users', userRouter);
+
+    // User routes
+    app.use('/api/user-auth', userAuthRouter);
 
     // User status routes
     app.use('/api/userstatus', userStatusRouter);
