@@ -17,6 +17,9 @@ const {
   restore,
 } = require("../app/controllers/UserController");
 
+// Middlewares
+const { verifyToken } = require("../app/middlewares/jwt");
+
 router.get("/checkUsername/:userUsername", checkUserNameIsset);
 router.get("/search", search);
 router.get("/:id", getUserByID);
@@ -27,6 +30,6 @@ router.put("/changePassword/:id", changePassword);
 router.put("/resetPassword/:id", resetPassword);
 router.delete("/:id", destroy);
 router.put("/restore/:id", restore);
-router.get("/", allUser);
+router.get("/", verifyToken, allUser);
 
 module.exports = router;
