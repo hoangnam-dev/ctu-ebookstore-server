@@ -9,6 +9,17 @@ const Category = function(category) {
     this.directoryid = category.directoryID;
 };
 
+// index
+Category.index = function index(result) {
+    db.query("SELECT categoryid, categoryname FROM category WHERE categorydeletedat IS NULL", function(err, res) {
+        if(err) {
+            result(err, null);
+        } else {
+            result(null, res);
+        }
+    });
+};
+
 // Get all category
 Category.getAll = function getAllCategory(result) {
     db.query("SELECT * FROM category WHERE categorydeletedat IS NULL", function(err, res) {

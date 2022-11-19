@@ -1,5 +1,27 @@
 const Category = require("../models/Category");
 
+// Show all category (id, name)
+const index = function (req, res) {
+  Category.getAll(function (err, categories) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không truy xuất được dữ liệu",
+      });
+    } else {
+      var resData = categories.map((data) => {
+        // return data
+        return {
+          categoryID: data.categoryid,
+          categoryName: data.categoryname,
+        };
+      });
+      res.json(resData);
+    }
+  });
+};
+
 // Show all category
 const allCategory = function (req, res) {
   Category.getAll(function (err, categories) {
@@ -215,6 +237,7 @@ const destroy = function (req, res) {
 
 module.exports = {
   allCategory,
+  index,
   getCategoryByID,
   getCategoryByDirectoryID,
   search,
