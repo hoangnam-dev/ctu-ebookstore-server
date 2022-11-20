@@ -7,20 +7,34 @@ require("dotenv").config();
 // List token need to refresh
 let refreshTokenList = [];
 
+// Account status
+const active = 'active';
+const blocked = 'blocked';
+
 const login = (req, res) => {
   var username = req.body.username;
   var password = req.body.password.toString();
 
   UserAuth.checkUsernameLogin(username, function (err, user) {
     if (err || Object.keys(user).length === 0) {
-      res.json({
+      return res.json({
         error: true,
         statusCode: 0,
         messeage: "Lỗi! Tên tài khoản không đúng",
       });
     } else {
+      // Check account status
+      let accountStatus = user[0].statusList[0].userstatuscode;
+      if (accountStatus === blocked) {
+        return res.json({
+          error: true,
+          statusCode: 0,
+          messeage: "Lỗi! Tài khoản đã bị khóa",
+        });
+      }
+      // Check password
       bcrypt.compare(password, user[0].userpassword, function (error, result) {
-        if (error || !result ) {
+        if (error || !result) {
           res.json({
             error: true,
             statusCode: 0,
@@ -34,7 +48,7 @@ const login = (req, res) => {
               roleCode: role.rolecode,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "1d" }
+            { expiresIn: "30s" }
           );
 
           const refreshToken = jwt.sign(
@@ -54,6 +68,7 @@ const login = (req, res) => {
             sameSite: "strict",
           });
 
+          // result user info
           var data = user.map((data) => {
             // Handle role list of the role
             var roleList = data.roleList.map((role) => {
@@ -140,7 +155,7 @@ const refreshAccessToken = (req, res) => {
         roleCode: data.roleCode,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "1m" }
+      { expiresIn: "30s" }
     );
     res.json({
       newAccessToken,
@@ -157,7 +172,7 @@ const logout = (req, res) => {
     statusCode: 1,
     message: "User logout successfully",
   });
-}
+};
 
 module.exports = {
   login,
