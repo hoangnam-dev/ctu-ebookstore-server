@@ -12,7 +12,7 @@ const login = (req, res) => {
   var password = req.body.password.toString();
 
   UserAuth.checkUsernameLogin(username, function (err, user) {
-    if (err) {
+    if (err || Object.keys(user).length === 0) {
       res.json({
         error: true,
         statusCode: 0,
@@ -20,7 +20,7 @@ const login = (req, res) => {
       });
     } else {
       bcrypt.compare(password, user[0].userpassword, function (error, result) {
-        if (error) {
+        if (error || !result ) {
           res.json({
             error: true,
             statusCode: 0,
@@ -34,7 +34,7 @@ const login = (req, res) => {
               roleCode: role.rolecode,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "3d" }
+            { expiresIn: "1d" }
           );
 
           const refreshToken = jwt.sign(
@@ -78,7 +78,6 @@ const login = (req, res) => {
               userID: data.userid,
               userName: data.username,
               userUserName: data.userusername,
-              userPassword: data.userpassword,
               userCIC: data.usercic,
               userAvatar: data.useravatar,
               userBirthdate: data.userbirthdate,
@@ -89,14 +88,15 @@ const login = (req, res) => {
               userBankNumber: data.userbanknumber,
               userCreatedAt: data.usercreatedat,
               userAddressSub: data.userAddressSub,
-              roleList: roleList,
-              userstatusList: userstatusList,
+              roleID: roleList[0].roleID,
+              roleName: roleList[0].roleName,
+              userstatusCode: userstatusList[0].userstatusCode,
             };
           });
 
           res.json({
             accessToken,
-            data: data[0],
+            userInfo: data[0],
           });
         }
       });
@@ -140,7 +140,7 @@ const refreshAccessToken = (req, res) => {
         roleCode: data.roleCode,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "3d" }
+      { expiresIn: "1m" }
     );
     res.json({
       newAccessToken,
