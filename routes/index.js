@@ -24,9 +24,6 @@ const userAuthRouter = require('./userAuth');
 const userStatusRouter = require('./userstatus');
 const wardRouter = require('./ward');
 
-// Middlewares
-const jwtMiddleware = require("../app/middlewares/jwt");
-
 function route(app) {
     // Author routes
     app.use('/api/authors', authorRouter);
@@ -95,7 +92,7 @@ function route(app) {
     app.use('/api/suppliers', supplierRouter);
 
     // User routes
-    app.use('/api/users', jwtMiddleware.verifyToken, userRouter);
+    app.use('/api/users', userRouter);
 
     // User routes
     app.use('/api/user-auth', userAuthRouter);

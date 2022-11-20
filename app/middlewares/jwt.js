@@ -28,23 +28,9 @@ const jwtMiddleware = {
     }
   },
 
-  // check admin permissions
-  systemManagerPermissions: (req, res, next) => {
-    const roles = [process.env.ADMIN_ROLE];
-    if(roles.includes(req.user.roleCode) === false){
-      return res.json({
-        error: true,
-        statusCode: 0,
-        message: "You are not allowed to do this",
-      });
-    }
-    const permisisons = [
-      process.env.CREATE_PERMISSION,
-      process.env.READ_PERMISSION,
-      process.env.UPDATE_PERMISSION,
-      process.env.DELETE_PERMISSION,
-    ];
-    var checkPerm = true;
+  // Check author permissions
+  managerAuthor: (req, res, next) => {
+    const permission = process.env.MANAGER_AUTHOR;
 
     jwtMiddleware.verifyToken(req, res, () => {
       let roleCode = req.user.roleCode;
@@ -57,42 +43,26 @@ const jwtMiddleware = {
           });
         }
         let arrPerm = permList[0].permissionList;
-        arrPerm.forEach((perm) => {
-          if (permisisons.includes(perm.permissioncode) === false) {
-            checkPerm = false;
-          }
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
         });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
       });
     });
-
-    if (checkPerm) {
-      next();
-    } else {
-      return res.json({
-        error: true,
-        statusCode: 0,
-        message: "You don't have permission to access this",
-      });
-    }
   },
 
-  // Check manager permissions
-  managerPermissions: (req, res, next) => {
-    const roles = [process.env.MANAGER_ROLE];
-    if(roles.includes(req.user.roleCode) === false){
-      return res.json({
-        error: true,
-        statusCode: 0,
-        message: "You are not allowed to do this",
-      });
-    }
-    const permisisons = [
-      process.env.CREATE_PERMISSION,
-      process.env.READ_PERMISSION,
-      process.env.UPDATE_PERMISSION,
-      process.env.DELETE_PERMISSION,
-    ];
-    var checkPerm = true;
+  // Check directory and category permissions
+  managerDirectoryCategory: (req, res, next) => {
+    const permission = process.env.MANAGER_DIRECTORY_CATEGORY;
 
     jwtMiddleware.verifyToken(req, res, () => {
       let roleCode = req.user.roleCode;
@@ -105,24 +75,247 @@ const jwtMiddleware = {
           });
         }
         let arrPerm = permList[0].permissionList;
-        arrPerm.forEach((perm) => {
-          if (permisisons.includes(perm.permissioncode) === false) {
-            checkPerm = false;
-          }
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
         });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
       });
     });
-
-    if (checkPerm) {
-      next();
-    } else {
-      return res.json({
-        error: true,
-        statusCode: 0,
-        message: "You don't have permission to access this",
-      });
-    }
   },
+
+  // Check ebook permissions
+  managerEbook: (req, res, next) => {
+    const permission = process.env.MANAGER_EBOOK;
+
+    jwtMiddleware.verifyToken(req, res, () => {
+      let roleCode = req.user.roleCode;
+      UserAuth.getRoleAndPermission(roleCode, (err, permList) => {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Role is available",
+          });
+        }
+        let arrPerm = permList[0].permissionList;
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
+        });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
+      });
+    });
+  },
+
+  // Check inputinfo permissions
+  managerInputinfo: (req, res, next) => {
+    const permission = process.env.MANAGER_INPUTINFO;
+
+    jwtMiddleware.verifyToken(req, res, () => {
+      let roleCode = req.user.roleCode;
+      UserAuth.getRoleAndPermission(roleCode, (err, permList) => {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Role is available",
+          });
+        }
+        let arrPerm = permList[0].permissionList;
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
+        });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
+      });
+    });
+  },
+
+  // Check outputinfo permissions
+  managerOutputinfo: (req, res, next) => {
+    const permission = process.env.MANAGER_OUTPUTINFO;
+
+    jwtMiddleware.verifyToken(req, res, () => {
+      let roleCode = req.user.roleCode;
+      UserAuth.getRoleAndPermission(roleCode, (err, permList) => {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Role is available",
+          });
+        }
+        let arrPerm = permList[0].permissionList;
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
+        });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
+      });
+    });
+  },
+
+  // Check role and permission permissions
+  managerRolePermission: (req, res, next) => {
+    const permission = process.env.MANAGER_ROLE_PERMISISON;
+
+    jwtMiddleware.verifyToken(req, res, () => {
+      let roleCode = req.user.roleCode;
+      UserAuth.getRoleAndPermission(roleCode, (err, permList) => {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Role is available",
+          });
+        }
+        let arrPerm = permList[0].permissionList;
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
+        });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
+      });
+    });
+  },
+
+  // Check sale permissions
+  managerSale: (req, res, next) => {
+    const permission = process.env.MANAGER_SALE;
+
+    jwtMiddleware.verifyToken(req, res, () => {
+      let roleCode = req.user.roleCode;
+      UserAuth.getRoleAndPermission(roleCode, (err, permList) => {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Role is available",
+          });
+        }
+        let arrPerm = permList[0].permissionList;
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
+        });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
+      });
+    });
+  },
+
+  // Check supplier permissions
+  managerSupplier: (req, res, next) => {
+    const permission = process.env.MANAGER_SUPPLIER;
+
+    jwtMiddleware.verifyToken(req, res, () => {
+      let roleCode = req.user.roleCode;
+      UserAuth.getRoleAndPermission(roleCode, (err, permList) => {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Role is available",
+          });
+        }
+        let arrPerm = permList[0].permissionList;
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
+        });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
+      });
+    });
+  },
+
+  // Check user permissions
+  managerUser: (req, res, next) => {
+    const permission = process.env.MANAGER_USER;
+
+    jwtMiddleware.verifyToken(req, res, () => {
+      let roleCode = req.user.roleCode;
+      UserAuth.getRoleAndPermission(roleCode, (err, permList) => {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Role is available",
+          });
+        }
+        let arrPerm = permList[0].permissionList;
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
+        });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
+      });
+    });
+  },
+
 };
 
 module.exports = jwtMiddleware;

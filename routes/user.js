@@ -18,21 +18,18 @@ const {
 } = require("../app/controllers/UserController");
 
 // Middlewares
-// const {
-//   systemManagerPermissions,
-// } = require("../app/middlewares/systemMangerPermission");
-const jwtMiddleware = require("../app/middlewares/jwt");
+const jwtMiddlewares = require('../app/middlewares/jwt');
 
 router.get("/checkUsername/:userUsername", checkUserNameIsset);
 router.get("/search", search);
 router.get("/:id", getUserByID);
-router.post("/", upload.single("userAvatar"), store);
-router.put("/:id", update);
-router.put("/changeAvatar/:id", upload.single("userAvatar"), changeAvatar);
-router.put("/changePassword/:id", changePassword);
-router.put("/resetPassword/:id", resetPassword);
-router.delete("/:id", destroy);
-router.put("/restore/:id", restore);
-router.get("/", jwtMiddleware.systemManagerPermissions, allUser);
+router.post("/", jwtMiddlewares.managerUser, upload.single("userAvatar"), store);
+router.put("/:id", jwtMiddlewares.managerUser, update);
+router.put("/changeAvatar/:id", jwtMiddlewares.managerUser, upload.single("userAvatar"), changeAvatar);
+router.put("/changePassword/:id", jwtMiddlewares.managerUser, changePassword);
+router.put("/resetPassword/:id", jwtMiddlewares.managerUser, resetPassword);
+router.delete("/:id", jwtMiddlewares.managerUser, destroy);
+router.put("/restore/:id", jwtMiddlewares.managerUser, restore);
+router.get("/", jwtMiddlewares.managerUser, allUser);
 
 module.exports = router;

@@ -9,10 +9,10 @@ const {
 } = require("../app/controllers/UserAuthController");
 
 // Middlewares
-const { verifyToken } = require("../app/middlewares/jwt");
+const jwtMiddlewares = require("../app/middlewares/jwt");
 
 router.post("/login", login);
 router.post("/refreshToken", refreshAccessToken);
-router.post("/logout", verifyToken, logout);
+router.post("/logout", jwtMiddlewares.verifyToken, logout);
 
 module.exports = router;

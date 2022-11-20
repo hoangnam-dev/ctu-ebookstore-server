@@ -16,7 +16,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: "*",
+  origin: ["http://localhost:3000"],
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };

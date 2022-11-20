@@ -4,13 +4,16 @@ const router = express.Router();
 // Import Controller
 const {allDirectory, index, store, getDirectoryByID, search, update, destroy, restore} = require('../app/controllers/DirectoryController');
 
-router.post('/', store);
+// Middlewares
+const jwtMiddlewares = require('../app/middlewares/jwt');
+
+router.post('/', jwtMiddlewares.managerDirectoryCategory, store);
 router.get('/index', index);
 router.get('/search', search);
 router.get('/:id', getDirectoryByID);
-router.put('/:id', update);
-router.delete('/:id', destroy);
-router.put('/restore/:id', restore);
-router.get('/', allDirectory);
+router.put('/:id', jwtMiddlewares.managerDirectoryCategory, update);
+router.delete('/:id', jwtMiddlewares.managerDirectoryCategory, destroy);
+router.put('/restore/:id', jwtMiddlewares.managerDirectoryCategory, restore);
+router.get('/', jwtMiddlewares.managerDirectoryCategory, allDirectory);
 
 module.exports = router;
