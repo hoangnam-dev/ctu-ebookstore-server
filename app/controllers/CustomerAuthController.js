@@ -32,8 +32,7 @@ const login = (req, res) => {
           messeage: "Lỗi! Tài khoản đã bị khóa",
         });
       }
-    //   console.log(customer[0].customerpassword);
-    //   // Check password
+      // Check password
       bcrypt.compare(password, customer[0].customerpassword, function (error, result) {
         if (error || !result) {
           res.json({
