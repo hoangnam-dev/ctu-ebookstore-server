@@ -1,0 +1,29 @@
+const express = require("express");
+const router = express.Router();
+const { upload } = require("../utils/multer");
+
+// Import Controller
+const {
+  login,
+  refreshAccessToken,
+  logout,
+} = require("../app/controllers/CustomerAuthController");
+
+const {
+  update,
+  changeAvatar,
+  changePassword,
+} = require("../app/controllers/CustomerController");
+
+// Middlewares
+const jwtMiddlewares = require("../app/middlewares/jwt");
+
+router.post("/login", login);
+router.post("/refreshToken", refreshAccessToken);
+router.post("/logout", jwtMiddlewares.verifyToken, logout);
+
+router.put("/:id", update);
+router.put("/changeAvatar/:id", upload.single("customerAvatar"), changeAvatar);
+router.put("/changePassword/:id", changePassword);
+
+module.exports = router;

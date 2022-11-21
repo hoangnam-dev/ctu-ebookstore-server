@@ -3,6 +3,7 @@ const categoryRouter = require('./category');
 const cartRouter = require('./cart');
 const commentRouter = require('./comment');
 const customerRouter = require('./customer');
+const customerAuthRouter = require('./customerAuth');
 const customerStatusRouter = require('./customerstatus');
 const directoryRouter = require('./directory');
 const districtRouter = require('./district');
@@ -39,6 +40,9 @@ function route(app) {
     
     // Customer routes
     app.use('/api/customers', customerRouter);
+    
+    // Customer Auth routes
+    app.use('/api/customer-auth', customerAuthRouter);
     
     // Customer routes
     app.use('/api/customerstatus', customerStatusRouter);
