@@ -3,6 +3,7 @@ const CustomerAuth = require("../models/CustomerAuth");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const Customer = require("../models/Customer");
 
 // List token need to refresh
 let refreshTokenList = [];
@@ -109,6 +110,118 @@ const login = (req, res) => {
   });
 };
 
+const register = async (req, res) => {
+  var newCustomer = new Customer(req.body);
+  newCustomer.customeravatar =
+    "https://res.cloudinary.com/hoangnam14/image/upload/v1668758923/ebookstore_user/avatar-default_xbg505.png";
+  if (
+    !newCustomer.customername ||
+    !newCustomer.customerpassword ||
+    !newCustomer.customeremail ||
+    !newCustomer.customerstatusid
+  ) {
+    res.json({
+      error: true,
+      statusCode: 0,
+      message: "Thông tin cá nhân không được để trống",
+    });
+  } else {
+    Customer.checkEmail(newCustomer.customeremail, async function(err, result) {
+      if(err) {
+        return res.json({
+          error: true,
+          statusCode: 0,
+          message: "Error checking",
+        }); 
+      }
+      if(Object.keys(result).length>0) {
+        return res.json({
+          error: true,
+          statusCode: 0,
+          message: "Email đã được đăng ký",
+        });
+      }
+
+      if(req.file !== undefined) {
+        try {
+          var customerAvt = req.file.path;
+          const uploadResponse = await cloudinary.uploader.upload(customerAvt, {
+            upload_preset: "ebookstore_customer",
+          });
+          if (uploadResponse.secure_url) {
+            newCustomer.customeravatar = uploadResponse.secure_url;
+            bcrypt.hash(
+              req.body.customerPassword,
+              saltRounds,
+              function (err, hash) {
+                if (err) {
+                  res.json({
+                    error: true,
+                    statusCode: 0,
+                    message: "Lỗi! Mã hóa password không thành công",
+                  });
+                }
+                newCustomer.customerpassword = hash;
+                Customer.store(newCustomer, function (err, customer) {
+                  if (err) {
+                    res.json({
+                      error: true,
+                      statusCode: 0,
+                      message: "Đăng ký tài khoản không thành công",
+                    });
+                  } else {
+                    res.json({
+                      error: false,
+                      statusCode: 1,
+                      message: "Đăng ký tài khoản thành công",
+                    });
+                  }
+                });
+              }
+            );
+          }
+        } catch (error) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Không thể lưu avatar",
+          });
+        }
+      } else {
+        bcrypt.hash(
+          req.body.customerPassword,
+          saltRounds,
+          function (err, hash) {
+            if (err) {
+              res.json({
+                error: true,
+                statusCode: 0,
+                message: "Lỗi! Mã hóa password không thành công",
+              });
+            }
+            newCustomer.customerpassword = hash;
+            Customer.store(newCustomer, function (err, customer) {
+              if (err) {
+                res.json({
+                  error: true,
+                  statusCode: 0,
+                  message: "Đăng ký tài khoản không thành công",
+                });
+              } else {
+                res.json({
+                  error: false,
+                  statusCode: 1,
+                  message: "Đăng ký tài khoản thành công",
+                });
+              }
+            });
+          }
+        );
+      }
+    });
+  }
+};
+
 const refreshAccessToken = (req, res) => {
   const refreshToken = req.cookies.refreshCustomerToken;
 
@@ -210,6 +323,7 @@ const logout = (req, res) => {
 
 module.exports = {
   login,
+  register,
   refreshAccessToken,
   logout,
 };
