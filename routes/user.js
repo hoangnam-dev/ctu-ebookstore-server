@@ -26,7 +26,6 @@ router.get("/:id", getUserByID);
 router.post("/", jwtMiddlewares.managerUser, upload.single("userAvatar"), store);
 router.put("/:id", jwtMiddlewares.managerUser, update);
 router.put("/changeAvatar/:id", jwtMiddlewares.managerUser, upload.single("userAvatar"), changeAvatar);
-router.put("/changePassword/:id", jwtMiddlewares.managerUser, changePassword);
 router.put("/resetPassword/:id", jwtMiddlewares.managerUser, resetPassword);
 router.delete("/:id", jwtMiddlewares.managerUser, destroy);
 router.put("/restore/:id", jwtMiddlewares.managerUser, restore);
