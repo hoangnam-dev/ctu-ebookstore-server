@@ -122,14 +122,29 @@ Customer.store = function storeCustomer(newCustomer, result) {
   });
 };
 
+// Get customer by ID
+Customer.checkEmail = function checkEmail(customerEmail, result) {
+  db.query(
+    "SELECT customerid FROM customer WHERE customeremail = ?",
+    [customerEmail],
+    async function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
+};
+
 // Update customer
 Customer.update = function updateCustomer(customerID, customer, result) {
   db.query(
-    "UPDATE customer SET customername = ?, customeremail = ?, customerstatus = ?, WHERE customerid = ?",
+    "UPDATE customer SET customername = ?, customeremail = ?, customerstatusid = ? WHERE customerid = ?",
     [
       customer.customername,
       customer.customeremail,
-      customer.status,
+      customer.customerstatusid,
       customerID,
     ],
     function (err, res) {

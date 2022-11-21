@@ -47,6 +47,8 @@ const allCustomer = function (req, res) {
 // Store new customer
 const store = async function (req, res) {
   var newCustomer = new Customer(req.body);
+  newCustomer.customeravatar =
+    "https://res.cloudinary.com/hoangnam14/image/upload/v1668758923/ebookstore_user/avatar-default_xbg505.png";
   if (
     !newCustomer.customername ||
     !newCustomer.customerpassword ||
@@ -59,47 +61,99 @@ const store = async function (req, res) {
       message: "Thông tin khách hàng không được để trống",
     });
   } else {
-    try {
-      var customerAvt = req.file.path;
-      const uploadResponse = await cloudinary.uploader.upload(customerAvt, {
-        upload_preset: "ebookstore_customer",
-      });
-      if (uploadResponse.secure_url) {
-        newCustomer.customeravatar = uploadResponse.secure_url;
-        bcrypt.hash(req.body.customerPassword, saltRounds, function (err, hash) {
-          if (err) {
-            res.json({
-              error: true,
-              statusCode: 0,
-              message: "Lỗi! Mã hóa password không thành công",
-            });
+    Customer.checkEmail(newCustomer.customeremail, async function(err, result) {
+      if(err) {
+        return res.json({
+          error: true,
+          statusCode: 0,
+          message: "Error checking",
+        }); 
+      }
+      if(Object.keys(result).length>0) {
+        return res.json({
+          error: true,
+          statusCode: 0,
+          message: "Email đã được đăng ký",
+        });
+      }
+
+      if(req.file !== undefined) {
+        try {
+          var customerAvt = req.file.path;
+          const uploadResponse = await cloudinary.uploader.upload(customerAvt, {
+            upload_preset: "ebookstore_customer",
+          });
+          if (uploadResponse.secure_url) {
+            newCustomer.customeravatar = uploadResponse.secure_url;
+            bcrypt.hash(
+              req.body.customerPassword,
+              saltRounds,
+              function (err, hash) {
+                if (err) {
+                  res.json({
+                    error: true,
+                    statusCode: 0,
+                    message: "Lỗi! Mã hóa password không thành công",
+                  });
+                }
+                newCustomer.customerpassword = hash;
+                Customer.store(newCustomer, function (err, customer) {
+                  if (err) {
+                    res.json({
+                      error: true,
+                      statusCode: 0,
+                      message: "Lỗi! Thêm khách hàng không thành công",
+                    });
+                  } else {
+                    res.json({
+                      error: false,
+                      statusCode: 1,
+                      message: "Thêm khách hàng thành công",
+                    });
+                  }
+                });
+              }
+            );
           }
-          newCustomer.customerpassword = hash;
-          Customer.store(newCustomer, function (err, customer) {
+        } catch (error) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Không thể lưu avatar",
+          });
+        }
+      } else {
+        bcrypt.hash(
+          req.body.customerPassword,
+          saltRounds,
+          function (err, hash) {
             if (err) {
               res.json({
                 error: true,
                 statusCode: 0,
-                message: "Lỗi! Thêm khách hàng không thành công",
-              });
-            } else {
-              res.json({
-                error: false,
-                statusCode: 1,
-                message: "Thêm khách hàng thành công",
+                message: "Lỗi! Mã hóa password không thành công",
               });
             }
-          });
-        });
+            newCustomer.customerpassword = hash;
+            Customer.store(newCustomer, function (err, customer) {
+              if (err) {
+                res.json({
+                  error: true,
+                  statusCode: 0,
+                  message: "Lỗi! Thêm khách hàng không thành công",
+                });
+              } else {
+                res.json({
+                  error: false,
+                  statusCode: 1,
+                  message: "Thêm khách hàng thành công",
+                });
+              }
+            });
+          }
+        );
       }
-    } catch (error) {
-      res.json({
-        error: true,
-        statusCode: 0,
-        message: "Lỗi! Không thể lưu avatar",
-      });
-    }
-    
+    });
   }
 };
 
@@ -173,20 +227,37 @@ const update = function (req, res) {
       message: "Thông tin khách hàng không được để trống",
     });
   } else {
-    Customer.update(customerID, newCustomer, function (err, customer) {
-      if (err) {
-        res.json({
+    Customer.checkEmail(newCustomer.customeremail, async function(err, result) {
+      if(err) {
+        return res.json({
           error: true,
           statusCode: 0,
-          message: "Lỗi! Cập nhật khách hàng không thành công",
-        });
-      } else {
-        res.json({
-          error: false,
-          statusCode: 1,
-          message: "Cập nhật khách hàng thành công",
+          message: "Error checking",
+        }); 
+      }
+      if(Object.keys(result).length > 0 && result[0].customerid !== customerID) {
+        return res.json({
+          error: true,
+          statusCode: 0,
+          message: "Email đã được đăng ký",
         });
       }
+
+      Customer.update(customerID, newCustomer, function (err, customer) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Cập nhật khách hàng không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Cập nhật khách hàng thành công",
+          });
+        }
+      });
     });
   }
 };
