@@ -60,6 +60,38 @@ const jwtMiddleware = {
     });
   },
 
+  // Check author permissions
+  managerCustomer: (req, res, next) => {
+    const permission = process.env.MANAGER_CUSTOMER;
+
+    jwtMiddleware.verifyToken(req, res, () => {
+      let roleCode = req.user.roleCode;
+      UserAuth.getRoleAndPermission(roleCode, (err, permList) => {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Role is available",
+          });
+        }
+        let arrPerm = permList[0].permissionList;
+        let listPerm = [];
+        arrPerm.forEach(perm => {
+          listPerm.push(perm.permissioncode);
+        });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "You don't have permission",
+          });
+        }
+      });
+    });
+  },
+
   // Check directory and category permissions
   managerDirectoryCategory: (req, res, next) => {
     const permission = process.env.MANAGER_DIRECTORY_CATEGORY;
