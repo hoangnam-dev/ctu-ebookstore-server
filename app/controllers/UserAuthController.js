@@ -1,5 +1,6 @@
 const { express } = require("express");
 const UserAuth = require("../models/UserAuth");
+const Permission = require("../models/Permission");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -8,8 +9,8 @@ require("dotenv").config();
 let refreshTokenList = [];
 
 // Account status
-const active = 'active';
-const blocked = 'blocked';
+const active = "active";
+const blocked = "blocked";
 
 const login = (req, res) => {
   var username = req.body.username;
@@ -48,7 +49,7 @@ const login = (req, res) => {
               roleCode: role.rolecode,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "30s" }
+            { expiresIn: "30m" }
           );
 
           const refreshToken = jwt.sign(
@@ -105,6 +106,7 @@ const login = (req, res) => {
               userAddressSub: data.userAddressSub,
               roleID: roleList[0].roleID,
               roleName: roleList[0].roleName,
+              permissionList: data.permissionList,
               userstatusCode: userstatusList[0].userstatusCode,
             };
           });
@@ -155,7 +157,7 @@ const refreshAccessToken = (req, res) => {
         roleCode: data.roleCode,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "30s" }
+      { expiresIn: "30m" }
     );
     res.json({
       newAccessToken,

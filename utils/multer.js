@@ -43,7 +43,7 @@ const imageFilter = function (req, file, cb) {
   cb(null, true);
 };
 
-const upload = multer({ storage: storage, fileFilter: imageFilter });
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 const uploadMultiple = multer({
   storage: storage,

@@ -23,6 +23,24 @@ async function hasRole(userID) {
   });
 }
 
+// Get list role of user
+async function userHasPermission(roleID) {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT permission.permissioncode FROM role 
+    INNER JOIN role_permission ON role.roleid = role_permission.roleid 
+    INNER JOIN permission ON role_permission.permissionid = permission.permissionid 
+    WHERE role.roleid = '${roleID}'`;
+  
+    db.query(sql, async function (err, resSub) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(resSub);
+      }
+    });
+  });
+}
+
 // Get address of user
 async function hasAddress(userID) {
   return new Promise((resolve, reject) => {
@@ -61,6 +79,7 @@ async function hasUserStatus(userID) {
 async function resultUser(res) {
   let listInfo = res.map(async (res) => {
     var role = [];
+    var permissions = [];
     var status = [];
     var address;
 
@@ -70,6 +89,16 @@ async function resultUser(res) {
       })
       .catch(function (errRole) {
         result(errRole, null);
+      });
+
+    await userHasPermission(res.roleid)
+      .then(function (resPermission) {
+        resPermission.forEach(permission => {
+          permissions.push(permission.permissioncode)
+        });
+      })
+      .catch(function (errPermission) {
+        result(errPermission, null);
       });
 
     await hasUserStatus(res.userid)
@@ -96,6 +125,7 @@ async function resultUser(res) {
       roleList: role,
       statusList: status,
       userAddressSub: address,
+      permissionList: permissions
     };
     return userInfo;
   });
@@ -173,4 +203,5 @@ UserAuth.getRoleAndPermission = function getRoleAndPermission(
     }
   });
 };
+
 module.exports = UserAuth;

@@ -14,6 +14,6 @@ router.get('/:id', getDirectoryByID);
 router.put('/:id', jwtMiddlewares.managerDirectoryCategory, update);
 router.delete('/:id', jwtMiddlewares.managerDirectoryCategory, destroy);
 router.put('/restore/:id', jwtMiddlewares.managerDirectoryCategory, restore);
-router.get('/', jwtMiddlewares.managerDirectoryCategory, allDirectory);
+router.get('/', allDirectory);
 
 module.exports = router;
