@@ -2,6 +2,10 @@ const { express } = require("express");
 const Ebook = require("../models/Ebook");
 const ImageEbook = require("../models/ImageEbook");
 const { cloudinary } = require("../../utils/cloudinary");
+const fs = require("fs");
+const path = require("path");
+const { PDFDocument } = require("pdf-lib");
+var appRoot = require("app-root-path");
 
 // Handle result
 function handleResultAll(arrData) {
@@ -22,7 +26,7 @@ function handleResultAll(arrData) {
       ebookName: data.ebookname,
       ebookAvatar: data.ebookavatar,
       ebookPrice: data.ebookprice,
-      ebookstatusList: ebookstatusList
+      ebookstatusList: ebookstatusList,
     };
   });
   return resData;
@@ -81,7 +85,12 @@ function handleResult(arrData) {
       ebookID: data.ebookid,
       ebookCode: data.ebookcode,
       ebookName: data.ebookname,
+      ebookAvatar: data.ebookavatar,
       ebookDescription: data.ebookdescription,
+      ebookEPUB: data.ebookepub,
+      ebookPDF: data.ebookpdf,
+      ebookPDFReview: data.ebookpdfreview,
+      ebookReleasedAt: data.ebookreleasedat,
       authorList: authorList,
       categoryList: categoryList,
       saleList: saleList,
@@ -127,14 +136,39 @@ const search = function (req, res) {
 };
 
 // Store new ebook
+// Slipt pdf file to small pdf
+const splitPDF = async (
+  pdfFilePath,
+  outputDirectory,
+  separatePage,
+  fileNameSave
+) => {
+  const writePdf = await PDFDocument.create();
+  var pdfA = await PDFDocument.load(fs.readFileSync(pdfFilePath));
+  if (pdfA.getPageIndices().length < separatePage) {
+    reject(err);
+  }
+  var pageMerge = [];
+  for (var i = 0; i < separatePage; i++) {
+    pageMerge.push(i);
+  }
+
+  var copiedPagesA = await writePdf.copyPages(pdfA, pageMerge);
+  copiedPagesA.forEach((page) => writePdf.addPage(page));
+  const bytes = await writePdf.save();
+  const outputPath2 = path.join(outputDirectory, fileNameSave);
+  await fs.promises.writeFile(outputPath2, bytes);
+};
+
 const store = async function (req, res) {
   var newEbook = new Ebook(req.body);
-  var categoriesID = req.body.categoriesID;
-  // var categoriesID = [1,2]; // test
+  // var categoriesID = req.body.categoriesID;
+  var categoriesID = [1,2]; // test
+  var separatePage = req.body.separatePage;
   if (
     !newEbook.ebookname ||
     !newEbook.ebookprice ||
-    !newEbook.ebookstatusidid ||
+    !newEbook.ebookstatusid ||
     !newEbook.supplierid
   ) {
     res.json({
@@ -165,21 +199,18 @@ const store = async function (req, res) {
       }
       // Upload epub
       if (req.ePubPathSaved !== undefined) {
-        var epubPath = req.ePubPathSaved;
-        let uploadResponse = await cloudinary.uploader.upload(epubPath, {
-          upload_preset: "ebookstore_ebook_epub",
-        });
-        newEbook.ebookepub = uploadResponse.secure_url;
+        newEbook.ebookepub = req.ePubPathSaved;
       } else {
         newEbook.ebookepub = "";
       }
       // Upload pdf
       if (req.pdfPathSaved !== undefined) {
-        var pdfPath = req.pdfPathSaved;
-        let uploadResponse = await cloudinary.uploader.upload(pdfPath, {
-          upload_preset: "ebookstore_ebook_pdf",
-        });
-        newEbook.ebookpdf = uploadResponse.secure_url;
+        newEbook.ebookpdf = req.pdfPathSaved;
+        newEbook.ebookpdfreview = appRoot + "\\public\\uploads\\ebookPDF\\pdf-review\\" + req.pdfReviewPathSaved;
+
+        splitPDF(newEbook.ebookpdf, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, req.pdfReviewPathSaved)
+          .then()
+          .catch((errorSlipt) => console.error);
       } else {
         newEbook.ebookpdf = "";
       }
@@ -201,21 +232,29 @@ const store = async function (req, res) {
                 message: "Thêm ebook category không thành công",
               });
             } else {
-              ImageEbook.storeEbookImages(ebook, cloudPathImages, function(err, images) {
-                if (err) {
-                  res.json({
-                    error: true,
-                    statusCode: 0,
-                    message: "Thêm ebook images không thành công",
-                  });
-                } else {
-                  res.json({
-                    error: false,
-                    statusCode: 1,
-                    message: "Thêm ebook thành công",
-                  });
-                }
-              })
+              if(cloudPathImages.length > 0) {
+                ImageEbook.store(ebook, cloudPathImages, function(err, images) {
+                  if (err) {
+                    res.json({
+                      error: true,
+                      statusCode: 0,
+                      message: "Thêm ebook images không thành công",
+                    });
+                  } else {
+                    res.json({
+                      error: false,
+                      statusCode: 1,
+                      message: "Thêm ebook thành công",
+                    });
+                  }
+                })
+              } else {
+                res.json({
+                  error: false,
+                  statusCode: 1,
+                  message: "Thêm ebook thành công",
+                });
+              }
             }
           })
         }
@@ -251,7 +290,12 @@ const getEbookByID = function (req, res) {
 const update = async function (req, res) {
   var newEbook = new Ebook(req.body);
   var ebookID = req.params.id;
-  if (!newEbook.ebookname || !newEbook.ebookprice || !newEbook.ebookstatusid || !newEbook.supplierid) {
+  if (
+    !newEbook.ebookname ||
+    !newEbook.ebookprice ||
+    !newEbook.ebookstatusid ||
+    !newEbook.supplierid
+  ) {
     res.json({
       error: true,
       statusCode: 0,
@@ -291,55 +335,59 @@ const update = async function (req, res) {
         message: "Upload không thành công",
       });
     }
-    
   }
 };
 // Update ebook content
 const updateEbookContent = async function (req, res) {
-  var newEbookCotentLink = '';
+  var newEbookContentLink = "";
   var ebookID = req.params.id;
+  var separatePage = req.body.separatePage;
   try {
-    var contentType= '';
+    var contentType = "";
     // Upload epub
     if (req.ePubPathSaved !== undefined) {
-      contentType = 'epub';
-      var epubPath = req.ePubPathSaved;
-      let uploadResponse = await cloudinary.uploader.upload(epubPath, {
-        upload_preset: "ebookstore_ebook_epub",
-      });
-      newEbookCotentLink = uploadResponse.secure_url;
+      contentType = "epub";
+      newEbookContentLink = req.ePubPathSaved;
     }
     // Upload pdf
     if (req.pdfPathSaved !== undefined) {
-      contentType = 'pdf';
-      var pdfPath = req.pdfPathSaved;
-      let uploadResponse = await cloudinary.uploader.upload(pdfPath, {
-        upload_preset: "ebookstore_ebook_pdf",
-      });
-      newEbookCotentLink = uploadResponse.secure_url;
+      contentType = "pdf";
+      newEbookContentLink = req.pdfPathSaved;
+      newEbookReviewLink = appRoot + "\\public\\uploads\\ebookPDF\\pdf-review\\" + req.pdfReviewPathSaved;
+
+
+      splitPDF(newEbook.ebookpdf, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, req.pdfReviewPathSaved)
+        .then()
+        .catch((err) => console.error);
     }
-    if(contentType === '') {
+    if (contentType === "") {
       res.status(500).json({
         error: true,
         statusCode: 0,
         message: "Hãy chọn nội dung cho ebook",
       });
     } else {
-      Ebook.updateEbookContent(ebookID, contentType, newEbookCotentLink, function (err, ebook) {
-        if (err) {
-          res.json({
-            error: true,
-            statusCode: 0,
-            message: "Lỗi! Cập nhật ebook không thành công",
-          });
-        } else {
-          res.json({
-            error: false,
-            statusCode: 1,
-            message: "Cập nhật ebook thành công",
-          });
+      Ebook.updateEbookContent(
+        ebookID,
+        contentType,
+        newEbookContentLink,
+        newEbookReviewLink,
+        function (err, ebook) {
+          if (err) {
+            res.json({
+              error: true,
+              statusCode: 0,
+              message: "Lỗi! Cập nhật ebook không thành công",
+            });
+          } else {
+            res.json({
+              error: false,
+              statusCode: 1,
+              message: "Cập nhật ebook thành công",
+            });
+          }
         }
-      });
+      );
     }
   } catch (error) {
     res.status(500).json({
@@ -364,7 +412,7 @@ const addImage = async function (req, res) {
         });
         cloudPathImages.push(uploadResponse.secure_url);
       }
-      ImageEbook.store(ebookID, cloudPathImages, function(err, images) {
+      ImageEbook.store(ebookID, cloudPathImages, function (err, images) {
         if (err) {
           res.json({
             error: true,
@@ -378,7 +426,7 @@ const addImage = async function (req, res) {
             message: "Thêm ebook images thành công",
           });
         }
-      })
+      });
     }
   } catch (error) {
     res.status(500).json({
@@ -392,7 +440,7 @@ const addImage = async function (req, res) {
 const deleteImage = async function (req, res) {
   var imageEbookID = req.body.imageEbookID;
   var ebookID = req.body.ebookID;
-  ImageEbook.delete(imageEbookID, ebookID, function(err, images) {
+  ImageEbook.delete(imageEbookID, ebookID, function (err, images) {
     if (err) {
       res.json({
         error: true,
@@ -406,7 +454,7 @@ const deleteImage = async function (req, res) {
         message: "Xóa ebook images thành công",
       });
     }
-  })
+  });
 };
 
 // Soft destroy ebook

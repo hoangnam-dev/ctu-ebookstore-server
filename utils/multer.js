@@ -1,17 +1,19 @@
 const multer = require("multer");
 const path = require("path");
 var appRoot = require("app-root-path");
+const fs = require('fs');
 
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//       cb(null, appRoot + "/public/ebooks");
-//   },
+const storageLocalServer = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, appRoot + `/public/uploads/${file.fieldname}`);
+  },
 
-//   // By default, multer removes file extensions so let's add them back
-//   filename: function (req, file, cb) {
-//       cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-//   }
-// });
+  // By default, multer removes file extensions so let's add them back
+  filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + '_' + file.originalname);
+  }
+});
+
 const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(
@@ -44,6 +46,7 @@ const imageFilter = function (req, file, cb) {
 };
 
 const upload = multer({ storage: storage, fileFilter: fileFilter });
+const uploadLocalServer = multer({ storage: storageLocalServer, fileFilter: fileFilter });
 
 const uploadMultiple = multer({
   storage: storage,
@@ -51,7 +54,7 @@ const uploadMultiple = multer({
 }).array("ebookImages", 6);
 
 const uploadFileAndImages = async (req, res, next) => {
-  upload.fields([
+  uploadLocalServer.fields([
     { name: "ebookAvatar", maxCount: 1 },
     { name: "ebookEPUB", maxCount: 1 },
     { name: "ebookPDF", maxCount: 1 },
@@ -69,8 +72,7 @@ const uploadFileAndImages = async (req, res, next) => {
       req.uploadAvatarAndImagesStatus = true;
       req.avatarPathSaved = "";
       req.ePubPathSaved = "";
-      req.pdfPathSaved = "";
-      let imagesPathSaved = [];
+      var imagesPathSaved = [];
 
       // If choose a avatar image => update
       if (req.files["ebookAvatar"]) {
@@ -90,6 +92,7 @@ const uploadFileAndImages = async (req, res, next) => {
       if (req.files["ebookPDF"]) {
         // req.pdfPathSaved = "/pdf/" + req.files["ebookPDF"][0].filename;
         req.pdfPathSaved = req.files["ebookPDF"][0].path;
+        req.pdfReviewPathSaved = Date.now()+'-review_'+req.files["ebookPDF"][0].filename;
       } else {
         req.pdfPathSaved = undefined;
       }

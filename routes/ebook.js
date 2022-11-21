@@ -22,7 +22,8 @@ const jwtMiddlewares = require('../app/middlewares/jwt');
 
 router.get("/search", search);
 router.get("/:id", getEbookByID);
-router.post("/", jwtMiddlewares.managerEbook, uploadFileAndImages, store);
+// router.post("/", jwtMiddlewares.managerEbook, uploadFileAndImages, store);
+router.post("/", uploadFileAndImages, store);
 router.put("/update-content/:id", jwtMiddlewares.managerEbook, uploadFileAndImages, updateEbookContent);
 router.put("/:id", jwtMiddlewares.managerEbook, uploadFileAndImages, update);
 router.post("/add-image", jwtMiddlewares.managerEbook, uploadFileAndImages, addImage);

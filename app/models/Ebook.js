@@ -10,6 +10,7 @@ const Ebook = function (ebook) {
   this.ebookavatar = ebook.ebookAvatar;
   this.ebookepub = ebook.ebookEPUB;
   this.ebookpdf = ebook.ebookPDF;
+  this.ebookpdfreview = ebook.ebookPDFReview;
   this.ebookcreatedat = ebook.ebookCreatedAt;
   this.ebookreleasedat = ebook.ebookReleasedAt;
   this.ebookstatusid = ebook.ebookStatusID;
@@ -295,13 +296,14 @@ Ebook.updateEbookContent = function updateEbookContent(
   ebookID,
   contentType,
   ebookContent,
+  ebookReviewContent,
   result
 ) {
   var sql = "UPDATE ebook SET ebookepub = ? WHERE ebookid = ?";
   if (contentType === "pdf") {
-    sql = "UPDATE ebook SET ebookpdf = ? WHERE ebookid = ?";
+    sql = "UPDATE ebook SET ebookpdf = ?, ebookpdfreview = ? WHERE ebookid = ?";
   }
-  db.query(sql, [ebookContent, ebookID], function (err, res) {
+  db.query(sql, [ebookContent, ebookReviewContent, ebookID], function (err, res) {
     if (err) {
       result(err, null);
     } else {
