@@ -136,7 +136,7 @@ User.getAll = function getAllUser(result) {
 
 // Get username
 User.checkUserName = function checkUserName(userName, result) {
-  const sql = "SELECT * FROM user WHERE userusername = '" + userName + "'";
+  const sql = "SELECT userid FROM user WHERE userusername = '" + userName + "'";
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);
