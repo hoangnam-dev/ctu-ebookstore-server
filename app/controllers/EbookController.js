@@ -162,8 +162,10 @@ const splitPDF = async (
 
 const store = async function (req, res) {
   var newEbook = new Ebook(req.body);
-  // var categoriesID = req.body.categoriesID;
-  var categoriesID = [1,2]; // test
+  var categoriesID = req.body.categoriesID;
+  var authorsID = req.body.authorsID;
+  // var categoriesID = [1,2]; // test
+  // var authorsID = [1,2]; // test
   var separatePage = req.body.separatePage;
   if (
     !newEbook.ebookname ||
@@ -186,17 +188,6 @@ const store = async function (req, res) {
         });
         newEbook.ebookavatar = uploadResponse.secure_url;
       }
-      // Upload Images
-      var cloudPathImages = [];
-      if (req.imagesPathSaved !== undefined) {
-        for (let i = 0; i < req.imagesPathSaved.length; i++) {
-          let imagesPath = req.imagesPathSaved[i];
-          let uploadResponse = await cloudinary.uploader.upload(imagesPath, {
-            upload_preset: "ebookstore_ebook_images",
-          });
-          cloudPathImages.push(uploadResponse.secure_url);
-        }
-      }
       // Upload epub
       if (req.ePubPathSaved !== undefined) {
         newEbook.ebookepub = req.ePubPathSaved;
@@ -216,7 +207,7 @@ const store = async function (req, res) {
       }
 
       // Store ebook
-      Ebook.store(newEbook, function (err, ebook) {
+      Ebook.store(newEbook, categoriesID, authorsID, function (err, ebook) {
         if (err) {
           res.json({
             error: true,
@@ -224,39 +215,11 @@ const store = async function (req, res) {
             message: "Lỗi! Thêm ebook không thành công",
           });
         } else {
-          Ebook.storeCategory(ebook, categoriesID, function(err, category) {
-            if (err) {
-              res.json({
-                error: true,
-                statusCode: 0,
-                message: "Thêm ebook category không thành công",
-              });
-            } else {
-              if(cloudPathImages.length > 0) {
-                ImageEbook.store(ebook, cloudPathImages, function(err, images) {
-                  if (err) {
-                    res.json({
-                      error: true,
-                      statusCode: 0,
-                      message: "Thêm ebook images không thành công",
-                    });
-                  } else {
-                    res.json({
-                      error: false,
-                      statusCode: 1,
-                      message: "Thêm ebook thành công",
-                    });
-                  }
-                })
-              } else {
-                res.json({
-                  error: false,
-                  statusCode: 1,
-                  message: "Thêm ebook thành công",
-                });
-              }
-            }
-          })
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Thêm ebook thành công",
+          });
         }
       });
     } catch (err) {
