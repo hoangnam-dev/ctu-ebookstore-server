@@ -5,6 +5,9 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const router = require("./routes");
+const paypal = require('paypal-rest-sdk');
+require('dotenv').config();
+
 
 const app = express();
 
@@ -27,6 +30,12 @@ app.use(express.static(path.join(__dirname, "public")));
 // view engine setup
 app.set("views", path.join(__dirname, "resources", "views"));
 app.set("view engine", "ejs");
+
+paypal.configure({
+  'mode': 'sandbox',
+  'client_id': process.env.CLIENT_ID,
+  'client_secret': process.env.CLIENT_SECRET,
+});
 
 app.use(logger("dev"));
 
