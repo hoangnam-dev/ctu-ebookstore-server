@@ -1,6 +1,5 @@
-const { express } = require("express");
+const express = require("express");
 const UserAuth = require("../models/UserAuth");
-const Permission = require("../models/Permission");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
@@ -11,7 +10,7 @@ let refreshTokenList = [];
 // Account status
 const active = "active";
 const blocked = "blocked";
-const author_worng = "author_worng";
+const author_wrong = "author_wrong";
 const author_blocked = "author_block";
 const author_null = "author_null";
 
@@ -23,8 +22,8 @@ const login = (req, res) => {
     if (err || Object.keys(user).length === 0) {
       return res.json({
         error: true,
-        statusCode: author_worng,
-        messeage: "Lỗi! Tên tài khoản không đúng",
+        statusCode: author_wrong,
+        messeage: "Tài khoản hoặc mật khẩu không chính xác",
       });
     } else {
       // Check account status
@@ -33,7 +32,7 @@ const login = (req, res) => {
         return res.json({
           error: true,
           statusCode: author_blocked,
-          messeage: "Lỗi! Tài khoản đã bị khóa",
+          messeage: "Tài khoản đã bị khóa",
         });
       }
       // Check password
@@ -41,8 +40,8 @@ const login = (req, res) => {
         if (error || !result) {
           res.json({
             error: true,
-            statusCode: author_worng,
-            message: "Lỗi! Mật khẩu không chính xác",
+            statusCode: author_wrong,
+            message: "Tài khoản hoặc mật khẩu không chính xác",
           });
         } else {
           const role = user[0].roleList[0];
