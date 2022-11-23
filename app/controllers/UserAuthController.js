@@ -23,7 +23,7 @@ const login = (req, res) => {
       return res.json({
         error: true,
         statusCode: author_wrong,
-        messeage: "Tài khoản hoặc mật khẩu không chính xác",
+        message: "Tài khoản hoặc mật khẩu không chính xác",
       });
     } else {
       // Check account status
@@ -32,7 +32,7 @@ const login = (req, res) => {
         return res.json({
           error: true,
           statusCode: author_blocked,
-          messeage: "Tài khoản đã bị khóa",
+          message: "Tài khoản đã bị khóa",
         });
       }
       // Check password
