@@ -11,8 +11,8 @@ let refreshTokenList = [];
 const active = "active";
 const blocked = "blocked";
 const author_wrong = "author_wrong";
-const author_blocked = "author_block";
 const author_null = "author_null";
+const author_blocked = "author_block";
 
 const login = (req, res) => {
   var username = req.body.username;
@@ -51,7 +51,7 @@ const login = (req, res) => {
               roleCode: role.rolecode,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "30s" }
+            { expiresIn: "30d" }
           );
 
           const refreshToken = jwt.sign(
@@ -174,12 +174,90 @@ const logout = (req, res) => {
   return res.json({
     error: false,
     statusCode: 1,
-    message: "User logout successfully",
+    message: "Bạn đã đăng xuất thành công",
   });
+};
+
+const profile = (req, res) => {
+  const token = req.headers.token;
+
+  if (token) {
+    const accessToken = token.split(" ")[1];
+    jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, function (err, data) {
+      if (err) {
+        return res.json({
+          error: true,
+          statusCode: author_null,
+          message: "Bạn chưa đăng nhập",
+        });
+      }
+
+      UserAuth.profile(data.id, function (err, user) {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: author_null,
+            message: "Không thể lấy thông tin user",
+          });
+        } else {
+          // result user info
+          var userInfo = user.map((data) => {
+            // Handle role list of the role
+            var roleList = data.roleList.map((role) => {
+              return {
+                roleID: role.roleid,
+                roleCode: role.rolecode,
+                roleName: role.rolename,
+                roleDescription: role.roledescription,
+              };
+            });
+            var userstatusList = data.statusList.map((userstatus) => {
+              return {
+                userstatusID: userstatus.userstatusid,
+                userstatusCode: userstatus.userstatuscode,
+                userstatusName: userstatus.userstatusname,
+                userstatusColor: userstatus.userstatuscolor,
+              };
+            });
+
+            // return user
+            return {
+              userID: data.userid,
+              userName: data.username,
+              userUserName: data.userusername,
+              userCIC: data.usercic,
+              userAvatar: data.useravatar,
+              userBirthdate: data.userbirthdate,
+              userGender: data.usergender,
+              userAddress: data.useraddress,
+              userEmail: data.useremail,
+              userPhone: data.userphone,
+              userBankNumber: data.userbanknumber,
+              userCreatedAt: data.usercreatedat,
+              userAddressSub: data.userAddressSub,
+              roleID: roleList[0].roleID,
+              roleName: roleList[0].roleName,
+              permissionList: data.permissionList,
+              userstatusCode: userstatusList[0].userstatusCode,
+            };
+          });
+
+          res.json(userInfo[0]);
+        }
+      });
+    });
+  } else {
+    return res.json({
+      error: true,
+      statusCode: author_null,
+      message: "Bạn chưa đăng nhập",
+    });
+  }
 };
 
 module.exports = {
   login,
   refreshAccessToken,
   logout,
+  profile,
 };

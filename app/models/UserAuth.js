@@ -147,6 +147,19 @@ UserAuth.checkUsernameLogin = function checkUsernameLogin(userName, result) {
   });
 };
 
+// Profile
+UserAuth.profile = function profile(userID, result) {
+  const sql = "SELECT * FROM user WHERE userid = '" + userID + "'";
+  db.query(sql, async function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      const userData = await resultUser(res);
+      result(null, userData);
+    }
+  });
+};
+
 // Get role and permission
 // Get list permissions of role
 async function hasPermission(roleID) {

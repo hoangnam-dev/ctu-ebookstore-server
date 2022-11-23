@@ -7,6 +7,7 @@ const {
   login,
   refreshAccessToken,
   logout,
+  profile
 } = require("../app/controllers/UserAuthController");
 
 const {
@@ -20,10 +21,11 @@ const jwtMiddlewares = require("../app/middlewares/jwt");
 
 router.post("/login", login);
 router.post("/refreshToken", refreshAccessToken);
-router.post("/logout", jwtMiddlewares.verifyToken, logout);
+router.post("/profile", jwtMiddlewares.authOwner, profile);
+router.post("/logout", jwtMiddlewares.authOwner, logout);
 
-router.put("/:id", jwtMiddlewares.verifyToken, update);
-router.put("/changeAvatar/:id", jwtMiddlewares.verifyToken, upload.single("userAvatar"), changeAvatar);
-router.put("/changePassword/:id", jwtMiddlewares.verifyToken, changePassword);
+router.put("/:id", jwtMiddlewares.authOwner, update);
+router.put("/changeAvatar/:id", jwtMiddlewares.authOwner, upload.single("userAvatar"), changeAvatar);
+router.put("/changePassword/:id", jwtMiddlewares.authOwner, changePassword);
 
 module.exports = router;
