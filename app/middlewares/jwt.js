@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
 const UserAuth = require("../models/UserAuth");
 
+const author_wrong = "author_wrong";
+const author_null = "author_null";
+const authorization_error = "authorization_error";
+
 const jwtMiddleware = {
   verifyToken: (req, res, next) => {
     const token = req.headers.token;
@@ -11,8 +15,8 @@ const jwtMiddleware = {
         if (err) {
           return res.json({
             error: true,
-            statusCode: 0,
-            message: "JWT had error: " + err.message,
+            statusCode: author_wrong,
+            message: "Bạn chưa đăng nhập",
           });
         }
 
@@ -22,10 +26,25 @@ const jwtMiddleware = {
     } else {
       return res.json({
         error: true,
-        statusCode: 0,
-        message: "You are not sing in",
+        statusCode: author_null,
+        message: "Bạn chưa đăng nhập",
       });
     }
+  },
+
+  // Check user login permission
+  authOwner: (req, res, next) => {
+    jwtMiddleware.verifyToken(req, res, () => {
+      if (req.user.id == req.params.userID) {
+        next();
+      } else {
+        return res.json({
+          error: true,
+          statusCode: authorization_error,
+          message: "Bạn không có quyền thực thi",
+        });
+      }
+    });
   },
 
   // Check author permissions
@@ -39,12 +58,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -53,7 +72,7 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
@@ -71,12 +90,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -85,7 +104,7 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
@@ -103,12 +122,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -117,7 +136,7 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
@@ -135,12 +154,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -149,7 +168,7 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
@@ -167,12 +186,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -181,7 +200,7 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
@@ -199,12 +218,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -213,7 +232,7 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
@@ -231,12 +250,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -245,7 +264,7 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
@@ -263,12 +282,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -277,7 +296,7 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
@@ -295,12 +314,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -309,7 +328,7 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
@@ -327,12 +346,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Role is available",
+            message: "Bạn không có vai trò này",
           });
         }
         let arrPerm = permList[0].permissionList;
         let listPerm = [];
-        arrPerm.forEach(perm => {
+        arrPerm.forEach((perm) => {
           listPerm.push(perm.permissioncode);
         });
         if (listPerm.includes(permission)) {
@@ -341,13 +360,12 @@ const jwtMiddleware = {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "You don't have permission",
+            message: "Bạn không có quyền thực thi",
           });
         }
       });
     });
   },
-
 };
 
 module.exports = jwtMiddleware;
