@@ -11,6 +11,9 @@ let refreshTokenList = [];
 // Account status
 const active = "active";
 const blocked = "blocked";
+const author_worng = "author_worng";
+const author_blocked = "author_block";
+const author_null = "author_null";
 
 const login = (req, res) => {
   var username = req.body.username;
@@ -20,7 +23,7 @@ const login = (req, res) => {
     if (err || Object.keys(user).length === 0) {
       return res.json({
         error: true,
-        statusCode: 0,
+        statusCode: author_worng,
         messeage: "Lỗi! Tên tài khoản không đúng",
       });
     } else {
@@ -29,7 +32,7 @@ const login = (req, res) => {
       if (accountStatus === blocked) {
         return res.json({
           error: true,
-          statusCode: 0,
+          statusCode: author_blocked,
           messeage: "Lỗi! Tài khoản đã bị khóa",
         });
       }
@@ -38,7 +41,7 @@ const login = (req, res) => {
         if (error || !result) {
           res.json({
             error: true,
-            statusCode: 0,
+            statusCode: author_worng,
             message: "Lỗi! Mật khẩu không chính xác",
           });
         } else {
@@ -49,7 +52,7 @@ const login = (req, res) => {
               roleCode: role.rolecode,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "30m" }
+            { expiresIn: "30s" }
           );
 
           const refreshToken = jwt.sign(
@@ -128,16 +131,16 @@ const refreshAccessToken = (req, res) => {
   if (!refreshToken) {
     return res.json({
       error: true,
-      statusCode: 0,
-      message: "You are not sing in",
+      statusCode: author_null,
+      message: "Bạn chưa đăng nhập",
     });
   }
   // Check token vailable
   if (!refreshTokenList.includes(refreshToken)) {
     return res.json({
       error: true,
-      statusCode: 0,
-      message: "Token is not available",
+      statusCode: author_null,
+      message: "Bạn chưa đăng nhập",
     });
   }
 
@@ -146,8 +149,8 @@ const refreshAccessToken = (req, res) => {
     if (err) {
       return res.json({
         error: true,
-        statusCode: 0,
-        message: "JWT had error: " + err.message,
+        statusCode: author_null,
+        message: "Bạn chưa đăng nhập",
       });
     }
 
@@ -157,7 +160,7 @@ const refreshAccessToken = (req, res) => {
         roleCode: data.roleCode,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "30m" }
+      { expiresIn: "30s" }
     );
     res.json({
       newAccessToken,
