@@ -38,78 +38,82 @@ const login = (req, res) => {
         });
       }
       // Check password
-      bcrypt.compare(password, customer[0].customerpassword, function (error, result) {
-        if (error || !result) {
-          return res.json({
-            error: true,
-            statusCode: 0,
-            message: "Lỗi! Mật khẩu không chính xác",
-          });
-        } else {
-          const accessToken = jwt.sign(
-            {
-              id: customer[0].customerid,
-            },
-            process.env.JWT_ACCESS_KEY,
-            { expiresIn: "30d" }
-          );
-
-          const refreshToken = jwt.sign(
-            {
-              id: customer[0].customerid,
-            },
-            process.env.JWT_REFRESH_KEY,
-            { expiresIn: "30d" }
-          );
-
-          refreshTokenList.push(refreshToken);
-          res.cookie("refreshCustomerToken", refreshToken, {
-            httqOnly: true,
-            secure: false,
-            path: "/",
-            sameSite: "strict",
-          });
-
-          // result customer info
-          var data = customer.map((data) => {
-            var customerstatusList = data.statusList.map((customerstatus) => {
-              return {
-                customerstatusID: customerstatus.customerstatusid,
-                customerstatusCode: customerstatus.customerstatuscode,
-                customerstatusName: customerstatus.customerstatusname,
-                customerstatusColor: customerstatus.customerstatuscolor,
-              };
+      bcrypt.compare(
+        password,
+        customer[0].customerpassword,
+        function (error, result) {
+          if (error || !result) {
+            return res.json({
+              error: true,
+              statusCode: 0,
+              message: "Lỗi! Mật khẩu không chính xác",
             });
-            var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
-              return {
-                ebookID: ebookOwn.ebookid,
-                licenseID: ebookOwn.licenseid,
-                licenseIsRent: ebookOwn.licenseisrent,
-                licenseStatus: ebookOwn.licensestatus,
-                licenseExpires: ebookOwn.licenseexpires,
-              };
+          } else {
+            const accessToken = jwt.sign(
+              {
+                id: customer[0].customerid,
+              },
+              process.env.JWT_ACCESS_KEY,
+              { expiresIn: "30d" }
+            );
+
+            const refreshToken = jwt.sign(
+              {
+                id: customer[0].customerid,
+              },
+              process.env.JWT_REFRESH_KEY,
+              { expiresIn: "30d" }
+            );
+
+            refreshTokenList.push(refreshToken);
+            res.cookie("refreshCustomerToken", refreshToken, {
+              httqOnly: true,
+              secure: false,
+              path: "/",
+              sameSite: "strict",
             });
 
-            // return customer
-            return {
-              customerID: data.customerid,
-              customerName: data.customername,
-              customerUserName: data.customercustomername,
-              customerAvatar: data.customeravatar,
-              customerAddress: data.customeraddress,
-              customerEmail: data.customeremail,
-              customerCreatedAt: data.customercreatedat,
-              customerstatusCode: customerstatusList[0].customerstatusCode,
-              ebookOwnList: ebookOwnList,
-            };
-          });
+            // result customer info
+            var data = customer.map((data) => {
+              var customerstatusList = data.statusList.map((customerstatus) => {
+                return {
+                  customerstatusID: customerstatus.customerstatusid,
+                  customerstatusCode: customerstatus.customerstatuscode,
+                  customerstatusName: customerstatus.customerstatusname,
+                  customerstatusColor: customerstatus.customerstatuscolor,
+                };
+              });
+              var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
+                return {
+                  ebookID: ebookOwn.ebookid,
+                  licenseCode: ebookOwn.licensecode,
+                  licenseIsRent: ebookOwn.licenseisrent,
+                  licenseStatus: ebookOwn.licensestatus,
+                  licenseExpires: ebookOwn.licenseexpires,
+                };
+              });
 
-          res.json({
-            accessToken,
-            customerInfo: data[0],
-          });
+              // return customer
+              return {
+                customerID: data.customerid,
+                customerName: data.customername,
+                customerUserName: data.customercustomername,
+                customerAvatar: data.customeravatar,
+                customerAddress: data.customeraddress,
+                customerEmail: data.customeremail,
+                customerCreatedAt: data.customercreatedat,
+                customerstatusCode: customerstatusList[0].customerstatusCode,
+                ebookOwnList: ebookOwnList,
+              };
+            });
+
+            res.json({
+              accessToken,
+              customerInfo: data[0],
+            });
+          }
         }
-      });
+      );
     }
   });
 };
@@ -129,99 +133,105 @@ const register = async (req, res) => {
       message: "Thông tin cá nhân không được để trống",
     });
   } else {
-    CustomerAuth.checkEmail(newCustomer.customeremail, async function(err, result) {
-      if(err) {
-        return res.json({
-          error: true,
-          statusCode: 0,
-          message: "Error checking",
-        }); 
-      }
-      if(Object.keys(result).length>0) {
-        return res.json({
-          error: true,
-          statusCode: 0,
-          message: "Email đã được đăng ký",
-        });
-      }
-
-      if(req.file !== undefined) {
-        try {
-          var customerAvt = req.file.path;
-          const uploadResponse = await cloudinary.uploader.upload(customerAvt, {
-            upload_preset: "ebookstore_customer",
-          });
-          if (uploadResponse.secure_url) {
-            newCustomer.customeravatar = uploadResponse.secure_url;
-            bcrypt.hash(
-              req.body.customerPassword,
-              saltRounds,
-              function (err, hash) {
-                if (err) {
-                  return res.json({
-                    error: true,
-                    statusCode: 0,
-                    message: "Lỗi! Mã hóa password không thành công",
-                  });
-                }
-                newCustomer.customerpassword = hash;
-                CustomerAuth.store(newCustomer, function (err, customer) {
-                  if (err) {
-                    res.json({
-                      error: true,
-                      statusCode: 0,
-                      message: "Đăng ký tài khoản không thành công",
-                    });
-                  } else {
-                    res.json({
-                      error: false,
-                      statusCode: 1,
-                      message: "Đăng ký tài khoản thành công",
-                    });
-                  }
-                });
-              }
-            );
-          }
-        } catch (error) {
+    CustomerAuth.checkEmail(
+      newCustomer.customeremail,
+      async function (err, result) {
+        if (err) {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Lỗi! Không thể lưu avatar",
+            message: "Error checking",
           });
         }
-      } else {
-        bcrypt.hash(
-          req.body.customerPassword,
-          saltRounds,
-          function (err, hash) {
-            if (err) {
-              return res.json({
-                error: true,
-                statusCode: 0,
-                message: "Lỗi! Mã hóa password không thành công",
-              });
+        if (Object.keys(result).length > 0) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Email đã được đăng ký",
+          });
+        }
+
+        if (req.file !== undefined) {
+          try {
+            var customerAvt = req.file.path;
+            const uploadResponse = await cloudinary.uploader.upload(
+              customerAvt,
+              {
+                upload_preset: "ebookstore_customer",
+              }
+            );
+            if (uploadResponse.secure_url) {
+              newCustomer.customeravatar = uploadResponse.secure_url;
+              bcrypt.hash(
+                req.body.customerPassword,
+                saltRounds,
+                function (err, hash) {
+                  if (err) {
+                    return res.json({
+                      error: true,
+                      statusCode: 0,
+                      message: "Lỗi! Mã hóa password không thành công",
+                    });
+                  }
+                  newCustomer.customerpassword = hash;
+                  CustomerAuth.store(newCustomer, function (err, customer) {
+                    if (err) {
+                      res.json({
+                        error: true,
+                        statusCode: 0,
+                        message: "Đăng ký tài khoản không thành công",
+                      });
+                    } else {
+                      res.json({
+                        error: false,
+                        statusCode: 1,
+                        message: "Đăng ký tài khoản thành công",
+                      });
+                    }
+                  });
+                }
+              );
             }
-            newCustomer.customerpassword = hash;
-            CustomerAuth.store(newCustomer, function (err, customer) {
+          } catch (error) {
+            return res.json({
+              error: true,
+              statusCode: 0,
+              message: "Lỗi! Không thể lưu avatar",
+            });
+          }
+        } else {
+          bcrypt.hash(
+            req.body.customerPassword,
+            saltRounds,
+            function (err, hash) {
               if (err) {
                 return res.json({
                   error: true,
                   statusCode: 0,
-                  message: "Đăng ký tài khoản không thành công",
-                });
-              } else {
-                return res.json({
-                  error: false,
-                  statusCode: 1,
-                  message: "Đăng ký tài khoản thành công",
+                  message: "Lỗi! Mã hóa password không thành công",
                 });
               }
-            });
-          }
-        );
+              newCustomer.customerpassword = hash;
+              CustomerAuth.store(newCustomer, function (err, customer) {
+                if (err) {
+                  return res.json({
+                    error: true,
+                    statusCode: 0,
+                    message: "Đăng ký tài khoản không thành công",
+                  });
+                } else {
+                  return res.json({
+                    error: false,
+                    statusCode: 1,
+                    message: "Đăng ký tài khoản thành công",
+                  });
+                }
+              });
+            }
+          );
+        }
       }
-    });
+    );
   }
 };
 
@@ -254,62 +264,61 @@ const refreshAccessToken = (req, res) => {
         message: "JWT had error: " + err.message,
       });
     }
-    CustomerAuth.getCustomerLoginInfo(data.id, function(err, customerInfo) {
-        if(err) {
-            return res.json({
-                error: true,
-                statusCode: 0,
-                message: "Lỗi! Không thể lấy thông tin khách hàng",
-            });
-        } else {
-            const newAccessToken = jwt.sign(
-              {
-                id: customerInfo[0].customerid,
-              },
-              process.env.JWT_ACCESS_KEY,
-              { expiresIn: "30m" }
-            );
-            // result customer info
-          var info = customerInfo.map((data) => {
-            var customerstatusList = data.statusList.map((customerstatus) => {
-              return {
-                customerstatusID: customerstatus.customerstatusid,
-                customerstatusCode: customerstatus.customerstatuscode,
-                customerstatusName: customerstatus.customerstatusname,
-                customerstatusColor: customerstatus.customerstatuscolor,
-              };
-            });
-            var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
-              return {
-                ebookID: ebookOwn.ebookid,
-                licenseID: ebookOwn.licenseid,
-                licenseIsRent: ebookOwn.licenseisrent,
-                licenseStatus: ebookOwn.licensestatus,
-                licenseExpires: ebookOwn.licenseexpires,
-              };
-            });
-
-            // return customer
+    CustomerAuth.getCustomerLoginInfo(data.id, function (err, customerInfo) {
+      if (err) {
+        return res.json({
+          error: true,
+          statusCode: 0,
+          message: "Lỗi! Không thể lấy thông tin khách hàng",
+        });
+      } else {
+        const newAccessToken = jwt.sign(
+          {
+            id: customerInfo[0].customerid,
+          },
+          process.env.JWT_ACCESS_KEY,
+          { expiresIn: "30m" }
+        );
+        // result customer info
+        var info = customerInfo.map((data) => {
+          var customerstatusList = data.statusList.map((customerstatus) => {
             return {
-              customerID: data.customerid,
-              customerName: data.customername,
-              customerUserName: data.customercustomername,
-              customerAvatar: data.customeravatar,
-              customerAddress: data.customeraddress,
-              customerEmail: data.customeremail,
-              customerCreatedAt: data.customercreatedat,
-              customerstatusCode: customerstatusList[0].customerstatusCode,
-              ebookOwnList: ebookOwnList,
+              customerstatusID: customerstatus.customerstatusid,
+              customerstatusCode: customerstatus.customerstatuscode,
+              customerstatusName: customerstatus.customerstatusname,
+              customerstatusColor: customerstatus.customerstatuscolor,
+            };
+          });
+          var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
+            return {
+              ebookID: ebookOwn.ebookid,
+              licenseCode: ebookOwn.licensecode,
+              licenseIsRent: ebookOwn.licenseisrent,
+              licenseStatus: ebookOwn.licensestatus,
+              licenseExpires: ebookOwn.licenseexpires,
             };
           });
 
-          res.json({
-            newAccessToken,
-            customerInfo: info[0],
-          });
-        }
-    });
+          // return customer
+          return {
+            customerID: data.customerid,
+            customerName: data.customername,
+            customerUserName: data.customercustomername,
+            customerAvatar: data.customeravatar,
+            customerAddress: data.customeraddress,
+            customerEmail: data.customeremail,
+            customerCreatedAt: data.customercreatedat,
+            customerstatusCode: customerstatusList[0].customerstatusCode,
+            ebookOwnList: ebookOwnList,
+          };
+        });
 
+        res.json({
+          newAccessToken,
+          customerInfo: info[0],
+        });
+      }
+    });
   });
 };
 
@@ -359,7 +368,7 @@ const profile = (req, res) => {
             var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
               return {
                 ebookID: ebookOwn.ebookid,
-                licenseID: ebookOwn.licenseid,
+                licenseCode: ebookOwn.licensecode,
                 licenseIsRent: ebookOwn.licenseisrent,
                 licenseStatus: ebookOwn.licensestatus,
                 licenseExpires: ebookOwn.licenseexpires,
@@ -396,51 +405,53 @@ const profile = (req, res) => {
 const updateProfile = function (req, res) {
   var newCustomer = new CustomerAuth(req.body);
   var customerID = req.params.id;
-  if (
-    !newCustomer.customername ||
-    !newCustomer.customeremail
-  ) {
+  if (!newCustomer.customername || !newCustomer.customeremail) {
     return res.json({
       error: true,
       statusCode: 0,
       message: "Thông tin khách hàng không được để trống",
     });
   } else {
-    CustomerAuth.checkEmail(newCustomer.customeremail, async function(err, result) {
-      if(err) {
-        return res.json({
-          error: true,
-          statusCode: 0,
-          message: "Error checking",
-        }); 
-      }
-      if(Object.keys(result).length > 0 && result[0].customerid != customerID) {
-        return res.json({
-          error: true,
-          statusCode: 0,
-          message: "Email đã được đăng ký",
-        });
-      }
-
-      CustomerAuth.update(customerID, newCustomer, function (err, customer) {
+    CustomerAuth.checkEmail(
+      newCustomer.customeremail,
+      async function (err, result) {
         if (err) {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Lỗi! Cập nhật khách hàng không thành công",
-          });
-        } else {
-          return res.json({
-            error: false,
-            statusCode: 1,
-            message: "Cập nhật khách hàng thành công",
+            message: "Error checking",
           });
         }
-      });
-    });
+        if (
+          Object.keys(result).length > 0 &&
+          result[0].customerid != customerID
+        ) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Email đã được đăng ký",
+          });
+        }
+
+        CustomerAuth.update(customerID, newCustomer, function (err, customer) {
+          if (err) {
+            return res.json({
+              error: true,
+              statusCode: 0,
+              message: "Lỗi! Cập nhật khách hàng không thành công",
+            });
+          } else {
+            return res.json({
+              error: false,
+              statusCode: 1,
+              message: "Cập nhật khách hàng thành công",
+            });
+          }
+        });
+      }
+    );
   }
 };
-
 
 // Update customer avatar
 const changeAvatar = async function (req, res) {
@@ -452,22 +463,26 @@ const changeAvatar = async function (req, res) {
     });
     if (uploadResponse.secure_url) {
       var customerAvatar = uploadResponse.secure_url;
-      CustomerAuth.changeAvatar(customerID, customerAvatar, function (err, customer) {
-        if (err) {
-          return res.json({
-            error: true,
-            statusCode: 0,
-            message: "Lỗi! Cập nhật avatar không thành công",
-          });
-        } else {
-          return res.json({
-            error: false,
-            statusCode: 1,
-            message: "Cập nhật avatar thành công",
-            avatarUrl: customerAvatar,
-          });
+      CustomerAuth.changeAvatar(
+        customerID,
+        customerAvatar,
+        function (err, customer) {
+          if (err) {
+            return res.json({
+              error: true,
+              statusCode: 0,
+              message: "Lỗi! Cập nhật avatar không thành công",
+            });
+          } else {
+            return res.json({
+              error: false,
+              statusCode: 1,
+              message: "Cập nhật avatar thành công",
+              avatarUrl: customerAvatar,
+            });
+          }
         }
-      });
+      );
     }
   } catch (error) {
     return res.json({
@@ -514,21 +529,25 @@ const changePassword = async function (req, res) {
               message: "Lỗi! Mã hóa password không thành công",
             });
           } else {
-            CustomerAuth.changePassword(customerID, hash, function (err, customer) {
-              if (err) {
-                return res.json({
-                  error: true,
-                  statusCode: 0,
-                  message: "Lỗi! Cập nhật customer password không thành công",
-                });
-              } else {
-                return res.json({
-                  error: false,
-                  statusCode: 1,
-                  message: "Cập nhật customer password thành công",
-                });
+            CustomerAuth.changePassword(
+              customerID,
+              hash,
+              function (err, customer) {
+                if (err) {
+                  return res.json({
+                    error: true,
+                    statusCode: 0,
+                    message: "Lỗi! Cập nhật customer password không thành công",
+                  });
+                } else {
+                  return res.json({
+                    error: false,
+                    statusCode: 1,
+                    message: "Cập nhật customer password thành công",
+                  });
+                }
               }
-            });
+            );
           }
         });
       }

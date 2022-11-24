@@ -30,13 +30,11 @@ async function hasCustomerStatus(customerID) {
 
 // Get list customerstatus of customer
 async function hasEbook(customerID) {
-  var now = moment().format('YYYY-MM-DD');
-  console.log(now);
   return new Promise((resolve, reject) => {
     const sql = `SELECT ebook.ebookid, license.* FROM customer 
         INNER JOIN license ON customer.customerid = license.customerid 
         INNER JOIN ebook ON license.ebookid = ebook.ebookid 
-        WHERE customer.customerid = ${customerID}`;
+        WHERE customer.customerid = ${customerID} AND (licenseexpires IS NULL OR datediff(licenseexpires, CURDATE()) > 0)`;
     db.query(sql, [customerID], async function (err, resSub) {
         if (err) {
           reject(err);
@@ -65,6 +63,7 @@ async function resultCustomer(res) {
     await hasEbook(res.customerid)
       .then(function (resEbook) {
         ebookOwn = resEbook
+        console.log(resEbook);
       })
       .catch(function (errEbook) {
         result(errEbook, null);
@@ -96,7 +95,7 @@ CustomerAuth.checkCustomerLogin = function checkCustomerLogin(customerEmail, res
   });
 };
 // Login
-CustomerAuth.getCustomerLoginInfo = function getCustomerLoginInfo(customerID, result) {
+CustomerAuth.getCustomerLoginInfo = function  getCustomerLoginInfo(customerID, result) {
   const sql = "SELECT * FROM customer WHERE customerid = '" + customerID + "'";
   db.query(sql, async function (err, res) {
     if (err) {
