@@ -40,7 +40,7 @@ const login = (req, res) => {
       // Check password
       bcrypt.compare(password, user[0].userpassword, function (error, result) {
         if (error || !result) {
-          res.json({
+          return res.json({
             error: true,
             statusCode: author_wrong,
             message: "Tài khoản hoặc mật khẩu không chính xác",
@@ -271,7 +271,7 @@ const updateProfile = async function (req, res) {
     !newUser.userbanknumber ||
     !newUser.wardid
   ) {
-    res.json({
+    return res.json({
       error: true,
       statusCode: 0,
       message: "Thông tin user không được để trống",
@@ -279,13 +279,13 @@ const updateProfile = async function (req, res) {
   } else {
     UserAuth.update(userID, newUser, function (err, user) {
       if (err) {
-        res.json({
+        return res.json({
           error: true,
           statusCode: 0,
           message: "Lỗi! Cập nhật thông tin user không thành công",
         });
       } else {
-        res.json({
+        return res.json({
           error: false,
           statusCode: 1,
           message: "Cập nhật thông tin user thành công",
@@ -308,13 +308,13 @@ const changeAvatar = async function (req, res) {
       var userAvatar = uploadResponse.secure_url;
       UserAuth.changeAvatar(userID, userAvatar, function (err, user) {
         if (err) {
-          res.json({
+          return res.json({
             error: true,
             statusCode: 0,
             message: "Lỗi! Cập nhật user avatar không thành công",
           });
         } else {
-          res.json({
+          return res.json({
             error: false,
             statusCode: 1,
             message: "Cập nhật user avatar thành công",
@@ -347,14 +347,14 @@ const changePassword = async function (req, res) {
     }
     bcrypt.compare(passwordOld, password, function (err, result) {
       if (err) {
-        res.json({
+        return res.json({
           error: true,
           statusCode: 0,
           message: "Lỗi! Không thể so sánh mật khẩu",
         });
       }
       if (!result) {
-        res.json({
+        return res.json({
           error: true,
           statusCode: 0,
           message: "Lỗi! Mật khẫu cũ không trùng khớp",
@@ -370,13 +370,13 @@ const changePassword = async function (req, res) {
           } else {
             UserAuth.changePassword(userID, hash, function (err, user) {
               if (err) {
-                res.json({
+                return res.json({
                   error: true,
                   statusCode: 0,
                   message: "Lỗi! Cập nhật user password không thành công",
                 });
               } else {
-                res.json({
+                return res.json({
                   error: false,
                   statusCode: 1,
                   message: "Cập nhật user password thành công",
