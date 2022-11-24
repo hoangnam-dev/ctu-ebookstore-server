@@ -2,8 +2,20 @@ const db = require("../../config/db");
 
 // Constructor
 const UserAuth = function (user) {
+  this.userid = user.userID;
+  this.username = user.userName;
   this.userusername = user.userUserName;
   this.userpassword = user.userPassword;
+  this.usercic = user.userCIC;
+  this.useravatar = user.userAvatar;
+  this.userbirthdate = user.userBirthdate;
+  this.usergender = user.userGender;
+  this.useraddress = user.userAddress;
+  this.useremail = user.userEmail;
+  this.userphone = user.userPhone;
+  this.userbanknumber = user.userBankNumber;
+  this.usercreatedat = "";
+  this.wardid = user.wardID;
 };
 
 // Get list role of user
@@ -156,6 +168,70 @@ UserAuth.profile = function profile(userID, result) {
     } else {
       const userData = await resultUser(res);
       result(null, userData);
+    }
+  });
+};
+
+// update profile
+UserAuth.update = function updateProfile(userID, user, result) {
+  const sql =
+    "UPDATE user SET username = ?, userbirthdate = ?, usergender = ?, useraddress = ?, usercic = ?, useremail = ?, userphone = ?, userbanknumber = ?, wardid = ? WHERE userid = ?";
+  db.query(
+    sql,
+    [
+      user.username,
+      user.userbirthdate,
+      user.usergender,
+      user.useraddress,
+      user.usercic,
+      user.useremail,
+      user.userphone,
+      user.userbanknumber,
+      user.wardid,
+      userID,
+    ],
+    function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
+};
+
+// Chagne user avatar
+UserAuth.changeAvatar = function changeAvatar(userID, userAvatar, result) {
+  const sql = "UPDATE user SET useravatar = ? WHERE userid = ?";
+  db.query(sql, [userAvatar, userID], function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+// Change user password
+UserAuth.getPassword = function getPassword(userID, result) {
+  db.query(
+    "SELECT userpassword FROM user WHERE userid = ?",
+    userID,
+    async function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res[0].userpassword);
+      }
+    }
+  );
+};
+UserAuth.changePassword = function changePassword(userID, userPassword, result) {
+  const sql = "UPDATE user SET userpassword = ? WHERE userid = ?";
+  db.query(sql, [userPassword, userID], function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
     }
   });
 };
