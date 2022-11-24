@@ -346,64 +346,6 @@ const changeAvatar = async function (req, res) {
 };
 
 // Update user password
-const changePassword = async function (req, res) {
-  var userID = req.params.id;
-  var userPassword = req.body.userPassword.toString();
-  var passwordOld = req.body.passwordOld.toString();
-  User.getPassword(userID, function (err, password) {
-    if (err) {
-      res.json({
-        error: true,
-        statusCode: 0,
-        message: "Lỗi! Không tìm thấy user",
-      });
-    }
-    bcrypt.compare(passwordOld, password, function (err, result) {
-      if (err) {
-        res.json({
-          error: true,
-          statusCode: 0,
-          message: "Lỗi! Không thể so sánh mật khẩu",
-        });
-      }
-      if (!result) {
-        res.json({
-          error: true,
-          statusCode: 0,
-          message: "Lỗi! Mật khẫu cũ không trùng khớp",
-        });
-      } else {
-        bcrypt.hash(userPassword, saltRounds, function (err, hash) {
-          if (err) {
-            res.json({
-              error: true,
-              statusCode: 0,
-              message: "Lỗi! Mã hóa password không thành công",
-            });
-          } else {
-            User.changePassword(userID, hash, function (err, user) {
-              if (err) {
-                res.json({
-                  error: true,
-                  statusCode: 0,
-                  message: "Lỗi! Cập nhật user password không thành công",
-                });
-              } else {
-                res.json({
-                  error: false,
-                  statusCode: 1,
-                  message: "Cập nhật user password thành công",
-                });
-              }
-            });
-          }
-        });
-      }
-    });
-  });
-};
-
-// Update user password
 const resetPassword = async function (req, res) {
   var userID = req.params.id;
   var userPassword = req.body.userPassword.toString();
@@ -502,7 +444,6 @@ module.exports = {
   store,
   update,
   changeAvatar,
-  changePassword,
   resetPassword,
   destroy,
   restore,

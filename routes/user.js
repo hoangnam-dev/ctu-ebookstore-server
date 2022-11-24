@@ -11,7 +11,6 @@ const {
   store,
   update,
   changeAvatar,
-  changePassword,
   resetPassword,
   destroy,
   restore,
