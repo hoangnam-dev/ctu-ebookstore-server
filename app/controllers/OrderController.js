@@ -1,44 +1,35 @@
 const Order = require("../models/Order");
-const Ebook = require("../models/Ebook");
-const License = require('../models/License');
 const paypal = require("paypal-rest-sdk");
-// const convertUSD = require('../../utils/convertMoney');
 const ratesData = require("../../utils/rates.json");
-const generateString = (length) => {
-  const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  const charactersLength = characters.length;
-  for ( let i = 0; i < length; i++ ) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength)); 
-  } 
-  return result; 
-}
 
 const order = async (req, res) => {
-  // var itemList = req.body.itemList;
-  // var orderNote = req.body.orderNote;
-  // var customerID = req.body.customerID;
-  // var borrowEbook = req.body.borrowEbook;
-  // var expiresBorrow = req.body.expiresBorrow;
-  // var orderNote = req.body.orderNote;
+  var itemList = req.body.itemList;
+  var orderNote = req.body.orderNote;
+  var customerID = req.body.customerID;
+  var orderNote = req.body.orderNote;
   var amount = 0;
+
+  // if customer borrow ebook
+  // var expiresBorrow = req.body.expiresBorrow;
+  // var borrowEbook = req.body.borrowEbook;
+
+  // Test with browser
   // var borrowEbook = true;
   // var expiresBorrow = 2;
-  var orderNote = "test order";
-  var customerID = 1;
-
-  var itemList = [
-    {
-      ebookID: 1,
-      ebookName: "ebook1",
-      ebookPrice: 24000,
-    },
-    {
-      ebookID: 2,
-      ebookName: "ebook2",
-      ebookPrice: 24000,
-    },
-  ];
+  // var orderNote = "test order";
+  // var customerID = 3;
+  // var itemList = [
+  //   // {
+  //   //   ebookID: 1,
+  //   //   ebookName: "ebook1",
+  //   //   ebookPrice: 24000,
+  //   // },
+  //   {
+  //     ebookID: 4,
+  //     ebookName: "ebook2",
+  //     ebookPrice: 24000,
+  //   },
+  // ];
 
   const currency = ratesData.rates[0].value.find((item) => item.code === "USD");
   const sell = parseFloat(currency.sell.replace(",", ""));
@@ -68,7 +59,7 @@ const order = async (req, res) => {
     customerID: customerID,
   });
 
-
+  // Store order
   Order.store(newOrder, itemList, function (err, order) {
     if (err) {
       return res.json({
@@ -77,11 +68,13 @@ const order = async (req, res) => {
         message: "Lỗi! Thêm đơn hàng không thành công",
       });
     } else {
+      // url_redirect if transaction success
       var url_redirect = `http://localhost:3001/api/orders/successPaypal?amount=${amount}&orderID=${order}&customerID=${customerID}`;
       // if(borrowEbook !== undefined) {
       //   url_redirect = `http://localhost:3001/api/orders/success?amount=${amount}&orderID=${order}&customerID=${customerID}&expiresBorrow=${expiresBorrow}`; 
       // }
 
+      // create payment info json
       var create_payment_json = {
         intent: "sale",
         payer: {
@@ -105,12 +98,14 @@ const order = async (req, res) => {
         ],
       };
 
+      // create a transaction with paypal
       paypal.payment.create(create_payment_json, function (error, payment) {
         if (error) {
           throw error;
         } else {
           for (let i = 0; i < payment.links.length; i++) {
             if (payment.links[i].rel === "approval_url") {
+              // redirect to approval
               res.redirect(payment.links[i].href);
             }
           }
@@ -198,6 +193,7 @@ const successPaypal = (req, res) => {
     ],
   };
 
+  // execute payment request
   paypal.payment.execute(
     paymentId,
     execute_payment_json,
@@ -206,6 +202,7 @@ const successPaypal = (req, res) => {
         console.log(error.response);
         throw error;
       } else {
+        // change order status to completed and create license ebooks for customerID
         Order.completeOrder(orderID, orderStatus, customerID, function (err, status) {
           if (err) {
             return res.json({
