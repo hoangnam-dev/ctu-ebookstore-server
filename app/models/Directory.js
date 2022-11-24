@@ -80,7 +80,7 @@ Directory.index = function index(result) {
 
 // Get directory by ID
 Directory.search = function search(directoryName, result) {
-  const sql = `SELECT * FROM directory WHERE REPLACE(directoryname, 'Đ', 'D') LIKE '%${directoryName}%'`;
+  const sql = `SELECT * FROM directory WHERE REPLACE(directoryname, 'Đ', 'D') LIKE '%${directoryName}%' AND directorydeletedat IS NULL`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
