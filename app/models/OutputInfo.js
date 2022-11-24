@@ -100,7 +100,7 @@ async function resultOutputInfo(res) {
 // Get all outputinfo
 OutputInfo.getAll = function getAllOutputInfo(result) {
   db.query(
-    "SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, outputinfo.supplierid, supplier.suppliername FROM ebookstore.outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE outputinfodeletedat IS NULL",
+    "SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, outputinfo.supplierid, supplier.suppliername FROM outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE outputinfo.outputinfodeletedat IS NULL",
     function (err, res) {
       if (err) {
         result(err, null);

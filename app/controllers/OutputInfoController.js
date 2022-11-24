@@ -61,7 +61,6 @@ const allOutputInfo = function (req, res) {
 const store = function (req, res) {
   var newOutputInfo = new OutputInfo(req.body);
   if (
-    !newOutputInfo.outputinfototalmoney ||
     !newOutputInfo.supplierid ||
     !newOutputInfo.userid
   ) {
@@ -137,7 +136,6 @@ const update = function (req, res) {
   var newOutputInfo = new OutputInfo(req.body);
   var outputinfoID = req.params.id;
   if (
-    !newOutputInfo.outputinfototalmoney ||
     !newOutputInfo.supplierid ||
     !newOutputInfo.userid
   ) {
