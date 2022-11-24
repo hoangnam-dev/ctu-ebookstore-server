@@ -35,9 +35,10 @@ const jwtMiddleware = {
   // Check user login permission
   authOwner: (req, res, next) => {
     jwtMiddleware.verifyToken(req, res, () => {
-      if (req.user.id == req.params.userID) {
+      if (req.user.id == req.params.id) {
         next();
       } else {
+        console.log(req.user.id);
         return res.json({
           error: true,
           statusCode: authorization_error,
