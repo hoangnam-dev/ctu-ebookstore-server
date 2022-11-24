@@ -8,13 +8,11 @@ const {
   register,
   refreshAccessToken,
   logout,
-} = require("../app/controllers/CustomerAuthController");
-
-const {
-  update,
+  profile,
+  updateProfile,
   changeAvatar,
   changePassword,
-} = require("../app/controllers/CustomerController");
+} = require("../app/controllers/CustomerAuthController");
 
 // Middlewares
 const jwtMiddlewares = require("../app/middlewares/jwt");
@@ -24,7 +22,8 @@ router.post("/register", register);
 router.post("/refreshToken", refreshAccessToken);
 router.post("/logout", jwtMiddlewares.verifyToken, logout);
 
-router.put("/:id", jwtMiddlewares.verifyToken, update);
+router.post("/profile", jwtMiddlewares.verifyToken, profile);
+router.put("/:id", jwtMiddlewares.verifyToken, updateProfile);
 router.put("/changeAvatar/:id", jwtMiddlewares.verifyToken, upload.single("customerAvatar"), changeAvatar);
 router.put("/changePassword/:id", jwtMiddlewares.verifyToken, changePassword);
 
