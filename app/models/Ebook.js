@@ -1,6 +1,5 @@
 const db = require("../../config/db");
 const moment = require("moment");
-const { result } = require("lodash");
 const util = require("util");
 
 // Constructor
@@ -203,11 +202,12 @@ Ebook.getEbookByDirectoryID = function getEbookByDirectoryID(
   db.query(
     "SELECT * FROM ebook WHERE categoryid = ?",
     [categoryID],
-    function (err, res) {
+    async function (err, res) {
       if (err) {
         result(err, null);
       } else {
-        result(null, res);
+        const ebookData = await resultEbook(res);
+        result(null, ebookData);
       }
     }
   );
@@ -225,6 +225,30 @@ Ebook.search = function searchEbook(col, val, result) {
     }
   });
 };
+
+// Get 20 new ebook
+Ebook.getNewEbook = function getNewEbook(result) {
+  const sql = "SELECT ebookid, ebookname, ebookcreatedat FROM ebook ORDER BY ebookcreatedat DESC LIMIT 20";
+  db.query(sql, function (err, res) {
+    if(err) {
+      result(err, null);
+    } else {
+      result(res, null);
+    }
+  })
+}
+
+// Get 20 new ebook
+Ebook.getEbookBestSaler = function getEbookBestSaler(result) {
+  const sql = "SELECT ebookid, ebookname, ebookcreatedat FROM ebook ORDER BY ebookcreatedat DESC LIMIT 20";
+  db.query(sql, function (err, res) {
+    if(err) {
+      result(err, null);
+    } else {
+      result(res, null);
+    }
+  })
+}
 
 // Store ebook
 Ebook.store = function storeEbook(newEbook, categoriesID, authorsID, result) {

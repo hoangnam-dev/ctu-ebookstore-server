@@ -305,6 +305,7 @@ const updateEbookContent = async function (req, res) {
   var newEbookContentLink = "";
   var ebookID = req.params.id;
   var separatePage = req.body.separatePage;
+  var newEbookReviewLink = "";
   try {
     var contentType = "";
     // Upload epub
