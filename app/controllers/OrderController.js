@@ -5,33 +5,34 @@ const ratesData = require("../../utils/rates.json");
 
 const order = async (req, res) => {
   var amount = 0;
-  // var itemList = req.body.itemList;
-  // var orderNote = req.body.orderNote;
-  // var customerID = req.body.customerID;
-  // var orderNote = req.body.orderNote;
+  var itemList = req.body.itemList;
+  var orderNote = req.body.orderNote;
+  var customerID = req.body.customerID;
+  var orderNote = req.body.orderNote;
 
   // if customer borrow ebook
   // var expiresBorrow = req.body.expiresBorrow;
   // var borrowEbook = req.body.borrowEbook;
-
+  
   // Test with browser
   // var borrowEbook = true;
   // var expiresBorrow = 2;
-
-  var orderNote = "test order";
-  var customerID = 1;
-  var itemList = [
-    {
-      ebookID: 34,
-      ebookName: "ebook1",
-      ebookPrice: 24000,
-    },
-    {
-      ebookID: 35,
-      ebookName: "ebook2",
-      ebookPrice: 24000,
-    },
-  ];
+  
+  
+  // var orderNote = "test order";
+  // var customerID = 2;
+  // var itemList = [
+  //   {
+  //     ebookID: 34,
+  //     ebookName: "ebook1",
+  //     ebookPrice: 24000,
+  //   },
+  //   {
+  //     ebookID: 35,
+  //     ebookName: "ebook2",
+  //     ebookPrice: 24000,
+  //   },
+  // ];
 
   const currency = ratesData.rates[0].value.find((item) => item.code === "USD");
   const sell = parseFloat(currency.sell.replace(",", ""));
