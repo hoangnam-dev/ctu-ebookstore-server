@@ -162,9 +162,8 @@ OutputInfo.update = function updateOutputInfo(
   result
 ) {
   db.query(
-    "UPDATE outputinfo SET outputinfototalmoney = ?, outputinfodescription = ?, userid = ?, supplierid = ? WHERE outputinfoid = ?",
+    "UPDATE outputinfo SET outputinfodescription = ?, userid = ?, supplierid = ? WHERE outputinfoid = ?",
     [
-      outputinfo.outputinfototalmoney,
       outputinfo.outputinfodescription,
       outputinfo.userid,
       outputinfo.supplierid,
