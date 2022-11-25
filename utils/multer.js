@@ -76,7 +76,6 @@ const uploadFileAndImages = async (req, res, next) => {
 
       // If choose a avatar image => update
       if (req.files["ebookAvatar"]) {
-        console.log(req.files["ebookAvatar"][0].filename);
         // req.avatarSaved = "/images/" + req.files["ebookAvatar"][0].filename;
         req.avatarSaved = req.files["ebookAvatar"][0].filename;
       } else {

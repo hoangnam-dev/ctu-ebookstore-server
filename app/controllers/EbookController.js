@@ -195,7 +195,6 @@ const store = async function (req, res) {
       // Upload epub
       if (req.ePubSaved !== undefined) {
         newEbook.ebookepub = handleFilePath('public/uploads/ebookEPUB', req.ePubSaved);
-        console.log(newEbook.ebookepub);
       } else {
         newEbook.ebookepub = "";
       }
@@ -204,8 +203,6 @@ const store = async function (req, res) {
         newEbook.ebookpdf = handleFilePath('public/uploads/ebookPDF', req.pdfSaved);
         newEbook.ebookpdfreview = handleFilePath('public/uploads/ebookPDF/pdf-review', req.pdfSaved);
         var pdfLink = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
-        console.log(newEbook.ebookpdf);
-        console.log(newEbook.ebookpdfreview);
 
         splitPDF(newEbook.ebookpdf, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, pdfLink)
           .then()
