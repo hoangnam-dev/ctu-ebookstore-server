@@ -1,13 +1,14 @@
 const Order = require("../models/Order");
+const PaypalPayment = require("../models/PaypalPayment");
 const paypal = require("paypal-rest-sdk");
 const ratesData = require("../../utils/rates.json");
 
 const order = async (req, res) => {
-  var itemList = req.body.itemList;
-  var orderNote = req.body.orderNote;
-  var customerID = req.body.customerID;
-  var orderNote = req.body.orderNote;
   var amount = 0;
+  // var itemList = req.body.itemList;
+  // var orderNote = req.body.orderNote;
+  // var customerID = req.body.customerID;
+  // var orderNote = req.body.orderNote;
 
   // if customer borrow ebook
   // var expiresBorrow = req.body.expiresBorrow;
@@ -16,20 +17,21 @@ const order = async (req, res) => {
   // Test with browser
   // var borrowEbook = true;
   // var expiresBorrow = 2;
-  // var orderNote = "test order";
-  // var customerID = 3;
-  // var itemList = [
-  //   // {
-  //   //   ebookID: 1,
-  //   //   ebookName: "ebook1",
-  //   //   ebookPrice: 24000,
-  //   // },
-  //   {
-  //     ebookID: 4,
-  //     ebookName: "ebook2",
-  //     ebookPrice: 24000,
-  //   },
-  // ];
+
+  var orderNote = "test order";
+  var customerID = 1;
+  var itemList = [
+    {
+      ebookID: 34,
+      ebookName: "ebook1",
+      ebookPrice: 24000,
+    },
+    {
+      ebookID: 35,
+      ebookName: "ebook2",
+      ebookPrice: 24000,
+    },
+  ];
 
   const currency = ratesData.rates[0].value.find((item) => item.code === "USD");
   const sell = parseFloat(currency.sell.replace(",", ""));
@@ -82,7 +84,7 @@ const order = async (req, res) => {
         },
         redirect_urls: {
           return_url: url_redirect,
-          cancel_url: "http://localhost:3001/api/orders/cancelPaypal",
+          cancel_url: `http://localhost:3001/api/orders/cancelPaypal?orderID=${order}`,
         },
         transactions: [
           {
@@ -192,6 +194,11 @@ const successPaypal = (req, res) => {
       },
     ],
   };
+  var newTransation = new PaypalPayment({
+    orderID : orderID,
+    paymentID : paymentId,
+    payerID : payer_id,
+  });
 
   // execute payment request
   paypal.payment.execute(
@@ -210,24 +217,46 @@ const successPaypal = (req, res) => {
               statusCode: 0,
               message: "Lỗi không thể cập nhật trạng thái đơn hàng",
             });    
+          } else {
+            PaypalPayment.store(newTransation, function (err, transaction) {
+              if (err) {
+                return res.json({
+                  error: true,
+                  statusCode: 0,
+                  message: "Lỗi không thể lưu thông tin giao dịch Paypal",
+                }); 
+              } else {
+                res.json({
+                  error: false,
+                  statusCode: 1,
+                  message: "Thanh toán thành công",
+                });
+              }
+            })
           }
         })
-        res.json({
-          error: false,
-          statusCode: 1,
-          message: "Thanh toán thành công",
-        });
       }
     }
   );
 };
 
 const cancelPaypal = (req, res) => {
-  return res.json({
-    error: false,
-    statusCode: 1,
-    message: "Đã hủy đặt hàng",
-  });  
+  var orderID = req.query.orderID;
+  Order.destroy(orderID, function (err, order) {
+    if (err) {
+      return res.json({
+        error: false,
+        statusCode: 1,
+        message: "Đã hủy đặt hàng không thành công",
+      }); 
+    } else {
+      return res.json({
+        error: false, 
+        statusCode: 1,
+        message: "Đã hủy đặt hàng",
+      }); 
+    }
+  })
 }
 
 const paymentPaypal = (req, res) => {

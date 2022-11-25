@@ -54,7 +54,6 @@ Order.store = function storeOrder(newOrder, itemList, result) {
   newOrder.ordercreatedat = moment().format("YYYY-MM-DD HH:mm:ss");
   db.query("INSERT INTO order_tbl set ?", newOrder, function (err, res) {
     if (err) {
-        console.log(err);
       result(err, null);
     } else {
       var detailorderQuantity = 1;
@@ -65,8 +64,16 @@ Order.store = function storeOrder(newOrder, itemList, result) {
       const sql = "INSERT INTO detailorder (ebookid, orderid, detailorderprice, detailorderquantity) VALUES ?";
       db.query(sql, [values], function (errDetail, resDetail) {
         if (errDetail) {
-            console.log(errDetail);
-          result(errDetail, null);
+          // Delete the order when can create deltail order
+          const sqlDel = `DELETE FROM order_tbl WHERE orderid = '${res.insertId}'`;
+          db.query(sql, [values], function (errDel, resDel) {
+            if(errDel) {
+              result(null, errDel);
+            } else {
+              result(errDetail, null);
+            }
+
+          });
         } else {
           result(null, res.insertId);
         }
@@ -94,7 +101,6 @@ Order.completeOrder = async function completeOrder(orderID, orderStatus, custome
 
             values.push([item.ebookid, customerID, generateString(5), licenseCreatedAt]);
         });
-        console.log(values);
         const sql = "INSERT INTO license (ebookid, customerid, licensecode, licensecreatedat) VALUES ?";
         db.query(sql, [values], function (errLicense, resLicense) {
           if (errLicense) {
@@ -120,7 +126,6 @@ Order.complete = async function complete(orderID, orderStatus, customerID, expir
       values.push([item.ebookid, orderID]);
     }
   });
- console.log(values);
   // db.query(
   //   "UPDATE order_tbl SET orderstatus = ? WHERE orderid = ?",
   //   [orderStatus, orderID],
@@ -136,7 +141,6 @@ Order.complete = async function complete(orderID, orderStatus, customerID, expir
 
 // Update order
 Order.update = function updateOrder(orderID, order, result) {
-  console.log(orderID);
   db.query(
     "UPDATE order_tbl SET orderstatus = ? WHERE orderid = ?",
     [order.orderstatus, orderID],
@@ -151,15 +155,25 @@ Order.update = function updateOrder(orderID, order, result) {
 };
 
 // Delete order
-Order.delete = function deleteOrder(orderID, result) {
+Order.destroy = function destroyOrder(orderID, result) {
   db.query(
-    "DELETE FROM order_tbl WHERE orderid = ?",
+    "DELETE FROM detailorder WHERE orderid = ?",
     orderID,
-    function (err, res) {
-      if (err) {
-        result(err, null);
+    function (errDetail, resDetail) {
+      if (errDetail) {
+        result(errDetail, null);
       } else {
-        result(null, res);
+        db.query(
+          "DELETE FROM order_tbl WHERE orderid = ?",
+          orderID,
+          function (err, res) {
+            if (err) {
+              result(err, null);
+            } else {
+              result(null, res);
+            }
+          }
+        );
       }
     }
   );
