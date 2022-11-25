@@ -6,21 +6,22 @@ const {
   allOrder,
   getOrderByID,
   order,
-  store,
   update,
   successPaypal,
   cancelPaypal,
-  check,
 } = require("../app/controllers/OrderController");
 
-router.post("/check", check);
-router.get("/order", order);
+// Completed Order
 router.get("/successPaypal", successPaypal);
+// Cancel Order
 router.get("/cancelPaypal", cancelPaypal);
+// Get Order Details
 router.get("/:id", getOrderByID);
+// Get All Order
 router.get("/", allOrder);
-router.post("/order", order);
-router.post("/", store);
+// Update Order(Admin using)
 router.put("/:id", update);
+// Order with Paypal
+router.post("/order", order);
 
 module.exports = router;
