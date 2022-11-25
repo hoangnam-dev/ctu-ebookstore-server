@@ -72,8 +72,12 @@ const allInputInfo = function (req, res) {
 // Store new inputinfo
 const store = function (req, res) {
   var newInputInfo = new InputInfo(req.body);
+  var inputDetail = req.body.inputDetail;
+  newInputInfo.inputinfototalmoney = 0;
+  inputDetail.forEach((item) => {
+    newInputInfo.inputinfototalmoney += parseFloat(item.inputPrice);
+  });
   if (
-    !newInputInfo.inputinfototalmoney ||
     !newInputInfo.supplierid ||
     !newInputInfo.userid ||
     !newInputInfo.outputinfoid
@@ -92,12 +96,12 @@ const store = function (req, res) {
           message: "Lỗi! Thêm phiếu nhập không thành công",
         });
       } else {
-        InputInfo.storeDetail(inputinfo, req.body.inputDetail, function(err, inputinfo) {
+        InputInfo.storeDetail(inputinfo, inputDetail, function(err, inputinfo) {
           if (err) {
             res.json({
               error: true,
               statusCode: 0,
-              message: "Thêm phiếu nhập không thành công",
+              message: "Thêm chi tiết phiếu nhập không thành công",
             });
           } else {
             res.json({
@@ -198,6 +202,7 @@ const addDetail = function (req, res) {
   var inputPrice = req.body.inputPrice;
   var totalMoney = req.body.totalMoney;
   var outputinfoID = req.body.outputinfoID;
+  totalMoney += parseFloat(inputPrice)
 
   InputInfo.addItemDetail(inputinfoID, ebookID, inputPrice, function (err, inputInfo) {
     if (err) {
@@ -233,6 +238,7 @@ const updateDetail = function (req, res) {
   var inputPrice = req.body.inputPrice;
   var totalMoney = req.body.totalMoney;
   var outputinfoID = req.body.outputinfoID;
+  totalMoney += parseFloat(inputPrice)
 
   InputInfo.updateItemDetail(inputinfoID, ebookID, inputPrice, function (err, inputInfo) {
     if (err) {
@@ -267,6 +273,9 @@ const deleteDetail = function (req, res) {
   var ebookID = req.body.ebookID;
   var totalMoney = req.body.totalMoney;
   var outputinfoID = req.body.outputinfoID;
+  var inputPrice = req.body.inputPrice;
+  totalMoney -= parseFloat(inputPrice)
+
   InputInfo.deleteItemDetail(inputinfoID, ebookID, function (err, inputInfo) {
     if (err) {
       res.json({

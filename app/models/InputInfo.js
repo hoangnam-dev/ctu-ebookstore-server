@@ -254,6 +254,7 @@ InputInfo.storeDetail = function storeInputInfoDetail(
     "INSERT INTO inputinfo_ebook (inputinfoid, ebookid, inputprice) VALUES ?";
   db.query(sql, [values], function (err, res) {
     if (err) {
+      log(err);
       result(err, null);
     } else {
       result(null, res.insertId);
@@ -322,8 +323,8 @@ InputInfo.updateItemDetail = function updateItemDetail(
   result
 ) {
   db.query(
-    "UPDATE inputinfo_ebook SET ebookid = ?, inputprice = ? WHERE inputinfoid = ?",
-    [ebookID, inputPrice, inputinfoID],
+    "UPDATE inputinfo_ebook SET inputprice = ? WHERE inputinfoid = ? AND  ebookid = ?",
+    [inputPrice, inputinfoID, ebookID],
     function (err, res) {
       if (err) {
         result(err, null);
