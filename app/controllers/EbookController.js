@@ -100,6 +100,9 @@ function handleResult(arrData) {
   });
   return resData;
 }
+const handleFilePath = (directoryPath, fileName) => {
+return `https://localhost:${process.env.PORT||3001}/${directoryPath}/${fileName}`
+}
 
 // Show all ebook
 const allEbook = function (req, res) {
@@ -162,10 +165,10 @@ const splitPDF = async (
 
 const store = async function (req, res) {
   var newEbook = new Ebook(req.body);
-  var categoriesID = req.body.categoriesID;
-  var authorsID = req.body.authorsID;
-  // var categoriesID = [1,2]; // test
-  // var authorsID = [1,2]; // test
+  // var categoriesID = req.body.categoriesID;
+  // var authorsID = req.body.authorsID;
+  var categoriesID = [1,2]; // test
+  var authorsID = [1,2]; // test
   var separatePage = req.body.separatePage;
   if (
     !newEbook.ebookname ||
@@ -181,25 +184,30 @@ const store = async function (req, res) {
   } else {
     try {
       // Upload Avatar
-      if (req.avatarPathSaved !== undefined) {
-        let avatarPath = req.avatarPathSaved;
+      if (req.avatarSaved !== undefined) {
+        const url = req.protocol + '://' + req.get('host')
+        let avatarPath = appRoot + "\\public\\uploads\\ebookAvatar\\" + req.avatarSaved;
         let uploadResponse = await cloudinary.uploader.upload(avatarPath, {
           upload_preset: "ebookstore_ebook_images",
         });
         newEbook.ebookavatar = uploadResponse.secure_url;
       }
       // Upload epub
-      if (req.ePubPathSaved !== undefined) {
-        newEbook.ebookepub = req.ePubPathSaved;
+      if (req.ePubSaved !== undefined) {
+        newEbook.ebookepub = handleFilePath('public/uploads/ebookEPUB', req.ePubSaved);
+        console.log(newEbook.ebookepub);
       } else {
         newEbook.ebookepub = "";
       }
       // Upload pdf
-      if (req.pdfPathSaved !== undefined) {
-        newEbook.ebookpdf = req.pdfPathSaved;
-        newEbook.ebookpdfreview = appRoot + "\\public\\uploads\\ebookPDF\\pdf-review\\" + req.pdfReviewPathSaved;
+      if (req.pdfSaved !== undefined) {
+        newEbook.ebookpdf = handleFilePath('public/uploads/ebookPDF', req.pdfSaved);
+        newEbook.ebookpdfreview = handleFilePath('public/uploads/ebookPDF/pdf-review', req.pdfSaved);
+        var pdfLink = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
+        console.log(newEbook.ebookpdf);
+        console.log(newEbook.ebookpdfreview);
 
-        splitPDF(newEbook.ebookpdf, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, req.pdfReviewPathSaved)
+        splitPDF(newEbook.ebookpdf, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, pdfLink)
           .then()
           .catch((errorSlipt) => console.error);
       } else {
@@ -253,11 +261,12 @@ const getEbookByID = function (req, res) {
 const update = async function (req, res) {
   var newEbook = new Ebook(req.body);
   var ebookID = req.params.id;
+  // var categoriesID = req.body.categoriesID;
+  // var authorsID = req.body.authorsID;
   if (
     !newEbook.ebookname ||
     !newEbook.ebookprice ||
-    !newEbook.ebookstatusid ||
-    !newEbook.supplierid
+    !newEbook.ebookstatusid
   ) {
     res.json({
       error: true,
@@ -267,8 +276,8 @@ const update = async function (req, res) {
   } else {
     try {
       // Upload Avatar
-      if (req.avatarPathSaved !== undefined) {
-        let avatarPath = req.avatarPathSaved;
+      if (req.avatarSaved !== undefined) {
+        let avatarPath = req.avatarSaved;
         let uploadResponse = await cloudinary.uploader.upload(avatarPath, {
           upload_preset: "ebookstore_ebook_images",
         });
@@ -309,18 +318,19 @@ const updateEbookContent = async function (req, res) {
   try {
     var contentType = "";
     // Upload epub
-    if (req.ePubPathSaved !== undefined) {
+    if (req.ePubSaved !== undefined) {
       contentType = "epub";
-      newEbookContentLink = req.ePubPathSaved;
+      newEbookContentLink = handleFilePath('public/uploads/ebookEPUB', req.ePubSaved);
     }
     // Upload pdf
-    if (req.pdfPathSaved !== undefined) {
+    if (req.pdfSaved !== undefined) {
       contentType = "pdf";
-      newEbookContentLink = req.pdfPathSaved;
-      newEbookReviewLink = appRoot + "\\public\\uploads\\ebookPDF\\pdf-review\\" + req.pdfReviewPathSaved;
+      newEbookContentLink = handleFilePath('public/uploads/ebookPDF', req.pdfSaved);
+      newEbookReviewLink =  handleFilePath('public/uploads/ebookPDF/pdf-review', req.pdfSaved);
+      var pdfLink = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
 
 
-      splitPDF(newEbook.ebookpdf, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, req.pdfReviewPathSaved)
+      splitPDF(newEbook.ebookpdf, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, pdfLink)
         .then()
         .catch((err) => console.error);
     }
@@ -368,9 +378,9 @@ const addImage = async function (req, res) {
   try {
     // Upload Images
     var cloudPathImages = [];
-    if (req.imagesPathSaved !== undefined) {
-      for (let i = 0; i < req.imagesPathSaved.length; i++) {
-        let imagesPath = req.imagesPathSaved[i];
+    if (req.imagesSaved !== undefined) {
+      for (let i = 0; i < req.imagesSaved.length; i++) {
+        let imagesPath = req.imagesSaved[i];
         let uploadResponse = await cloudinary.uploader.upload(imagesPath, {
           upload_preset: "ebookstore_ebook_images",
         });
