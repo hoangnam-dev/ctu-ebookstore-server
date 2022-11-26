@@ -10,7 +10,28 @@ const allLicense = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      res.json(licenses);
+      var resData = licenses.map((data) => {
+        var ebookInfo = data.ebook;
+        var customerInfo = data.customer;
+        // return licede
+        return {
+          licenseCode: data.licensecode,
+          licenseStatus: data.licensestatus,
+          licenseIsRent: data.licenseisrent,
+          licenseExpires: data.licenseexpires,
+          licenseCreatedAt: data.licensecreatedat,
+          ebook: {
+            ebookID: ebookInfo.ebookid,
+            ebookName: ebookInfo.ebookname,
+            ebookAvatar: ebookInfo.ebookavatar,
+          },
+          customer: {
+            customerID: customerInfo.customerid,
+            customerName: customerInfo.customername,
+          }
+        };
+      });
+      res.json(resData);
     }
   });
 };
@@ -18,14 +39,14 @@ const allLicense = function (req, res) {
 // Store new license
 const store = function (req, res) {
   var newLicense = new License(req.body);
-  if (!newLicense.licenseisrent || !newLicense.licenseexpires || !newLicense.ebookID || !newLicense.customerid) {
+  if (!newLicense.ebookID || !newLicense.customerid) {
     res.json({
       error: true,
       statusCode: 0,
       message: "Thông tin license không được để trống",
     });
   } else {
-    License.store(newLicense, function (err, license) {
+    License.store(newLicenses, function (err, license) {
       if (err) {
         res.json({
           error: true,
@@ -43,6 +64,37 @@ const store = function (req, res) {
   }
 };
 
+// Delete License
+const destroy = function (req, res) {
+  var licenseCode = req.body.licenseCode;
+  console.log(licenseCode);
+  License.getLicenseByID(licenseCode, function (err, license) {
+    if (err || Object.keys(license).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy license",
+      });
+    } else {
+      License.delete(licenseCode, function (err, license) {
+        if (err) {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Lỗi! Xóa license không thành công",
+          });
+        } else {
+          res.json({
+            error: false,
+            statusCode: 1,
+            message: "Xóa license thành công",
+          });
+        }
+      });
+    }
+  });
+};
+
 // Get license by ID
 const getLicenseByID = function (req, res) {
   var licenseID = req.params.id;
@@ -54,44 +106,36 @@ const getLicenseByID = function (req, res) {
         message: "Lỗi! Không tìm thấy license",
       });
     } else {
-      res.json(license);
+      var resData = license.map((data) => {
+        var ebookInfo = data.ebook;
+        var customerInfo = data.customer;
+        // return licede
+        return {
+          licenseCode: data.licensecode,
+          licenseStatus: data.licensestatus,
+          licenseIsRent: data.licenseisrent,
+          licenseExpires: data.licenseexpires,
+          licenseCreatedAt: data.licensecreatedat,
+          ebook: {
+            ebookID: ebookInfo.ebookid,
+            ebookName: ebookInfo.ebookname,
+            ebookAvatar: ebookInfo.ebookavatar,
+          },
+          customer: {
+            customerID: customerInfo.customerid,
+            customerName: customerInfo.customername,
+          }
+        };
+      });
+      res.json(resData);
     }
   })
 }
 
-// Store new license
-const update = function (req, res) {
-  var newLicense = new License(req.body);
-  var licenseID = req.params.id;
-  if (!newLicense.licenseisrent || !newLicense.licenseexpires || !newLicense.ebookID || !newLicense.customerid) {
-    res.json({
-      error: true,
-      statusCode: 0,
-      message: "Thông tin license không được để trống",
-    });
-  } else {
-    License.update(licenseID, newLicense, function (err, license) {
-      if (err) {
-        res.json({
-          error: true,
-          statusCode: 0,
-          message: "Lỗi! Cập nhật license không thành công",
-        });
-      } else {
-        res.json({
-          error: false,
-          statusCode: 1,
-          message: "Cập nhật license thành công",
-        });
-      }
-    });
-  }
-};
 
 module.exports = {
     allLicense,
     getLicenseByID,
     store,
-    update,
-    // destroy,
+    destroy,
 }
