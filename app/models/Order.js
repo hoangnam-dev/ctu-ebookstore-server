@@ -1,7 +1,6 @@
 const db = require("../../config/db");
 const moment = require("moment");
 const util = require("util");
-const { log } = require("console");
 
 // Constructor
 const Order = function (order) {
