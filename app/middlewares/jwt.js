@@ -208,6 +208,38 @@ const jwtMiddleware = {
     });
   },
 
+  // Check order permissions
+  managerOrder: (req, res, next) => {
+    const permission = process.env.MANAGER_ORDER;
+
+    jwtMiddleware.verifyToken(req, res, () => {
+      let roleCode = req.user.roleCode;
+      UserAuth.getRoleAndPermission(roleCode, (err, permList) => {
+        if (err) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Bạn không có vai trò này",
+          });
+        }
+        let arrPerm = permList[0].permissionList;
+        let listPerm = [];
+        arrPerm.forEach((perm) => {
+          listPerm.push(perm.permissioncode);
+        });
+        if (listPerm.includes(permission)) {
+          next();
+        } else {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Bạn không có quyền thực thi",
+          });
+        }
+      });
+    });
+  },
+
   // Check outputinfo permissions
   managerOutputinfo: (req, res, next) => {
     const permission = process.env.MANAGER_OUTPUTINFO;

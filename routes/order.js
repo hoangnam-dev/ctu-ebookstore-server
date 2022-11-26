@@ -11,6 +11,8 @@ const {
   update
 } = require("../app/controllers/OrderController");
 
+const jwtMiddlewares = require('../app/middlewares/jwt');
+
 // router.get("/order", order); // test
 // Completed Order
 router.get("/successPaypal", successPaypal);
@@ -21,7 +23,7 @@ router.get("/:id", getOrderByID);
 // Get All Order
 router.get("/", allOrder);
 // Update Order(Admin using)
-router.put("/:id", update);
+router.put("/:id", jwtMiddlewares.managerOrder, update);
 // Order with Paypal
 router.post("/order", order);
 
