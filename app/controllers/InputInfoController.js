@@ -314,7 +314,7 @@ const destroy = function (req, res) {
         message: "Lỗi! Không tìm thấy phiếu nhập",
       });
     } else {
-      InputInfo.delete(inputInfoID, function (err, inputInfo) {
+      InputInfo.delete(inputInfoID, inputInfo[0].inputinfototalmoney, inputInfo[0].outputinfoid, function (err, inputInfo) {
         if (err) {
           res.json({
             error: true,

@@ -78,54 +78,7 @@ async function hasOutputInfo(outputinfoID) {
   });
 }
 
-// Get list outputinfo of inputinfo
-async function getTotalMomeyOutputInfo(outputinfoID) {
-  return new Promise((resolve, reject) => {
-    db.query(
-      "SELECT outputinfototalmoney FROM outputinfo WHERE outputinfoid = ?",
-      [outputinfoID],
-      async function (err, resSub) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(resSub);
-        }
-      }
-    );
-  });
-}
-// Get list outputinfo of inputinfo
-async function getTotalMomeyInputInfo(outputinfoID) {
-  return new Promise((resolve, reject) => {
-    db.query(
-      "SELECT SUM(inputinfototalmoney) as inputinfototalmoney  FROM inputinfo WHERE outputinfoid = ?",
-      [outputinfoID],
-      async function (err, resSub) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(resSub);
-        }
-      }
-    );
-  });
-}
-
-// User result,
-async function resultTotalMoney(outputinfoID) {
-  var inputTotalMoney = 0;
-
-  await getTotalMomeyInputInfo(outputinfoID)
-    .then(function (resInput) {
-      inputTotalMoney = resInput[0].inputinfototalmoney;
-    })
-    .catch(function (errInput) {
-      result(errInput, null);
-    });
-
-  return inputTotalMoney;
-}
-// User result,
+// Ouputinfo result,
 async function resultOutputInfo(res) {
   let listInfo = res.map(async (res) => {
     var ebooks = [];
@@ -214,6 +167,36 @@ InputInfo.search = function searchInputInfo(col, val, result) {
 };
 
 // Store inputinfo
+// Get output total money
+async function getTotalMomeyInputInfo(outputinfoID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT SUM(inputinfototalmoney) as inputinfototalmoney  FROM inputinfo WHERE outputinfoid = ?",
+      [outputinfoID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
+// result output total money
+async function resultTotalMoney(outputinfoID) {
+  var inputTotalMoney = 0;
+
+  await getTotalMomeyInputInfo(outputinfoID)
+    .then(function (resInput) {
+      inputTotalMoney = resInput[0].inputinfototalmoney;
+    })
+    .catch(function (errInput) {
+      result(errInput, null);
+    });
+
+  return inputTotalMoney;
+}
 InputInfo.store = function storeInputInfo(newInputInfo, result) {
   newInputInfo.inputinfocreatedat = moment().format("YYYY-MM-DD HH:mm:ss");
   db.query(
@@ -223,7 +206,9 @@ InputInfo.store = function storeInputInfo(newInputInfo, result) {
       if (err) {
         result(err, null);
       } else {
-        var totalMoneyOutput = await resultTotalMoney(newInputInfo.outputinfoid);
+        var totalMoneyOutput = await resultTotalMoney(
+          newInputInfo.outputinfoid
+        );
         db.query(
           "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
           [totalMoneyOutput, newInputInfo.outputinfoid],
@@ -294,7 +279,6 @@ InputInfo.update = function updateInputInfo(inputinfoID, inputinfo, result) {
     }
   );
 };
-
 // Add detail inputinfo
 InputInfo.addItemDetail = function addItemDetail(
   inputinfoID,
@@ -314,7 +298,6 @@ InputInfo.addItemDetail = function addItemDetail(
     }
   );
 };
-
 // Update detail inputinfo
 InputInfo.updateItemDetail = function updateItemDetail(
   inputinfoID,
@@ -386,19 +369,63 @@ InputInfo.updateTotalMoney = function updateTotalMoney(
 };
 
 // Delete inputinfo
-InputInfo.delete = function deleteInputInfo(inputinfoID, result) {
-  let now = moment().format("YYYY-MM-DD HH:mm:ss");
-  db.query(
-    "UPDATE inputinfo SET inputinfodeletedat = ? WHERE inputinfoid = ?",
-    [now, inputinfoID],
-    function (err, res) {
-      if (err) {
-        result(err, null);
-      } else {
-        result(null, res);
+// get outputinfo total money
+async function getTotalMomeyOutputInfo(outputinfoID) {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT outputinfototalmoney FROM outputinfo WHERE outputinfoid = ${outputinfoID}`;
+    db.query(
+      sql, async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
       }
+    );
+  });
+}
+// Result output total money
+async function resultOutputTotalMoney(outputinfoID) {
+  var outputTotalMoney = 0;
+
+  await getTotalMomeyOutputInfo(outputinfoID)
+    .then(function (resOutput) {
+      outputTotalMoney = resOutput[0].outputinfototalmoney;
+    })
+    .catch(function (errOutput) {
+      result(errOutput, null);
+    });
+
+  return outputTotalMoney;
+}
+InputInfo.delete = async function deleteInputInfo(inputinfoID, inputTotalMoney, outputinfoID, result) {
+  const sqlDetail = `DELETE FROM inputinfo_ebook WHERE inputinfoid = ${inputinfoID}`;
+  db.query(sqlDetail, function (errDetail, resDetail) {
+    if (errDetail) {
+      result(errDetail, null);
+    } else {
+      const sql = `DELETE FROM inputinfo WHERE inputinfoid = '${inputinfoID}'`;
+      db.query(sql, async function (err, res) {
+        if (err) {
+          result(err, null);
+        } else {
+          var totalMoneyOutput = await resultOutputTotalMoney(outputinfoID);
+          totalMoneyOutput -= inputTotalMoney;
+          db.query(
+            "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
+            [totalMoneyOutput, outputinfoID],
+            function (errUpdate, resUpdate) {
+              if (errUpdate) {
+                result(errUpdate, null);
+              } else {
+                result(null, res);
+              }
+            }
+          );
+        }
+      });
     }
-  );
+  });
 };
 
 // Restore inputinfo
