@@ -5,6 +5,7 @@ const commentRouter = require("./comment");
 const customerRouter = require("./customer");
 const customerAuthRouter = require("./customerAuth");
 const customerStatusRouter = require("./customerstatus");
+const dashboardRouter = require("./dashboard");
 const directoryRouter = require("./directory");
 const districtRouter = require("./district");
 const ebookRouter = require("./ebook");
@@ -48,6 +49,12 @@ function route(app) {
 
   // Customer routes
   app.use("/api/customerstatus", customerStatusRouter);
+
+  // Dashboard routes
+  app.use("/api/dashboard", dashboardRouter);
+
+  // Directory routes
+  app.use("/api/directories", directoryRouter);
 
   // Directory routes
   app.use("/api/directories", directoryRouter);

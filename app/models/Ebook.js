@@ -99,6 +99,30 @@ async function hasEbookStatus(ebookID) {
   });
 }
 // Customer result,
+async function resultEbookDashBoard(res) {
+  let listInfo = res.map(async (res) => {
+    var authors = [];
+
+    await hasAuthor(res.ebookid)
+      .then(function (resAuthor) {
+        authors = resAuthor;
+      })
+      .catch(function (errAuthor) {
+        result(errAuthor, null);
+      });
+
+    var ebookInfo = {
+      ...res,
+      authorList: authors,
+    };
+
+    return ebookInfo;
+  });
+
+  const ebookData = await Promise.all(listInfo);
+  return ebookData;
+}
+// Customer result,
 async function resultEbook(res) {
   let listInfo = res.map(async (res) => {
     var authors = [];
@@ -228,24 +252,43 @@ Ebook.search = function searchEbook(col, val, result) {
 
 // Get 20 new ebook
 Ebook.getNewEbook = function getNewEbook(result) {
-  const sql = "SELECT ebookid, ebookname, ebookcreatedat FROM ebook ORDER BY ebookcreatedat DESC LIMIT 20";
-  db.query(sql, function (err, res) {
+    const sql = `SELECT ebook.ebookid, ebook.ebookname, ebook.ebookavatar, ebook.ebookprice, ebook.ebookcreatedat ,
+                    ebookstatus.ebookstatuscode, ebookstatus.ebookstatusname, ebookstatus.ebookstatuscolor
+                FROM ebook 
+                INNER JOIN ebookstatus ON ebook.ebookstatusid = ebookstatus.ebookstatusid
+                ORDER BY ebookcreatedat DESC LIMIT 20`;
+  db.query(sql, async function (err, res) {
     if(err) {
+      console.log(err);
       result(err, null);
     } else {
-      result(res, null);
+      const ebookData = await resultEbookDashBoard(res);
+      result(null, ebookData);
     }
   })
 }
 
-// Get 20 new ebook
-Ebook.getEbookBestSaler = function getEbookBestSaler(result) {
-  const sql = "SELECT ebookid, ebookname, ebookcreatedat FROM ebook ORDER BY ebookcreatedat DESC LIMIT 20";
-  db.query(sql, function (err, res) {
+// Get 10 bestseller ebook in week
+Ebook.getBestsellerEbook = function getBestsellerEbook(result) {
+  const sql = `SELECT ebook.ebookid, ebook.ebookname, ebook.ebookavatar, ebook.ebookprice, 
+                ebookstatus.ebookstatuscode, ebookstatus.ebookstatusname, ebookstatus.ebookstatuscolor,
+                week(order_tbl.ordercreatedat) as week , 
+                sum(detailorder.detailorderquantity) as totalsale
+              FROM order_tbl
+              INNER JOIN detailorder ON order_tbl.orderid = detailorder.orderid
+              INNER JOIN ebook ON detailorder.ebookid = ebook.ebookid
+              INNER JOIN ebookstatus ON ebook.ebookstatusid = ebookstatus.ebookstatusid
+              WHERE week(order_tbl.ordercreatedat) = week(curdate())
+                  GROUP BY detailorder.ebookid
+                  ORDER BY totalsale DESC
+                  LIMIT 10`;
+  db.query(sql, async function (err, res) {
     if(err) {
+      console.log(err);
       result(err, null);
     } else {
-      result(res, null);
+      const ebookData = await resultEbookDashBoard(res);
+      result(null, ebookData);
     }
   })
 }
