@@ -83,6 +83,14 @@ const login = (req, res) => {
                   customerstatusColor: customerstatus.customerstatuscolor,
                 };
               });
+              var orderList = data.orderList.map((order) => {
+                return {
+                  orderID: order.orderid,
+                  orderTotalPrice: order.ordertotalprice,
+                  orderStatus: order.orderstatus,
+                  orderCreatedAt: order.ordercreatedat,
+                };
+              });
               var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
                 return {
                   ebookID: ebookOwn.ebookid,
@@ -92,7 +100,7 @@ const login = (req, res) => {
                   licenseExpires: ebookOwn.licenseexpires,
                 };
               });
-
+  
               // return customer
               return {
                 customerID: data.customerid,
@@ -104,6 +112,7 @@ const login = (req, res) => {
                 customerCreatedAt: data.customercreatedat,
                 customerstatusCode: customerstatusList[0].customerstatusCode,
                 ebookOwnList: ebookOwnList,
+                orderList: orderList,
               };
             });
 
@@ -280,13 +289,21 @@ const refreshAccessToken = (req, res) => {
           { expiresIn: "30m" }
         );
         // result customer info
-        var info = customerInfo.map((data) => {
+        var data = customer.map((data) => {
           var customerstatusList = data.statusList.map((customerstatus) => {
             return {
               customerstatusID: customerstatus.customerstatusid,
               customerstatusCode: customerstatus.customerstatuscode,
               customerstatusName: customerstatus.customerstatusname,
               customerstatusColor: customerstatus.customerstatuscolor,
+            };
+          });
+          var orderList = data.orderList.map((order) => {
+            return {
+              orderID: order.orderid,
+              orderTotalPrice: order.ordertotalprice,
+              orderStatus: order.orderstatus,
+              orderCreatedAt: order.ordercreatedat,
             };
           });
           var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
@@ -310,12 +327,14 @@ const refreshAccessToken = (req, res) => {
             customerCreatedAt: data.customercreatedat,
             customerstatusCode: customerstatusList[0].customerstatusCode,
             ebookOwnList: ebookOwnList,
+            orderList: orderList,
           };
         });
 
+
         res.json({
           newAccessToken,
-          customerInfo: info[0],
+          customerInfo: data[0],
         });
       }
     });
@@ -365,6 +384,14 @@ const profile = (req, res) => {
                 customerstatusColor: customerstatus.customerstatuscolor,
               };
             });
+            var orderList = data.orderList.map((order) => {
+              return {
+                orderID: order.orderid,
+                orderTotalPrice: order.ordertotalprice,
+                orderStatus: order.orderstatus,
+                orderCreatedAt: order.ordercreatedat,
+              };
+            });
             var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
               return {
                 ebookID: ebookOwn.ebookid,
@@ -386,6 +413,7 @@ const profile = (req, res) => {
               customerCreatedAt: data.customercreatedat,
               customerstatusCode: customerstatusList[0].customerstatusCode,
               ebookOwnList: ebookOwnList,
+              orderList: orderList,
             };
           });
 

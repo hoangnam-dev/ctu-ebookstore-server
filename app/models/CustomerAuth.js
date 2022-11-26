@@ -27,6 +27,22 @@ async function hasCustomerStatus(customerID) {
     );
   });
 }
+// Get list order_tbl of customer
+async function hasOrder(customerID) {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT * FROM order_tbl WHERE order_tbl.customerid = ?",
+      [customerID],
+      async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
 
 // Get list customerstatus of customer
 async function hasEbook(customerID) {
@@ -50,6 +66,7 @@ async function hasEbook(customerID) {
 async function resultCustomer(res) {
   let listInfo = res.map(async (res) => {
     var status = [];
+    var orders = [];
     var ebookOwn = [];
 
     await hasCustomerStatus(res.customerid)
@@ -60,10 +77,18 @@ async function resultCustomer(res) {
         result(errStatus, null);
       });
 
+    await hasOrder(res.customerid)
+      .then(function (resOrder) {
+        orders = resOrder
+        console.log(resOrder);
+      })
+      .catch(function (errOrder) {
+        result(errOrder, null);
+      });
+
     await hasEbook(res.customerid)
       .then(function (resEbook) {
         ebookOwn = resEbook
-        console.log(resEbook);
       })
       .catch(function (errEbook) {
         result(errEbook, null);
@@ -72,6 +97,7 @@ async function resultCustomer(res) {
     var customerInfo = {
       ...res,
       statusList: status,
+      orderList: orders,
       ebookOwnList: ebookOwn,
     };
     return customerInfo;
@@ -145,6 +171,7 @@ CustomerAuth.profile = function profile(customerID, result) {
         result(err, null);
       } else {
         const customerData = await resultCustomer(res);
+        console.log(customerData);
         result(null, customerData);
       }
     }
