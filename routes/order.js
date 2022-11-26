@@ -6,11 +6,11 @@ const {
   allOrder,
   getOrderByID,
   order,
-  update,
   successPaypal,
   cancelPaypal,
 } = require("../app/controllers/OrderController");
 
+// router.get("/order", order); // test
 // Completed Order
 router.get("/successPaypal", successPaypal);
 // Cancel Order
@@ -19,8 +19,6 @@ router.get("/cancelPaypal", cancelPaypal);
 router.get("/:id", getOrderByID);
 // Get All Order
 router.get("/", allOrder);
-// Update Order(Admin using)
-router.put("/:id", update);
 // Order with Paypal
 router.post("/order", order);
 

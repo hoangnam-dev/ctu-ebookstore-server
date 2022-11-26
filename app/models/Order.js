@@ -23,13 +23,56 @@ const generateString = (length) => {
   return result; 
 }
 
+
+// Get list detail of order
+async function hasDetail(orderID) {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT ebook.ebookid, ebook.ebookname, detailorder.* FROM detailorder 
+        INNER JOIN ebook ON detailorder.ebookid = ebook.ebookid
+        WHERE detailorder.orderid = ${orderID}`;
+    db.query(sql, [orderID], async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
+
+// Order result,
+async function resultOrder(res) {
+  let listInfo = res.map(async (res) => {
+    var detail = [];
+
+    await hasDetail(res.orderid)
+      .then(function (resOrder) {
+        detail = resOrder;
+      })
+      .catch(function (errOrder) {
+        result(errOrder, null);
+      });
+
+    var orderInfo = {
+      ...res,
+      detailList: detail,
+    };
+    return orderInfo;
+  });
+
+  const resultData = await Promise.all(listInfo);
+  return resultData;
+}
+
 // Get all order
 Order.getAll = function getAllOrder(result) {
-  db.query("SELECT * FROM order_tbl", function (err, res) {
+  db.query("SELECT * FROM order_tbl", async function (err, res) {
     if (err) {
       result(err, null);
     } else {
-      result(null, res);
+      const orderData = await resultOrder(res);
+      result(null, orderData)
     }
   });
 };
@@ -39,11 +82,12 @@ Order.getOrderByID = function getOrderByID(orderID, result) {
   db.query(
     "SELECT * FROM order_tbl WHERE orderid = ?",
     orderID,
-    function (err, res) {
+    async function (err, res) {
       if (err) {
         result(err, null);
       } else {
-        result(null, res);
+        const orderData = await resultOrder(res);
+        result(null, orderData);
       }
     }
   );
