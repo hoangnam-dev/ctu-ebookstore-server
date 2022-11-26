@@ -375,10 +375,33 @@ const getOrderByID = function (req, res) {
   });
 };
 
+// Update order status
+const update = (req, res) => {
+  var orderID = req.params.id;
+  var orderStatus = req.body.orderStatus;
+
+  Order.updateStatus(orderID, orderStatus, (err, result) => {
+    if (err) {
+      return res.json({
+        error: true,
+        statusCode: order_error_code,
+        message: "Cập nhật trạng thái đơn hàng không thành công"
+      });
+    } else {
+      return res.json({
+        error: false,
+        statusCode: success_code,
+        message: "Cập nhật trạng thái đơn hàng thành công"
+      });
+    }
+  });
+}
+
 module.exports = {
   allOrder,
   getOrderByID,
   order,
   successPaypal,
   cancelPaypal,
+  update,
 };

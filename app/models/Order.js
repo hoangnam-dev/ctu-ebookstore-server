@@ -184,10 +184,10 @@ Order.complete = async function complete(orderID, orderStatus, customerID, expir
 };
 
 // Update order
-Order.update = function updateOrder(orderID, order, result) {
+Order.updateStatus = function updateOrder(orderID, orderStatus, result) {
   db.query(
     "UPDATE order_tbl SET orderstatus = ? WHERE orderid = ?",
-    [order.orderstatus, orderID],
+    [orderStatus, orderID],
     function (err, res) {
       if (err) {
         result(err, null);
