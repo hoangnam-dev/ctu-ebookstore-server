@@ -201,10 +201,10 @@ const store = async function (req, res) {
       // Upload pdf
       if (req.pdfSaved !== undefined) {
         newEbook.ebookpdf = handleFilePath('public/uploads/ebookPDF', req.pdfSaved);
-        newEbook.ebookpdfreview = handleFilePath('public/uploads/ebookPDF/pdf-review', req.pdfSaved);
-        var pdfLink = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
+        newEbook.ebookpdfreview = handleFilePath('public/uploads/ebookPDF/pdf-review', req.pdfReviewSaved);
+        var pdfPath = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
 
-        splitPDF(newEbook.ebookpdf, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, pdfLink)
+        splitPDF(pdfPath, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, req.pdfReviewSaved)
           .then()
           .catch((errorSlipt) => console.error);
       } else {
@@ -323,11 +323,10 @@ const updateEbookContent = async function (req, res) {
     if (req.pdfSaved !== undefined) {
       contentType = "pdf";
       newEbookContentLink = handleFilePath('public/uploads/ebookPDF', req.pdfSaved);
-      newEbookReviewLink =  handleFilePath('public/uploads/ebookPDF/pdf-review', req.pdfSaved);
-      var pdfLink = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
+      newEbookReviewLink =  handleFilePath('public/uploads/ebookPDF/pdf-review', req.pdfReviewSaved);
+      var pdfPath = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
 
-
-      splitPDF(newEbook.ebookpdf, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, pdfLink)
+      splitPDF(pdfPath, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, req.pdfReviewSaved)
         .then()
         .catch((err) => console.error);
     }
