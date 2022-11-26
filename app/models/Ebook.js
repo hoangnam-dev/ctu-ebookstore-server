@@ -338,31 +338,67 @@ Ebook.storeCategory = function storeEbookCategory(
   categoriesID,
   result
 ) {
-  var values = [];
-  categoriesID.forEach((categoryID) => {
-    values.push([ebookID, categoryID]);
-  });
-  const sql = "INSERT INTO categoryofebook (ebookid, categoryid) VALUES ?";
-  db.query(sql, [values], function (err, res) {
-    if (err) {
-      result(err, null);
-    } else {
-      result(null, res.insertId);
-    }
-  });
+  try {
+    var values = [];
+    categoriesID.forEach((categoryID) => {
+      values.push([ebookID, categoryID]);
+    });
+    const sql = "INSERT INTO categoryofebook (ebookid, categoryid) VALUES ?";
+    db.query(sql, [values], function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res.insertId);
+      }
+    });
+  } catch (error) {
+    result(err, null);
+  }
 };
 // Store ebook
 Ebook.storeAuthor = function storeEbookAuthor(ebookID, authorsID, result) {
-  var values = [];
-  authorsID.forEach((authorID) => {
-    values.push([ebookID, authorID]);
-  });
-  const sql = "INSERT INTO authorofebook (ebookid, authorid) VALUES ?";
-  db.query(sql, [values], function (err, res) {
+  try {
+    var values = [];
+    authorsID.forEach((authorID) => {
+      values.push([ebookID, authorID]);
+    });
+    const sql = "INSERT INTO authorofebook (ebookid, authorid) VALUES ?";
+    db.query(sql, [values], function (err, res) {
+      if (err) {
+        result(err, null);
+      } else {
+        result(null, res.insertId);
+      }
+    });
+  } catch (error) {
+    result(null, res.insertId);
+  }
+  
+};
+// Delete author ebook
+Ebook.deleteCategory = function deleteEbookCategory(
+  ebookID,
+  categoryID,
+  result
+) {
+  const sql = "DELETE FROM categoryofebook WHERE ebookid = ? AND categoryid = ?";
+  db.query(sql, [ebookID, categoryID], function (err, res) {
     if (err) {
       result(err, null);
     } else {
-      result(null, res.insertId);
+      console.log(res);
+      result(null, res);
+    }
+  });
+};
+// Delete category ebook
+Ebook.deleteAuthor = function deleteEbookAuthor(ebookID, authorID, result) {
+  const sql = "DELETE FROM authorofebook  WHERE ebookid = ? AND authorid = ?";
+  db.query(sql, [ebookID, authorID], function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
     }
   });
 };

@@ -368,60 +368,83 @@ const updateEbookContent = async function (req, res) {
   }
 };
 
-// add Images
-const addImage = async function (req, res) {
-  var ebookID = req.body.ebookID;
-  try {
-    // Upload Images
-    var cloudPathImages = [];
-    if (req.imagesSaved !== undefined) {
-      for (let i = 0; i < req.imagesSaved.length; i++) {
-        let imagesPath = req.imagesSaved[i];
-        let uploadResponse = await cloudinary.uploader.upload(imagesPath, {
-          upload_preset: "ebookstore_ebook_images",
-        });
-        cloudPathImages.push(uploadResponse.secure_url);
-      }
-      ImageEbook.store(ebookID, cloudPathImages, function (err, images) {
-        if (err) {
-          res.json({
-            error: true,
-            statusCode: 0,
-            message: "Thêm ebook images không thành công",
-          });
-        } else {
-          res.json({
-            error: false,
-            statusCode: 1,
-            message: "Thêm ebook images thành công",
-          });
-        }
+// add Category
+const addCategory = async function (req, res) {
+  var ebookID = req.params.id;
+  var categoriesID = req.body.categoriesID;
+  Ebook.storeCategory(ebookID, categoriesID, (err, result) => {
+    if(err) {
+      res.status(500).json({
+        error: true,
+        statusCode: 0,
+        message: "Thêm thể loại cho ebook không thành công",
+      });
+    } else {
+      res.status(500).json({
+        error: true,
+        statusCode: 0,
+        message: "Thêm thể loại cho ebook thành công",
       });
     }
-  } catch (error) {
-    res.status(500).json({
-      error: true,
-      statusCode: 0,
-      message: "Upload không thành công",
-    });
-  }
+  });
 };
-// delete Images
-const deleteImage = async function (req, res) {
-  var imageEbookID = req.body.imageEbookID;
-  var ebookID = req.body.ebookID;
-  ImageEbook.delete(imageEbookID, ebookID, function (err, images) {
+// delete Category
+const deleteCategory = async function (req, res) {
+  var ebookID = req.params.id;
+  var categoryID = req.body.categoryID;
+  Ebook.deleteCategory(ebookID, categoryID, function (err, images) {
     if (err) {
       res.json({
         error: true,
         statusCode: 0,
-        message: "Xóa ebook images không thành công",
+        message: "Xóa thể loại của ebook  không thành công",
       });
     } else {
       res.json({
         error: false,
         statusCode: 1,
-        message: "Xóa ebook images thành công",
+        message: "Xóa thể loại của ebook thành công",
+      });
+    }
+  });
+};
+
+// add Author
+const addAuthor = async function (req, res) {
+  var ebookID = req.params.id;
+  var authorsID = req.body.authorsID;
+  Ebook.storeAuthor(ebookID, authorsID, (err, result) => {
+    if(err) {
+      res.status(500).json({
+        error: true,
+        statusCode: 0,
+        message: "Thêm tác giả của ebook không thành công",
+      });
+    } else {
+      res.status(500).json({
+        error: true,
+        statusCode: 0,
+        message: "Thêm tác giả của ebook thành công",
+      });
+    }
+  });
+};
+// delete Author
+const deleteAuthor = async function (req, res) {
+  var ebookID = req.params.id;
+  var authorID = req.body.authorID;
+  Ebook.deleteAuthor(ebookID, authorID, function (err, images) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Xóa tác giả của ebook  không thành công",
+      });
+    } else {
+      res.json({
+        error: false,
+        statusCode: 1,
+        message: "Xóa tác giả của ebook thành công",
       });
     }
   });
@@ -494,8 +517,10 @@ module.exports = {
   store,
   update,
   updateEbookContent,
-  addImage,
-  deleteImage,
+  addAuthor,
+  addCategory,
+  deleteAuthor,
+  deleteCategory,
   destroy,
   restore,
 };

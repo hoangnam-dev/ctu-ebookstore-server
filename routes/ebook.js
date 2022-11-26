@@ -11,8 +11,10 @@ const {
   store,
   update,
   updateEbookContent,
-  addImage,
-  deleteImage,
+  addAuthor,
+  addCategory,
+  deleteAuthor,
+  deleteCategory,
   destroy,
   restore,
 } = require("../app/controllers/EbookController");
@@ -29,8 +31,12 @@ router.put("/update-content/:id", jwtMiddlewares.managerEbook, uploadFileAndImag
 // Update ebook info (name, avatar, etc)
 router.put("/:id", jwtMiddlewares.managerEbook, uploadFileAndImages, update);
 
-router.post("/add-image", jwtMiddlewares.managerEbook, uploadFileAndImages, addImage);
-router.post("/delete-image", jwtMiddlewares.managerEbook, deleteImage);
+// Router change category and author of ebook
+router.post("/add-author/:id", jwtMiddlewares.managerEbook, addAuthor);
+router.post("/delete-author/:id", jwtMiddlewares.managerEbook, deleteAuthor);
+router.post("/add-category/:id", jwtMiddlewares.managerEbook, addCategory);
+router.post("/delete-category/:id", jwtMiddlewares.managerEbook, deleteCategory);
+
 router.post("/restore/:id", jwtMiddlewares.managerEbook, restore);
 router.delete("/:id", jwtMiddlewares.managerEbook, destroy);
 router.get("/", allEbook);
