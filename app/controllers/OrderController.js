@@ -3,6 +3,12 @@ const PaypalPayment = require("../models/PaypalPayment");
 const paypal = require("paypal-rest-sdk");
 const ratesData = require("../../utils/rates.json");
 
+const order_error_code = "order_error";
+const success_code = "success";
+const payment_error_code = "payment_error";
+const cancel_code = "cancel";
+const cancel_error_code = "cancel_error";
+
 const order = async (req, res) => {
   var amount = 0;
   var itemList = req.body.itemList;
@@ -67,7 +73,7 @@ const order = async (req, res) => {
     if (err) {
       return res.json({
         error: true,
-        statusCode: 0,
+        statusCode: order_error_code,
         message: "Lỗi! Thêm đơn hàng không thành công",
       });
     } else {
@@ -207,15 +213,20 @@ const successPaypal = (req, res) => {
     execute_payment_json,
     function (error, payment) {
       if (error) {
-        console.log(error.response);
+        return res.json({
+          error: true,
+          statusCode: payment_error_code,
+          message: "Lỗi thanh toán không thành công",
+        });
         throw error;
+
       } else {
         // change order status to completed and create license ebooks for customerID
         Order.completeOrder(orderID, orderStatus, customerID, function (err, status) {
           if (err) {
             return res.json({
               error: true,
-              statusCode: 0,
+              statusCode: order_error_code,
               message: "Lỗi không thể cập nhật trạng thái đơn hàng",
             });    
           } else {
@@ -223,13 +234,13 @@ const successPaypal = (req, res) => {
               if (err) {
                 return res.json({
                   error: true,
-                  statusCode: 0,
+                  statusCode: payment_error_code,
                   message: "Lỗi không thể lưu thông tin giao dịch Paypal",
                 }); 
               } else {
                 res.json({
                   error: false,
-                  statusCode: 1,
+                  statusCode: success_code,
                   message: "Thanh toán thành công",
                 });
               }
@@ -247,13 +258,13 @@ const cancelPaypal = (req, res) => {
     if (err) {
       return res.json({
         error: false,
-        statusCode: 1,
+        statusCode: cancel_error_code,
         message: "Đã hủy đặt hàng không thành công",
       }); 
     } else {
       return res.json({
         error: false, 
-        statusCode: 1,
+        statusCode: cancel_code,
         message: "Đã hủy đặt hàng",
       }); 
     }
