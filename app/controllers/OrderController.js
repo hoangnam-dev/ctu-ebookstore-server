@@ -212,12 +212,23 @@ const successPaypal = (req, res) => {
     paymentId,
     execute_payment_json,
     function (error, payment) {
+      
       if (error) {
-        return res.json({
-          error: true,
-          statusCode: payment_error_code,
-          message: "Lỗi thanh toán không thành công",
-        });
+        Order.destroy(orderID, function (err, order) {
+          if (err) {
+            return res.json({
+              error: false,
+              statusCode: cancel_error_code,
+              message: "Đã hủy đặt hàng không thành công",
+            }); 
+          } else {
+            return res.json({
+              error: false, 
+              statusCode: cancel_code,
+              message: "Đã hủy đặt hàng",
+            }); 
+          }
+        })
         throw error;
 
       } else {
@@ -225,17 +236,17 @@ const successPaypal = (req, res) => {
         Order.completeOrder(orderID, orderStatus, customerID, function (err, status) {
           if (err) {
             return res.json({
-              error: true,
+              error: false,
               statusCode: order_error_code,
-              message: "Lỗi không thể cập nhật trạng thái đơn hàng",
-            });    
+              message: `Đã thanh toán. Lỗi không cập nhật trạng thái đơn hàng ${orderID}. Liên hệ nhân viên hỗ trợ`,
+            });   
           } else {
             PaypalPayment.store(newTransation, function (err, transaction) {
               if (err) {
                 return res.json({
                   error: true,
                   statusCode: payment_error_code,
-                  message: "Lỗi không thể lưu thông tin giao dịch Paypal",
+                  message: `Đã thanh toán. Lỗi không thể lưu thông tin giao dịch Paypal đơn hàng ${orderID}. Liên hệ nhân viên hỗ trợ`,
                 }); 
               } else {
                 res.json({
