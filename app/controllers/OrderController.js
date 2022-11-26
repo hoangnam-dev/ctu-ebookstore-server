@@ -29,7 +29,7 @@ const order = async (req, res) => {
   
   
   var orderNote = "test order";
-  var customerID = 2;
+  var customerID = 3;
   var itemList = [
     {
       ebookID: 1,
@@ -42,6 +42,7 @@ const order = async (req, res) => {
       ebookPrice: 24000,
     },
   ];
+  console.log('check');
   try {
     const currency = ratesData.rates[0].value.find((item) => item.code === "USD");
     const sell = parseFloat(currency.sell.replace(",", ""));
@@ -57,6 +58,7 @@ const order = async (req, res) => {
         quantity: 1,
       };
     });
+    console.log(paypalItem);
 
     // Paypal amount
     for (let i = 0; i < paypalItem.length; i++) {
@@ -139,7 +141,8 @@ const order = async (req, res) => {
             for (let i = 0; i < payment.links.length; i++) {
               if (payment.links[i].rel === "approval_url") {
                 // redirect to approval
-                res.redirect(payment.links[i].href);
+                // res.redirect(payment.links[i].href);
+                res.json({forwardLink: payment.links[i].href});
               }
             }
           }
