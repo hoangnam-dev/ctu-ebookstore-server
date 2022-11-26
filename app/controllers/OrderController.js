@@ -11,6 +11,7 @@ const cancel_error_code = "cancel_error";
 
 const order = async (req, res) => {
   var amount = 0;
+
   var itemList = req.body.itemList;
   var orderNote = req.body.orderNote;
   var customerID = req.body.customerID;
@@ -26,15 +27,15 @@ const order = async (req, res) => {
   
   
   // var orderNote = "test order";
-  // var customerID = 2;
+  // var customerID = 4;
   // var itemList = [
   //   {
-  //     ebookID: 34,
+  //     ebookID: 1,
   //     ebookName: "ebook1",
   //     ebookPrice: 24000,
   //   },
   //   {
-  //     ebookID: 35,
+  //     ebookID: 2,
   //     ebookName: "ebook2",
   //     ebookPrice: 24000,
   //   },
@@ -78,7 +79,8 @@ const order = async (req, res) => {
       });
     } else {
       // url_redirect if transaction success
-      var url_redirect = `http://localhost:3001/api/orders/successPaypal?amount=${amount}&orderID=${order}&customerID=${customerID}`;
+      var url_success_redirect = `http://localhost:3001/api/orders/successPaypal?amount=${amount}&orderID=${order}&customerID=${customerID}`;
+      var url_cancel_redirect = `http://localhost:3001/api/orders/cancelPaypal?orderID=${order}`;
       // if(borrowEbook !== undefined) {
       //   url_redirect = `http://localhost:3001/api/orders/success?amount=${amount}&orderID=${order}&customerID=${customerID}&expiresBorrow=${expiresBorrow}`; 
       // }
@@ -90,8 +92,8 @@ const order = async (req, res) => {
           payment_method: "paypal",
         },
         redirect_urls: {
-          return_url: url_redirect,
-          cancel_url: `http://localhost:3001/api/orders/cancelPaypal?orderID=${order}`,
+          return_url: url_success_redirect,
+          cancel_url: url_cancel_redirect,
         },
         transactions: [
           {
@@ -110,6 +112,21 @@ const order = async (req, res) => {
       // create a transaction with paypal
       paypal.payment.create(create_payment_json, function (error, payment) {
         if (error) {
+          Order.destroy(order, function (err, order) {
+            if (err) {
+              return res.json({
+                error: false,
+                statusCode: cancel_error_code,
+                message: "Đã hủy đặt hàng không thành công",
+              }); 
+            } else {
+              return res.json({
+                error: false, 
+                statusCode: cancel_code,
+                message: "Đã hủy đặt hàng",
+              }); 
+            }
+          })
           throw error;
         } else {
           for (let i = 0; i < payment.links.length; i++) {
@@ -246,13 +263,13 @@ const successPaypal = (req, res) => {
                 return res.json({
                   error: true,
                   statusCode: payment_error_code,
-                  message: `Đã thanh toán. Lỗi không thể lưu thông tin giao dịch Paypal đơn hàng ${orderID}. Liên hệ nhân viên hỗ trợ`,
+                  message: `Đặt hàng thành công. Lỗi không thể lưu thông tin giao dịch Paypal đơn hàng ${orderID}. Liên hệ nhân viên hỗ trợ`,
                 }); 
               } else {
                 res.json({
                   error: false,
                   statusCode: success_code,
-                  message: "Thanh toán thành công",
+                  message: "Đặt hàng thành công",
                 });
               }
             })
