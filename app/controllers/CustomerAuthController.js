@@ -107,7 +107,6 @@ const login = (req, res) => {
                 customerName: data.customername,
                 customerUserName: data.customercustomername,
                 customerAvatar: data.customeravatar,
-                customerAddress: data.customeraddress,
                 customerEmail: data.customeremail,
                 customerCreatedAt: data.customercreatedat,
                 customerstatusCode: customerstatusList[0].customerstatusCode,
