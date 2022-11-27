@@ -25,7 +25,7 @@ const User = function (user) {
 async function hasRole(userID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT role.* FROM user INNER JOIN role ON user.roleid = role.roleid WHERE user.userid = ?",
+      "SELECT role.* FROM user INNER JOIN role ON user.roleid = role.roleid WHERE user.userid = ? and role.roledeletedat IS NULL",
       [userID],
       async function (err, resSub) {
         if (err) {
