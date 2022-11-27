@@ -166,7 +166,6 @@ const update = function (req, res) {
   var newInputInfo = new InputInfo(req.body);
   var inputinfoID = req.params.id;
   if (
-    !newInputInfo.inputinfototalmoney ||
     !newInputInfo.supplierid ||
     !newInputInfo.userid ||
     !newInputInfo.outputinfoid

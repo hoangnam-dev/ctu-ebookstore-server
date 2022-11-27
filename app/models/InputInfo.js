@@ -250,10 +250,8 @@ InputInfo.storeDetail = function storeInputInfoDetail(
 // Update inputinfo
 InputInfo.update = function updateInputInfo(inputinfoID, inputinfo, result) {
   db.query(
-    "UPDATE inputinfo SET inputinfototalmoney = ?, inputinfostatus = ?, outputinfoid = ?, userid = ?, supplierid = ? WHERE inputinfoid = ?",
+    "UPDATE inputinfo SET outputinfoid = ?, userid = ?, supplierid = ? WHERE inputinfoid = ?",
     [
-      inputinfo.inputinfototalmoney,
-      inputinfo.inputinfostatus,
       inputinfo.outputinfoid,
       inputinfo.userid,
       inputinfo.supplierid,
@@ -263,18 +261,7 @@ InputInfo.update = function updateInputInfo(inputinfoID, inputinfo, result) {
       if (err) {
         result(err, null);
       } else {
-        var totalMoneyOutput = await resultTotalMoney(inputinfo.outputinfoid);
-        db.query(
-          "UPDATE outputinfo SET outputinfototalmoney = ? WHERE outputinfoid = ?",
-          [totalMoneyOutput, inputinfo.outputinfoid],
-          function (errUpdate, resUpdate) {
-            if (errUpdate) {
-              result(errUpdate, null);
-            } else {
-              result(null, res.insertId);
-            }
-          }
-        );
+        result(null, res);
       }
     }
   );
