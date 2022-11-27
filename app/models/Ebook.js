@@ -128,7 +128,6 @@ async function resultEbook(res) {
     var authors = [];
     var categories = [];
     var sales = [];
-    var images = [];
     var status = [];
 
     await hasAuthor(res.ebookid)
@@ -163,20 +162,12 @@ async function resultEbook(res) {
         result(errEbookStt, null);
       });
 
-    await hasImages(res.ebookid)
-      .then(function (resImages) {
-        images = resImages;
-      })
-      .catch(function (errImages) {
-        result(errImages, null);
-      });
 
     var ebookInfo = {
       ...res,
       authorList: authors,
       categoryList: categories,
       saleList: sales,
-      imageebookList: images,
       ebookstatusList: status,
     };
 

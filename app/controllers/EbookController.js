@@ -62,14 +62,6 @@ function handleResult(arrData) {
       };
     });
 
-    // Handle Image list of the ebook
-    var imgList = data.imageebookList.map((imageebook) => {
-      return {
-        imageebookID: imageebook.imageebookid,
-        imageebookSource: imageebook.imageebooksource,
-      };
-    });
-
     // Handle EbookStatus list of the ebook
     var ebookstatusList = data.ebookstatusList.map((status) => {
       return {
@@ -83,7 +75,6 @@ function handleResult(arrData) {
     // return ebook
     return {
       ebookID: data.ebookid,
-      ebookCode: data.ebookcode,
       ebookName: data.ebookname,
       ebookAvatar: data.ebookavatar,
       ebookDescription: data.ebookdescription,
@@ -94,7 +85,6 @@ function handleResult(arrData) {
       authorList: authorList,
       categoryList: categoryList,
       saleList: saleList,
-      imageList: imgList,
       ebookstatusList: ebookstatusList,
     };
   });
