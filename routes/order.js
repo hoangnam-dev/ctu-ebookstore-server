@@ -6,6 +6,7 @@ const {
   allOrder,
   getOrderByID,
   order,
+  search,
   successPaypal,
   cancelPaypal,
   update
@@ -14,6 +15,7 @@ const {
 const jwtMiddlewares = require('../app/middlewares/jwt');
 
 // router.get("/order", order); // test
+router.get('/search', search);
 // Completed Order
 router.get("/successPaypal", successPaypal);
 // Cancel Order

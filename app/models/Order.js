@@ -24,6 +24,21 @@ const generateString = (length) => {
 
 
 // Get list detail of order
+async function ofCustomer(customerID) {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT customerid, customername, customeremail FROM customer WHERE customerid = ${customerID}`;
+    db.query(sql, async function (err, resSub) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(resSub);
+        }
+      }
+    );
+  });
+}
+
+// Get list detail of order
 async function hasDetail(orderID) {
   return new Promise((resolve, reject) => {
     const sql = `SELECT ebook.ebookid, ebook.ebookname, detailorder.* FROM detailorder 
@@ -40,10 +55,12 @@ async function hasDetail(orderID) {
   });
 }
 
+
 // Order result,
 async function resultOrder(res) {
   let listInfo = res.map(async (res) => {
     var detail = [];
+    var customer = {};
 
     await hasDetail(res.orderid)
       .then(function (resOrder) {
@@ -53,9 +70,18 @@ async function resultOrder(res) {
         result(errOrder, null);
       });
 
+    await ofCustomer(res.customerid)
+      .then(function (resCustomer) {
+        customer = resCustomer[0];
+      })
+      .catch(function (errCustomer) {
+        result(errCustomer, null);
+      });
+
     var orderInfo = {
       ...res,
       detailList: detail,
+      customer: customer
     };
     return orderInfo;
   });
@@ -90,6 +116,19 @@ Order.getOrderByID = function getOrderByID(orderID, result) {
       }
     }
   );
+};
+
+// Search order
+Order.search = function searchOrder(orderID, result) {
+  const sql =
+    `SELECT * FROM order_tbl WHERE orderid LIKE '%${orderID}%'`;
+  db.query(sql, function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
 };
 
 // Store order
@@ -158,29 +197,30 @@ Order.completeOrder = async function completeOrder(orderID, orderStatus, custome
 };
 
 
-Order.complete = async function complete(orderID, orderStatus, customerID, expiresBorrow, result) {
-  const sql = `SELECT ebookid FROM detailorder WHERE orderid = ${orderID}`;
-  const data = await query(sql);
-  var values = [];
-  data.map((item) => {
-    if(expiresBorrow !== undefined) {
-      values.push([item.ebookid, orderID, 1, expiresBorrow]);
-    } else {
-      values.push([item.ebookid, orderID]);
-    }
-  });
-  // db.query(
-  //   "UPDATE order_tbl SET orderstatus = ? WHERE orderid = ?",
-  //   [orderStatus, orderID],
-  //   function (err, res) {
-  //     if (err) {
-  //       result(err, null);
-  //     } else {
-  //       result(null, res);
-  //     }
-  //   }
-  // );
-};
+// Order.complete = async function complete(orderID, orderStatus, customerID, expiresBorrow, result) {
+//   const sql = `SELECT ebookid FROM detailorder WHERE orderid = ${orderID}`;
+//   const data = await query(sql);
+//   var values = [];
+//   data.map((item) => {
+//     if(expiresBorrow !== undefined) {
+//       values.push([item.ebookid, orderID, 1, expiresBorrow]);
+//     } else {
+//       values.push([item.ebookid, orderID]);
+//     }
+//   });
+//   // db.query(
+//   //   "UPDATE order_tbl SET orderstatus = ? WHERE orderid = ?",
+//   //   [orderStatus, orderID],
+//   //   function (err, res) {
+//   //     if (err) {
+//   //       result(err, null);
+//   //     } else {
+//   //       result(null, res);
+//   //     }
+//   //   }
+//   // );
+// };
+
 
 // Update order
 Order.updateStatus = function updateOrder(orderID, orderStatus, result) {

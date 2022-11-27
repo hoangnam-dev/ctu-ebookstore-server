@@ -22,12 +22,11 @@ const order = async (req, res) => {
   // if customer borrow ebook
   // var expiresBorrow = req.body.expiresBorrow;
   // var borrowEbook = req.body.borrowEbook;
-  
+
   // Test with browser
   // var borrowEbook = true;
   // var expiresBorrow = 2;
-  
-  
+
   var orderNote = "test order";
   var customerID = 3;
   var itemList = [
@@ -42,9 +41,10 @@ const order = async (req, res) => {
       ebookPrice: 24000,
     },
   ];
-  console.log('check');
   try {
-    const currency = ratesData.rates[0].value.find((item) => item.code === "USD");
+    const currency = ratesData.rates[0].value.find(
+      (item) => item.code === "USD"
+    );
     const sell = parseFloat(currency.sell.replace(",", ""));
     var paypalItem = itemList.map((item) => {
       var output = parseFloat(item.ebookPrice) / sell;
@@ -58,13 +58,12 @@ const order = async (req, res) => {
         quantity: 1,
       };
     });
-    console.log(paypalItem);
 
     // Paypal amount
     for (let i = 0; i < paypalItem.length; i++) {
       amount += parseFloat(paypalItem[i].price);
     }
-    
+
     // Order total price
     for (let i = 0; i < itemList.length; i++) {
       totalPrice += parseFloat(itemList[i].ebookPrice);
@@ -81,17 +80,15 @@ const order = async (req, res) => {
     // Store order
     Order.store(newOrder, itemList, function (err, order) {
       if (err) {
-        return res.json({
-          error: true,
-          statusCode: order_error_code,
-          message: "Lỗi! Thêm đơn hàng không thành công",
-        });
+        res.redirect(
+          `http://localhost:3000/ebook-store-fe/checkout/failed?error=${order_error_code}`
+        );
       } else {
         // url_redirect if transaction success
         var url_success_redirect = `http://localhost:3001/api/orders/successPaypal?amount=${amount}&orderID=${order}&customerID=${customerID}`;
         var url_cancel_redirect = `http://localhost:3001/api/orders/cancelPaypal?orderID=${order}`;
         // if(borrowEbook !== undefined) {
-        //   url_redirect = `http://localhost:3001/api/orders/success?amount=${amount}&orderID=${order}&customerID=${customerID}&expiresBorrow=${expiresBorrow}`; 
+        //   url_redirect = `http://localhost:3001/api/orders/success?amount=${amount}&orderID=${order}&customerID=${customerID}&expiresBorrow=${expiresBorrow}`;
         // }
 
         // create payment info json
@@ -123,26 +120,22 @@ const order = async (req, res) => {
           if (error) {
             Order.destroy(order, function (err, order) {
               if (err) {
-                return res.json({
-                  error: false,
-                  statusCode: cancel_error_code,
-                  message: "Đã hủy đặt hàng không thành công",
-                }); 
+                res.redirect(
+                  `http://localhost:3000/ebook-store-fe/checkout/failed?error=${cancel_error_code}`
+                );
               } else {
-                return res.json({
-                  error: false, 
-                  statusCode: cancel_code,
-                  message: "Đã hủy đặt hàng",
-                }); 
+                res.redirect(
+                  `http://localhost:3000/ebook-store-fe/checkout/success?success=${cancel_code}`
+                );
               }
-            })
+            });
             throw error;
           } else {
             for (let i = 0; i < payment.links.length; i++) {
               if (payment.links[i].rel === "approval_url") {
                 // redirect to approval
                 // res.redirect(payment.links[i].href);
-                res.json({forwardLink: payment.links[i].href});
+                res.json({ forwardLink: payment.links[i].href });
               }
             }
           }
@@ -209,11 +202,9 @@ const order = async (req, res) => {
       }
     });
   } catch (error) {
-    return res.json({
-      error: false,
-      statusCode: order_failed_code,
-      message: "Lỗi! Đặt hàng không thành công",
-    }); 
+    res.redirect(
+      `http://localhost:3000/ebook-store-fe/checkout/failed?error=${order_failed_code}`
+    );
   }
 };
 
@@ -236,9 +227,9 @@ const successPaypal = (req, res) => {
     ],
   };
   var newTransation = new PaypalPayment({
-    orderID : orderID,
-    paymentID : paymentId,
-    payerID : payer_id,
+    orderID: orderID,
+    paymentID: paymentId,
+    payerID: payer_id,
   });
 
   // execute payment request
@@ -246,52 +237,45 @@ const successPaypal = (req, res) => {
     paymentId,
     execute_payment_json,
     function (error, payment) {
-      
       if (error) {
         Order.destroy(orderID, function (err, order) {
           if (err) {
-            return res.json({
-              error: false,
-              statusCode: cancel_error_code,
-              message: "Đã hủy đặt hàng không thành công",
-            }); 
+            res.redirect(
+              `http://localhost:3000/ebook-store-fe/checkout/failed?error=${cancel_error_code}`
+            );
           } else {
-            return res.json({
-              error: false, 
-              statusCode: cancel_code,
-              message: "Đã hủy đặt hàng",
-            }); 
+            res.redirect(
+              `http://localhost:3000/ebook-store-fe/checkout/success?success=${cancel_code}`
+            );
           }
-        })
+        });
         throw error;
-
       } else {
         // change order status to completed and create license ebooks for customerID
-        Order.completeOrder(orderID, orderStatus, customerID, function (err, status) {
-          if (err) {
-            return res.json({
-              error: false,
-              statusCode: order_error_code,
-              message: `Đã thanh toán. Lỗi không cập nhật trạng thái đơn hàng ${orderID}. Liên hệ nhân viên hỗ trợ`,
-            });   
-          } else {
-            PaypalPayment.store(newTransation, function (err, transaction) {
-              if (err) {
-                return res.json({
-                  error: true,
-                  statusCode: payment_error_code,
-                  message: `Đặt hàng thành công. Lỗi không thể lưu thông tin giao dịch Paypal đơn hàng ${orderID}. Liên hệ nhân viên hỗ trợ`,
-                }); 
-              } else {
-                res.json({
-                  error: false,
-                  statusCode: success_code,
-                  message: "Đặt hàng thành công",
-                });
-              }
-            })
+        Order.completeOrder(
+          orderID,
+          orderStatus,
+          customerID,
+          function (err, status) {
+            if (err) {
+              res.redirect(
+                `http://localhost:3000/ebook-store-fe/checkout/failed?error=${order_error_code}&orderID=${orderID}`
+              );
+            } else {
+              PaypalPayment.store(newTransation, function (err, transaction) {
+                if (err) {
+                  res.redirect(
+                    `http://localhost:3000/ebook-store-fe/checkout/failed?error=${payment_error_code}&orderID=${orderID}`
+                  );
+                } else {
+                  res.redirect(
+                    `http://localhost:3000/ebook-store-fe/checkout/success?success=${success_code}`
+                  );
+                }
+              });
+            }
           }
-        })
+        );
       }
     }
   );
@@ -301,20 +285,16 @@ const cancelPaypal = (req, res) => {
   var orderID = req.query.orderID;
   Order.destroy(orderID, function (err, order) {
     if (err) {
-      return res.json({
-        error: false,
-        statusCode: cancel_error_code,
-        message: "Đã hủy đặt hàng không thành công",
-      }); 
+      res.redirect(
+        `http://localhost:3000/ebook-store-fe/checkout/failed?error=${cancel_error_code}`
+      );
     } else {
-      return res.json({
-        error: false, 
-        statusCode: cancel_code,
-        message: "Đã hủy đặt hàng",
-      }); 
+      res.redirect(
+        `http://localhost:3000/ebook-store-fe/checkout/success?success=${cancel_code}`
+      );
     }
-  })
-}
+  });
+};
 
 // Show all order
 const allOrder = function (req, res) {
@@ -326,7 +306,7 @@ const allOrder = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      var data = order.map((data) => {
+      var data = orders.map((data) => {
         // return order
         return {
           orderID: data.orderid,
@@ -334,10 +314,9 @@ const allOrder = function (req, res) {
           orderStatus: data.orderstatus,
           orderNote: data.ordernote,
           orderCreatedAt: data.ordercreatedat,
-          detailList: detailList
         };
       });
-      res.json(data[0]);
+      res.json(data);
     }
   });
 };
@@ -370,10 +349,40 @@ const getOrderByID = function (req, res) {
           orderStatus: data.orderstatus,
           orderNote: data.ordernote,
           orderCreatedAt: data.ordercreatedat,
-          detailList: detailList
+          detailList: detailList,
+          customer: {
+            customerID: data.customer.customerid,
+            customerName: data.customer.customername,
+            customerEmail: data.customer.customeremail,
+          },
         };
       });
       res.json(data[0]);
+    }
+  });
+};
+
+const search = function (req, res) {
+  var orderID = req.query.orderID;
+  Order.search(orderID, function (err, orders) {
+    if (err) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy đơn hàng",
+      });
+    } else {
+      var data = orders.map((data) => {
+        // return order
+        return {
+          orderID: data.orderid,
+          orderTotalPrice: data.ordertotalprice,
+          orderStatus: data.orderstatus,
+          orderNote: data.ordernote,
+          orderCreatedAt: data.ordercreatedat,
+        };
+      });
+      res.json(data);
     }
   });
 };
@@ -388,22 +397,23 @@ const update = (req, res) => {
       return res.json({
         error: true,
         statusCode: order_error_code,
-        message: "Cập nhật trạng thái đơn hàng không thành công"
+        message: "Cập nhật trạng thái đơn hàng không thành công",
       });
     } else {
       return res.json({
         error: false,
         statusCode: success_code,
-        message: "Cập nhật trạng thái đơn hàng thành công"
+        message: "Cập nhật trạng thái đơn hàng thành công",
       });
     }
   });
-}
+};
 
 module.exports = {
   allOrder,
   getOrderByID,
   order,
+  search,
   successPaypal,
   cancelPaypal,
   update,
