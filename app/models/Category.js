@@ -98,14 +98,21 @@ Category.update = function updateCategory(categoryID, category, result) {
 // Delete category
 Category.delete = function deleteCategory(categoryID, result) {
     let now = moment().format('YYYY-MM-DD');
-    db.query("UPDATE category SET categorydeletedat = ? WHERE categoryid = ?",
-    [now, categoryID],
-    function(err, res) {
-        if(err) {
-            result(err, null);
+    const sqlDetail = `DELETE FROM categoryofebook WHERE categoryid = ${categoryID}`;
+    const sql = `DELETE FROM category WHERE categoryid = ${categoryID}`;
+    db.query(sqlDetail, function(errDetail, resDetail) {
+        if(errDetail) {
+            result(errDetail, null);
         }
         else{
-            result(null, res);
+            db.query(sql, function(err, res) {
+                if(err) {
+                    result(err, null);
+                }
+                else{
+                    result(null, res);
+                }
+            });
         }
     });
 };
