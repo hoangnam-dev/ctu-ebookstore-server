@@ -20,12 +20,28 @@ function handleResultAll(arrData) {
       };
     });
 
+    // Handle ebook sale price and Sale list of the ebook
+    var salePrice = null;
+    if(Object.keys(data.saleList).length > 0) {
+      salePrice = parseFloat(data.ebookprice);
+      data.saleList.map((sale) => {
+        salePrice -= parseFloat(sale.salevalue);
+        return {
+          saleID: sale.saleid,
+          saleName: sale.salename,
+          saleValue: sale.salevalue,
+          saleEndAt: sale.saleendat,
+        };
+      });
+    }
+
     // return ebook
     return {
       ebookID: data.ebookid,
       ebookName: data.ebookname,
       ebookAvatar: data.ebookavatar,
       ebookPrice: data.ebookprice,
+      salePrice: salePrice,
       ebookstatusList: ebookstatusList,
     };
   });
@@ -49,16 +65,15 @@ function handleResult(arrData) {
       };
     });
 
-    // Handle Sale list of the ebook
+    // Handle ebook sale price and Sale list of the ebook
+    var salePrice = parseFloat(data.ebookprice);
     var saleList = data.saleList.map((sale) => {
+      salePrice -= parseFloat(sale.salevalue);
       return {
         saleID: sale.saleid,
-        saleCode: sale.salecode,
         saleName: sale.salename,
-        saleType: sale.saleebooktype,
         saleValue: sale.salevalue,
-        saleQuantityMax: sale.salequantitymax,
-        saleQuantityCurrent: sale.salequantitycurrent,
+        saleEndAt: sale.saleendat,
       };
     });
 
@@ -76,6 +91,8 @@ function handleResult(arrData) {
     return {
       ebookID: data.ebookid,
       ebookName: data.ebookname,
+      ebookPrice: data.ebookprice,
+      salePrice: salePrice,
       ebookAvatar: data.ebookavatar,
       ebookDescription: data.ebookdescription,
       ebookEPUB: data.ebookepub,
@@ -91,8 +108,10 @@ function handleResult(arrData) {
   return resData;
 }
 const handleFilePath = (directoryPath, fileName) => {
-return `https://localhost:${process.env.PORT||3001}/${directoryPath}/${fileName}`
-}
+  return `https://localhost:${
+    process.env.PORT || 3001
+  }/${directoryPath}/${fileName}`;
+};
 
 // Show all ebook
 const allEbook = function (req, res) {
@@ -137,8 +156,8 @@ const splitPDF = async (
   fileNameSave
 ) => {
   const writePdf = await PDFDocument.create();
-  var pdfA = await PDFDocument.load(fs.readFileSync(pdfFilePath));
-  if (pdfA.getPageIndices().length < separatePage) {
+  var pdf = await PDFDocument.load(fs.readFileSync(pdfFilePath));
+  if (pdf.getPageIndices().length < separatePage) {
     reject(err);
   }
   var pageMerge = [];
@@ -146,8 +165,8 @@ const splitPDF = async (
     pageMerge.push(i);
   }
 
-  var copiedPagesA = await writePdf.copyPages(pdfA, pageMerge);
-  copiedPagesA.forEach((page) => writePdf.addPage(page));
+  var copiedPages = await writePdf.copyPages(pdf, pageMerge);
+  copiedPages.forEach((page) => writePdf.addPage(page));
   const bytes = await writePdf.save();
   const outputPath2 = path.join(outputDirectory, fileNameSave);
   await fs.promises.writeFile(outputPath2, bytes);
@@ -157,8 +176,8 @@ const store = async function (req, res) {
   var newEbook = new Ebook(req.body);
   // var categoriesID = req.body.categoriesID;
   // var authorsID = req.body.authorsID;
-  var categoriesID = [1,2]; // test
-  var authorsID = [1,2]; // test
+  var categoriesID = [1, 2]; // test
+  var authorsID = [1, 2]; // test
   var separatePage = req.body.separatePage;
   if (
     !newEbook.ebookname ||
@@ -174,27 +193,39 @@ const store = async function (req, res) {
   } else {
     try {
       // Upload Avatar
-      if (req.avatarSaved !== undefined) {
-        const url = req.protocol + '://' + req.get('host')
-        let avatarPath = appRoot + "\\public\\uploads\\ebookAvatar\\" + req.avatarSaved;
-        let uploadResponse = await cloudinary.uploader.upload(avatarPath, {
+      if (req.avatarPathSaved !== undefined) {
+        let uploadResponse = await cloudinary.uploader.upload(req.avatarPathSaved, {
           upload_preset: "ebookstore_ebook_images",
         });
         newEbook.ebookavatar = uploadResponse.secure_url;
       }
       // Upload epub
       if (req.ePubSaved !== undefined) {
-        newEbook.ebookepub = handleFilePath('public/uploads/ebookEPUB', req.ePubSaved);
+        newEbook.ebookepub = handleFilePath(
+          "public/uploads/ebookEPUB",
+          req.ePubSaved
+        );
       } else {
         newEbook.ebookepub = "";
       }
       // Upload pdf
       if (req.pdfSaved !== undefined) {
-        newEbook.ebookpdf = handleFilePath('public/uploads/ebookPDF', req.pdfSaved);
-        newEbook.ebookpdfreview = handleFilePath('public/uploads/ebookPDF/pdf-review', req.pdfReviewSaved);
+        newEbook.ebookpdf = handleFilePath(
+          "public/uploads/ebookPDF",
+          req.pdfSaved
+        );
+        newEbook.ebookpdfreview = handleFilePath(
+          "public/uploads/ebookPDF/pdf-review",
+          req.pdfReviewSaved
+        );
         var pdfPath = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
 
-        splitPDF(pdfPath, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, req.pdfReviewSaved)
+        splitPDF(
+          pdfPath,
+          appRoot + "/public/uploads/ebookPDF/pdf-review",
+          separatePage,
+          req.pdfReviewSaved
+        )
           .then()
           .catch((errorSlipt) => console.error);
       } else {
@@ -250,11 +281,7 @@ const update = async function (req, res) {
   var ebookID = req.params.id;
   // var categoriesID = req.body.categoriesID;
   // var authorsID = req.body.authorsID;
-  if (
-    !newEbook.ebookname ||
-    !newEbook.ebookprice ||
-    !newEbook.ebookstatusid
-  ) {
+  if (!newEbook.ebookname || !newEbook.ebookprice || !newEbook.ebookstatusid) {
     res.json({
       error: true,
       statusCode: 0,
@@ -307,16 +334,30 @@ const updateEbookContent = async function (req, res) {
     // Upload epub
     if (req.ePubSaved !== undefined) {
       contentType = "epub";
-      newEbookContentLink = handleFilePath('public/uploads/ebookEPUB', req.ePubSaved);
+      newEbookContentLink = handleFilePath(
+        "public/uploads/ebookEPUB",
+        req.ePubSaved
+      );
     }
     // Upload pdf
     if (req.pdfSaved !== undefined) {
       contentType = "pdf";
-      newEbookContentLink = handleFilePath('public/uploads/ebookPDF', req.pdfSaved);
-      newEbookReviewLink =  handleFilePath('public/uploads/ebookPDF/pdf-review', req.pdfReviewSaved);
+      newEbookContentLink = handleFilePath(
+        "public/uploads/ebookPDF",
+        req.pdfSaved
+      );
+      newEbookReviewLink = handleFilePath(
+        "public/uploads/ebookPDF/pdf-review",
+        req.pdfReviewSaved
+      );
       var pdfPath = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
 
-      splitPDF(pdfPath, appRoot + '/public/uploads/ebookPDF/pdf-review', separatePage, req.pdfReviewSaved)
+      splitPDF(
+        pdfPath,
+        appRoot + "/public/uploads/ebookPDF/pdf-review",
+        separatePage,
+        req.pdfReviewSaved
+      )
         .then()
         .catch((err) => console.error);
     }
@@ -363,7 +404,7 @@ const addCategory = async function (req, res) {
   var ebookID = req.params.id;
   var categoriesID = req.body.categoriesID;
   Ebook.storeCategory(ebookID, categoriesID, (err, result) => {
-    if(err) {
+    if (err) {
       res.status(500).json({
         error: true,
         statusCode: 0,
@@ -404,7 +445,7 @@ const addAuthor = async function (req, res) {
   var ebookID = req.params.id;
   var authorsID = req.body.authorsID;
   Ebook.storeAuthor(ebookID, authorsID, (err, result) => {
-    if(err) {
+    if (err) {
       res.status(500).json({
         error: true,
         statusCode: 0,

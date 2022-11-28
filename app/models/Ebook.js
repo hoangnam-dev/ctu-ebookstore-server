@@ -53,26 +53,10 @@ async function hasCategory(ebookID) {
 // Get list sale of ebook
 async function hasSale(ebookID) {
   return new Promise((resolve, reject) => {
-    db.query(
-      "SELECT saleebook.*, sale.* FROM saleebook INNER JOIN sale ON saleebook.saleid = sale.saleid WHERE saleebook.ebookid = ?",
-      [ebookID],
-      async function (err, resSub) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(resSub);
-        }
-      }
-    );
-  });
-}
-// Get list imageebook of ebook
-async function hasImages(ebookID) {
-  return new Promise((resolve, reject) => {
-    db.query(
-      "SELECT imageebookid, imageebooksource FROM imageebook WHERE imageebook.ebookid = ?",
-      [ebookID],
-      async function (err, resSub) {
+    const sql = `SELECT saleebook.salevalue, sale.saleid, sale.salename, sale.saleendat
+    FROM saleebook INNER JOIN sale ON saleebook.saleid = sale.saleid 
+    WHERE saleebook.ebookid = ${ebookID} AND sale.saleendat > curdate()`;
+    db.query(sql, async function (err, resSub) {
         if (err) {
           reject(err);
         } else {
