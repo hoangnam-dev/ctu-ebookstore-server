@@ -65,14 +65,6 @@ const login = (req, res) => {
             { expiresIn: "30d" }
           );
 
-          refreshTokenList.push(refreshToken);
-          res.cookie("refreshToken", refreshToken, {
-            httqOnly: true,
-            secure: false,
-            path: "/",
-            sameSite: "strict",
-          });
-
           // result user info
           var data = user.map((data) => {
             // Handle role list of the role
