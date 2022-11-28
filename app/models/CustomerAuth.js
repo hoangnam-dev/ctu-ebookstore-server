@@ -47,7 +47,7 @@ async function hasOrder(customerID) {
 // Get list customerstatus of customer
 async function hasEbook(customerID) {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT ebook.ebookid, license.* FROM customer 
+    const sql = `SELECT ebook.ebookid, ebook.ebookname, ebook.ebookavatar, license.* FROM customer 
         INNER JOIN license ON customer.customerid = license.customerid 
         INNER JOIN ebook ON license.ebookid = ebook.ebookid 
         WHERE customer.customerid = ${customerID} AND (licenseexpires IS NULL OR datediff(licenseexpires, CURDATE()) > 0) AND ebook.ebookdeletedat IS NULL`;

@@ -54,7 +54,7 @@ const login = (req, res) => {
                 id: customer[0].customerid,
               },
               process.env.JWT_ACCESS_KEY,
-              { expiresIn: "30d" }
+              { expiresIn: "30m" }
             );
 
             const refreshToken = jwt.sign(
@@ -64,14 +64,6 @@ const login = (req, res) => {
               process.env.JWT_REFRESH_KEY,
               { expiresIn: "30d" }
             );
-
-            refreshTokenList.push(refreshToken);
-            res.cookie("refreshCustomerToken", refreshToken, {
-              httqOnly: true,
-              secure: false,
-              path: "/",
-              sameSite: "strict",
-            });
 
             // result customer info
             var data = customer.map((data) => {
@@ -94,6 +86,8 @@ const login = (req, res) => {
               var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
                 return {
                   ebookID: ebookOwn.ebookid,
+                  ebookName: ebookOwn.ebookname,
+                  ebookAvatar: ebookOwn.ebookavatar,
                   licenseCode: ebookOwn.licensecode,
                   licenseIsRent: ebookOwn.licenseisrent,
                   licenseStatus: ebookOwn.licensestatus,
@@ -117,6 +111,7 @@ const login = (req, res) => {
 
             res.json({
               accessToken,
+              refreshToken,
               customerInfo: data[0],
             });
           }
@@ -244,7 +239,7 @@ const register = async (req, res) => {
 };
 
 const refreshAccessToken = (req, res) => {
-  const refreshToken = req.cookies.refreshCustomerToken;
+  const refreshToken = req.body.refreshToken;
 
   // Check token isset
   if (!refreshToken) {
@@ -287,53 +282,9 @@ const refreshAccessToken = (req, res) => {
           process.env.JWT_ACCESS_KEY,
           { expiresIn: "30m" }
         );
-        // result customer info
-        var data = customer.map((data) => {
-          var customerstatusList = data.statusList.map((customerstatus) => {
-            return {
-              customerstatusID: customerstatus.customerstatusid,
-              customerstatusCode: customerstatus.customerstatuscode,
-              customerstatusName: customerstatus.customerstatusname,
-              customerstatusColor: customerstatus.customerstatuscolor,
-            };
-          });
-          var orderList = data.orderList.map((order) => {
-            return {
-              orderID: order.orderid,
-              orderTotalPrice: order.ordertotalprice,
-              orderStatus: order.orderstatus,
-              orderCreatedAt: order.ordercreatedat,
-            };
-          });
-          var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
-            return {
-              ebookID: ebookOwn.ebookid,
-              licenseCode: ebookOwn.licensecode,
-              licenseIsRent: ebookOwn.licenseisrent,
-              licenseStatus: ebookOwn.licensestatus,
-              licenseExpires: ebookOwn.licenseexpires,
-            };
-          });
-
-          // return customer
-          return {
-            customerID: data.customerid,
-            customerName: data.customername,
-            customerUserName: data.customercustomername,
-            customerAvatar: data.customeravatar,
-            customerAddress: data.customeraddress,
-            customerEmail: data.customeremail,
-            customerCreatedAt: data.customercreatedat,
-            customerstatusCode: customerstatusList[0].customerstatusCode,
-            ebookOwnList: ebookOwnList,
-            orderList: orderList,
-          };
-        });
-
 
         res.json({
           newAccessToken,
-          customerInfo: data[0],
         });
       }
     });
@@ -394,6 +345,8 @@ const profile = (req, res) => {
             var ebookOwnList = data.ebookOwnList.map((ebookOwn) => {
               return {
                 ebookID: ebookOwn.ebookid,
+                ebookName: ebookOwn.ebookname,
+                ebookAvatar: ebookOwn.ebookavatar,
                 licenseCode: ebookOwn.licensecode,
                 licenseIsRent: ebookOwn.licenseisrent,
                 licenseStatus: ebookOwn.licensestatus,
