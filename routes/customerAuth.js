@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { upload } = require("../utils/multer");
+const { upload, uploadFileAndImages } = require("../utils/multer");
 
 // Import Controller
 const {
@@ -18,7 +18,7 @@ const {
 const jwtMiddlewares = require("../app/middlewares/jwt");
 
 router.post("/login", login);
-router.post("/register", register);
+router.post("/register", upload.single("customerAvatar"), register);
 router.post("/refreshToken", refreshAccessToken);
 router.post("/logout", jwtMiddlewares.verifyToken, logout);
 
