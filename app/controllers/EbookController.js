@@ -22,9 +22,10 @@ function handleResultAll(arrData) {
 
     // Handle ebook sale price and Sale list of the ebook
     var salePrice = null;
+    var saleList = [];
     if(Object.keys(data.saleList).length > 0) {
       salePrice = parseFloat(data.ebookprice);
-      data.saleList.map((sale) => {
+      saleList = data.saleList.map((sale) => {
         salePrice -= parseFloat(sale.salevalue);
         return {
           saleID: sale.saleid,
@@ -42,7 +43,9 @@ function handleResultAll(arrData) {
       ebookAvatar: data.ebookavatar,
       ebookPrice: data.ebookprice,
       salePrice: salePrice,
-      ebookstatusList: ebookstatusList,
+      saleList: saleList[0],
+      ebookstatusList: ebookstatusList[0],
+      
     };
   });
   return resData;

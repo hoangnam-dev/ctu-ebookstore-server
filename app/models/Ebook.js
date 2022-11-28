@@ -53,9 +53,11 @@ async function hasCategory(ebookID) {
 // Get list sale of ebook
 async function hasSale(ebookID) {
   return new Promise((resolve, reject) => {
-    const sql = `SELECT saleebook.salevalue, sale.saleid, sale.salename, sale.saleendat
-    FROM saleebook INNER JOIN sale ON saleebook.saleid = sale.saleid 
-    WHERE saleebook.ebookid = ${ebookID} AND sale.saleendat > curdate()`;
+    const sql = `SELECT max(saleebook.salevalue) as salevalue, sale.saleid, sale.salename, sale.saleendat
+                      FROM saleebook INNER JOIN sale ON saleebook.saleid = sale.saleid 
+                      INNER JOIN ebook ON ebook.ebookid = saleebook.ebookid 
+                      WHERE saleebook.ebookid = ${ebookID} AND sale.saleendat > curdate()
+                      GROUP BY ebook.ebookid;`;
     db.query(sql, async function (err, resSub) {
         if (err) {
           reject(err);
@@ -186,8 +188,8 @@ Ebook.getEbookByID = function getEbookByID(ebookID, result) {
       if (err) {
         result(err, null);
       } else {
-        const ebookData = await resultEbook(res);
-        result(null, ebookData);
+        const data = await resultEbook(res);
+        result(null, data);
       }
     }
   );
