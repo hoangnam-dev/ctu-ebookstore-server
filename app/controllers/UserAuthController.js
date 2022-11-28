@@ -53,7 +53,7 @@ const login = (req, res) => {
               roleCode: role.rolecode,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "30d" }
+            { expiresIn: "30m" }
           );
 
           const refreshToken = jwt.sign(
@@ -117,6 +117,7 @@ const login = (req, res) => {
 
           res.json({
             accessToken,
+            refreshToken,
             userInfo: data[0],
           });
         }
@@ -126,7 +127,7 @@ const login = (req, res) => {
 };
 
 const refreshAccessToken = (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
+  const refreshToken = req.body.refreshToken;
 
   // Check token isset
   if (!refreshToken) {
