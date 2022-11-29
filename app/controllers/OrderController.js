@@ -81,7 +81,7 @@ const order = async (req, res) => {
     Order.store(newOrder, itemList, function (err, order) {
       if (err) {
         res.redirect(
-          `http://localhost:3000/ebook-store-fe/checkout/failed?error=${order_error_code}`
+          `http://localhost:3000/checkout/failed?error=${order_error_code}`
         );
       } else {
         // url_redirect if transaction success
@@ -121,11 +121,11 @@ const order = async (req, res) => {
             Order.destroy(order, function (err, order) {
               if (err) {
                 res.redirect(
-                  `http://localhost:3000/ebook-store-fe/checkout/failed?error=${cancel_error_code}`
+                  `http://localhost:3000/checkout/failed?error=${cancel_error_code}`
                 );
               } else {
                 res.redirect(
-                  `http://localhost:3000/ebook-store-fe/checkout/success?success=${cancel_code}`
+                  `http://localhost:3000/checkout/success?success=${cancel_code}`
                 );
               }
             });
@@ -203,7 +203,7 @@ const order = async (req, res) => {
     });
   } catch (error) {
     res.redirect(
-      `http://localhost:3000/ebook-store-fe/checkout/failed?error=${order_failed_code}`
+      `http://localhost:3000/checkout/failed?error=${order_failed_code}`
     );
   }
 };
@@ -241,11 +241,11 @@ const successPaypal = (req, res) => {
         Order.destroy(orderID, function (err, order) {
           if (err) {
             res.redirect(
-              `http://localhost:3000/ebook-store-fe/checkout/failed?error=${cancel_error_code}`
+              `http://localhost:3000/checkout/failed?error=${cancel_error_code}`
             );
           } else {
             res.redirect(
-              `http://localhost:3000/ebook-store-fe/checkout/success?success=${cancel_code}`
+              `http://localhost:3000/checkout/success?success=${cancel_code}`
             );
           }
         });
@@ -259,17 +259,17 @@ const successPaypal = (req, res) => {
           function (err, status) {
             if (err) {
               res.redirect(
-                `http://localhost:3000/ebook-store-fe/checkout/failed?error=${order_error_code}&orderID=${orderID}`
+                `http://localhost:3000/checkout/failed?error=${order_error_code}&orderID=${orderID}`
               );
             } else {
               PaypalPayment.store(newTransation, function (err, transaction) {
                 if (err) {
                   res.redirect(
-                    `http://localhost:3000/ebook-store-fe/checkout/failed?error=${payment_error_code}&orderID=${orderID}`
+                    `http://localhost:3000/checkout/failed?error=${payment_error_code}&orderID=${orderID}`
                   );
                 } else {
                   res.redirect(
-                    `http://localhost:3000/ebook-store-fe/checkout/success?success=${success_code}`
+                    `http://localhost:3000/checkout/success?success=${success_code}`
                   );
                 }
               });
@@ -286,11 +286,11 @@ const cancelPaypal = (req, res) => {
   Order.destroy(orderID, function (err, order) {
     if (err) {
       res.redirect(
-        `http://localhost:3000/ebook-store-fe/checkout/failed?error=${cancel_error_code}`
+        `http://localhost:3000/checkout/failed?error=${cancel_error_code}`
       );
     } else {
       res.redirect(
-        `http://localhost:3000/ebook-store-fe/checkout/success?success=${cancel_code}`
+        `http://localhost:3000/checkout/success?success=${cancel_code}`
       );
     }
   });
