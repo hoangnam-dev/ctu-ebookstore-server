@@ -15,6 +15,13 @@ const blocked = "blocked";
 const author_wrong = "author_wrong";
 const author_null = "author_null";
 const author_blocked = "author_block";
+const email_wrong = "email_wrong";
+const email_isset = "email_isset";
+const info_null = "info_null";
+const password_error = "password_error";
+const avatar_error = "avatar_error";
+const register_error = "register_error";
+const register_success = "register_success";
 
 const login = (req, res) => {
   var email = req.body.email;
@@ -24,7 +31,7 @@ const login = (req, res) => {
     if (err || Object.keys(customer).length === 0) {
       return res.json({
         error: true,
-        statusCode: 0,
+        statusCode: author_wrong,
         messeage: "Lỗi! Email không đúng",
       });
     } else {
@@ -33,7 +40,7 @@ const login = (req, res) => {
       if (accountStatus === blocked) {
         return res.json({
           error: true,
-          statusCode: 0,
+          statusCode: author_blocked,
           messeage: "Lỗi! Tài khoản đã bị khóa",
         });
       }
@@ -45,7 +52,7 @@ const login = (req, res) => {
           if (error || !result) {
             return res.json({
               error: true,
-              statusCode: 0,
+              statusCode: author_wrong,
               message: "Lỗi! Mật khẩu không chính xác",
             });
           } else {
@@ -132,7 +139,7 @@ const register = async (req, res) => {
   ) {
     return res.json({
       error: true,
-      statusCode: 0,
+      statusCode: info_null,
       message: "Thông tin cá nhân không được để trống",
     });
   } else {
@@ -142,14 +149,14 @@ const register = async (req, res) => {
         if (err) {
           return res.json({
             error: true,
-            statusCode: 0,
-            message: "Error checking",
+            statusCode: email_wrong,
+            message: "Không truy xuất được dữ liệu",
           });
         }
         if (Object.keys(result).length > 0) {
           return res.json({
             error: true,
-            statusCode: 0,
+            statusCode: email_isset,
             message: "Email đã được đăng ký",
           });
         }
@@ -172,7 +179,7 @@ const register = async (req, res) => {
                   if (err) {
                     return res.json({
                       error: true,
-                      statusCode: 0,
+                      statusCode: password_error,
                       message: "Lỗi! Mã hóa password không thành công",
                     });
                   }
@@ -181,13 +188,13 @@ const register = async (req, res) => {
                     if (err) {
                       res.json({
                         error: true,
-                        statusCode: 0,
+                        statusCode: register_error,
                         message: "Đăng ký tài khoản không thành công",
                       });
                     } else {
                       res.json({
                         error: false,
-                        statusCode: 1,
+                        statusCode: register_success,
                         message: "Đăng ký tài khoản thành công",
                       });
                     }
@@ -198,7 +205,7 @@ const register = async (req, res) => {
           } catch (error) {
             return res.json({
               error: true,
-              statusCode: 0,
+              statusCode: avatar_error,
               message: "Lỗi! Không thể lưu avatar",
             });
           }
@@ -210,7 +217,7 @@ const register = async (req, res) => {
               if (err) {
                 return res.json({
                   error: true,
-                  statusCode: 0,
+                  statusCode: password_error,
                   message: "Lỗi! Mã hóa password không thành công",
                 });
               }
@@ -219,13 +226,13 @@ const register = async (req, res) => {
                 if (err) {
                   return res.json({
                     error: true,
-                    statusCode: 0,
+                    statusCode: register_error,
                     message: "Đăng ký tài khoản không thành công",
                   });
                 } else {
                   return res.json({
                     error: false,
-                    statusCode: 1,
+                    statusCode: register_success,
                     message: "Đăng ký tài khoản thành công",
                   });
                 }
@@ -245,16 +252,8 @@ const refreshAccessToken = (req, res) => {
   if (!refreshToken) {
     return res.json({
       error: true,
-      statusCode: 0,
-      message: "You are not sing in",
-    });
-  }
-  // Check token vailable
-  if (!refreshTokenList.includes(refreshToken)) {
-    return res.json({
-      error: true,
-      statusCode: 0,
-      message: "Token is not available",
+      statusCode: author_null,
+      message: "Bạn chưa đăng nhập",
     });
   }
 
@@ -263,15 +262,15 @@ const refreshAccessToken = (req, res) => {
     if (err) {
       return res.json({
         error: true,
-        statusCode: 0,
-        message: "JWT had error: " + err.message,
+        statusCode: author_null,
+        message: "Bạn chưa đăng nhập",
       });
     }
     CustomerAuth.getCustomerLoginInfo(data.id, function (err, customerInfo) {
       if (err) {
         return res.json({
           error: true,
-          statusCode: 0,
+          statusCode: author_null,
           message: "Lỗi! Không thể lấy thông tin khách hàng",
         });
       } else {
@@ -298,7 +297,7 @@ const logout = (req, res) => {
   return res.json({
     error: false,
     statusCode: 1,
-    message: "Customer logout successfully",
+    message: "Đăng xuất thành công",
   });
 };
 
@@ -399,7 +398,7 @@ const updateProfile = function (req, res) {
           return res.json({
             error: true,
             statusCode: 0,
-            message: "Error checking",
+            message: "Không thể truy xuất được dữ liệu",
           });
         }
         if (
