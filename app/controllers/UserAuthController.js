@@ -129,14 +129,6 @@ const refreshAccessToken = (req, res) => {
       message: "Bạn chưa đăng nhập",
     });
   }
-  // Check token vailable
-  if (!refreshTokenList.includes(refreshToken)) {
-    return res.json({
-      error: true,
-      statusCode: author_null,
-      message: "Bạn chưa đăng nhập",
-    });
-  }
 
   // Token is available
   jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, function (err, data) {
