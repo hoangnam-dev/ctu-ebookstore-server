@@ -56,7 +56,7 @@ async function hasSale(ebookID) {
     const sql = `SELECT max(saleebook.salevalue) as salevalue, sale.saleid, sale.salename, sale.saleendat
                       FROM saleebook INNER JOIN sale ON saleebook.saleid = sale.saleid 
                       INNER JOIN ebook ON ebook.ebookid = saleebook.ebookid 
-                      WHERE saleebook.ebookid = ${ebookID} AND sale.saleendat > curdate()
+                      WHERE saleebook.ebookid = ${ebookID} AND sale.saleendat >= curdate()
                       GROUP BY ebook.ebookid;`;
     db.query(sql, async function (err, resSub) {
         if (err) {
