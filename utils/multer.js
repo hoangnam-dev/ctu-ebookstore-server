@@ -70,31 +70,31 @@ const uploadFileAndImages = async (req, res, next) => {
       next();
     } else {
       req.uploadAvatarAndImagesStatus = true;
-      req.avatarPathSaved = "";
-      req.ePubPathSaved = "";
-      var imagesPathSaved = [];
+      req.avatarSaved = "";
+      req.ePubSaved = "";
+      var imagesSaved = [];
 
       // If choose a avatar image => update
       if (req.files["ebookAvatar"]) {
-        // req.avatarPathSaved = "/images/" + req.files["ebookAvatar"][0].filename;
-        req.avatarPathSaved = req.files["ebookAvatar"][0].path;
+        // req.avatarSaved = "/images/" + req.files["ebookAvatar"][0].filename;
+        req.avatarSaved = req.files["ebookAvatar"][0].path;
       } else {
-        req.avatarPathSaved = undefined;
+        req.avatarSaved = undefined;
       }
       // If choose a epub => update
       if (req.files["ebookEPUB"]) {
-        // req.ePubPathSaved = "/epub/" + req.files["ebookEPUB"][0].filename;
-        req.ePubPathSaved = req.files["ebookEPUB"][0].path;
+        // req.ePubSaved = "/epub/" + req.files["ebookEPUB"][0].filename;
+        req.ePubSaved = req.files["ebookEPUB"][0].filename;
       } else {
-        req.ePubPathSaved = undefined;
+        req.ePubSaved = undefined;
       }
       // If choose a pdf => update
       if (req.files["ebookPDF"]) {
-        // req.pdfPathSaved = "/pdf/" + req.files["ebookPDF"][0].filename;
-        req.pdfPathSaved = req.files["ebookPDF"][0].path;
-        req.pdfReviewPathSaved = Date.now()+'-review_'+req.files["ebookPDF"][0].filename;
+        // req.pdfSaved = "/pdf/" + req.files["ebookPDF"][0].filename;
+        req.pdfSaved = req.files["ebookPDF"][0].filename;
+        req.pdfReviewSaved = Date.now()+'-review_'+req.files["ebookPDF"][0].filename;
       } else {
-        req.pdfPathSaved = undefined;
+        req.pdfSaved = undefined;
       }
 
       // If choose a list images => update
@@ -103,16 +103,16 @@ const uploadFileAndImages = async (req, res, next) => {
         // let array = [];
         for (let i = 0; i < req.files["ebookImages"].length; i++) {
           // array.push("/images/" + req.files["ebookImages"][i].filename);
-          array.push(req.files["ebookImages"][i].path);
-          // imagesPathSaved.push(array);
-          // req.imagesPathSaved.push(req.files["ebookImages"][i].path);
+          array.push(req.files["ebookImages"][i].filename);
+          // imagesSaved.push(array);
+          // req.imagesSaved.push(req.files["ebookImages"][i].filename);
         }
       } else {
-        req.imagesPathSaved = undefined;
+        req.imagesSaved = undefined;
       }
 
-      // req.imagesPathSaved = imagesPathSaved;
-      req.imagesPathSaved = array;
+      // req.imagesSaved = imagesSaved;
+      req.imagesSaved = array;
       next();
     }
   });

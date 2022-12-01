@@ -196,8 +196,8 @@ const store = async function (req, res) {
   } else {
     try {
       // Upload Avatar
-      if (req.avatarPathSaved !== undefined) {
-        let uploadResponse = await cloudinary.uploader.upload(req.avatarPathSaved, {
+      if (req.avatarSaved !== undefined) {
+        let uploadResponse = await cloudinary.uploader.upload(req.avatarSaved, {
           upload_preset: "ebookstore_ebook_images",
         });
         newEbook.ebookavatar = uploadResponse.secure_url;
@@ -230,10 +230,10 @@ const store = async function (req, res) {
           req.pdfReviewSaved
         )
           .then()
-          .catch((errorSlipt) => console.error);
       } else {
         newEbook.ebookpdf = "";
       }
+
 
       // Store ebook
       Ebook.store(newEbook, categoriesID, authorsID, function (err, ebook) {
@@ -362,7 +362,6 @@ const updateEbookContent = async function (req, res) {
         req.pdfReviewSaved
       )
         .then()
-        .catch((err) => console.error);
     }
     if (contentType === "") {
       res.status(500).json({
