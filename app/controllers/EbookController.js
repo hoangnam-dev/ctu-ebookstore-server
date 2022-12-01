@@ -334,12 +334,16 @@ const updateEbookContent = async function (req, res) {
   var newEbookReviewLink = "";
   try {
     var contentType = "";
+
+    // if file update is .epub => contentType = "epub"
+    // if file update is .pdf => contentType = "pdf"
+    
     // Upload epub
     if (req.ePubSaved !== undefined) {
       contentType = "epub";
       newEbookContentLink = handleFilePath(
         "public/uploads/ebookEPUB",
-        req.ePubSaved
+        req.ePubSaved 
       );
     }
     // Upload pdf
@@ -363,6 +367,8 @@ const updateEbookContent = async function (req, res) {
       )
         .then()
     }
+
+    // Check if contentType not null => update to DB
     if (contentType === "") {
       res.status(500).json({
         error: true,

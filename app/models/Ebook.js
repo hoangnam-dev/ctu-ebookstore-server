@@ -167,7 +167,7 @@ async function resultEbook(res) {
 // Get all ebook
 Ebook.getAll = function getAllEbook(result) {
   db.query(
-    "SELECT ebookid, ebookname, ebookprice, ebookstatusid FROM ebook",
+    "SELECT ebookid, ebookname, ebookprice, ebookstatusid FROM ebook WHERE ebookdeletedat IS NULL",
     async function (err, res) {
       if (err) {
         result(err, null);
@@ -182,7 +182,7 @@ Ebook.getAll = function getAllEbook(result) {
 // Get ebook by ID
 Ebook.getEbookByID = function getEbookByID(ebookID, result) {
   db.query(
-    "SELECT * FROM ebook WHERE ebookid = ?",
+    "SELECT * FROM ebook WHERE ebookid = ? AND ebookdeletedat IS NULL",
     ebookID,
     async function (err, res) {
       if (err) {
@@ -424,21 +424,18 @@ Ebook.updateEbookContent = function updateEbookContent(
   ebookReviewContent,
   result
 ) {
-  var sql = "UPDATE ebook SET ebookepub = ? WHERE ebookid = ?";
+  var sql = `UPDATE ebook SET ebookepub = '${ebookContent}' WHERE ebookid = ${ebookID}`;
   if (contentType === "pdf") {
-    sql = "UPDATE ebook SET ebookpdf = ?, ebookpdfreview = ? WHERE ebookid = ?";
+    sql = `UPDATE ebook SET ebookpdf = '${ebookContent}', ebookpdfreview = '${ebookReviewContent}' WHERE ebookid = ${ebookID}`;
   }
-  db.query(
-    sql,
-    [ebookContent, ebookReviewContent, ebookID],
-    function (err, res) {
-      if (err) {
-        result(err, null);
-      } else {
-        result(null, res);
-      }
+  db.query(sql, function (err, res) {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res);
     }
-  );
+  });
 };
 
 // Delete ebook
