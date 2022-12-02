@@ -111,7 +111,7 @@ function handleResult(arrData) {
   return resData;
 }
 const handleFilePath = (directoryPath, fileName) => {
-  return `https://localhost:${
+  return `http://localhost:${
     process.env.PORT || 3001
   }/${directoryPath}/${fileName}`;
 };
@@ -205,7 +205,7 @@ const store = async function (req, res) {
       // Upload epub
       if (req.ePubSaved !== undefined) {
         newEbook.ebookepub = handleFilePath(
-          "public/uploads/ebookEPUB",
+          "uploads/ebookEPUB",
           req.ePubSaved
         );
       } else {
@@ -214,11 +214,11 @@ const store = async function (req, res) {
       // Upload pdf
       if (req.pdfSaved !== undefined) {
         newEbook.ebookpdf = handleFilePath(
-          "public/uploads/ebookPDF",
+          "uploads/ebookPDF",
           req.pdfSaved
         );
         newEbook.ebookpdfreview = handleFilePath(
-          "public/uploads/ebookPDF/pdf-review",
+          "uploads/ebookPDF/pdf-review",
           req.pdfReviewSaved
         );
         var pdfPath = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
@@ -342,7 +342,7 @@ const updateEbookContent = async function (req, res) {
     if (req.ePubSaved !== undefined) {
       contentType = "epub";
       newEbookContentLink = handleFilePath(
-        "public/uploads/ebookEPUB",
+        "uploads/ebookEPUB",
         req.ePubSaved 
       );
     }
@@ -350,11 +350,11 @@ const updateEbookContent = async function (req, res) {
     if (req.pdfSaved !== undefined) {
       contentType = "pdf";
       newEbookContentLink = handleFilePath(
-        "public/uploads/ebookPDF",
+        "uploads/ebookPDF",
         req.pdfSaved
       );
       newEbookReviewLink = handleFilePath(
-        "public/uploads/ebookPDF/pdf-review",
+        "uploads/ebookPDF/pdf-review",
         req.pdfReviewSaved
       );
       var pdfPath = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
