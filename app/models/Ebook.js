@@ -383,7 +383,7 @@ Ebook.deleteAuthor = function deleteEbookAuthor(ebookID, authorID, result) {
 // Update ebook
 Ebook.update = function updateEbook(ebookID, ebook, result) {
   var sql =
-    "UPDATE ebook SET ebookname = ?, ebookdescription = ?, ebookprice = ?, ebookavatar = ?, ebookreleasedat = ?, ebookstatusid = ?, supplierid = ? WHERE ebookid = ?";
+    "UPDATE ebook SET ebookname = ?, ebookdescription = ?, ebookprice = ?, ebookavatar = ?, ebookreleasedat = ?, ebookstatusid = ? WHERE ebookid = ?";
   var values = [
     ebook.ebookname,
     ebook.ebookdescription,
@@ -391,19 +391,17 @@ Ebook.update = function updateEbook(ebookID, ebook, result) {
     ebook.ebookavatar,
     ebook.ebookreleasedat,
     ebook.ebookstatusid,
-    ebook.supplierid,
     ebookID,
   ];
   if (ebook.ebookavatar === null) {
     sql =
-      "UPDATE ebook SET ebookname = ?, ebookdescription = ?, ebookprice = ?, ebookreleasedat = ?, ebookstatusid = ?, supplierid = ? WHERE ebookid = ?";
+      "UPDATE ebook SET ebookname = ?, ebookdescription = ?, ebookprice = ?, ebookreleasedat = ?, ebookstatusid = ? WHERE ebookid = ?";
     values = [
       ebook.ebookname,
       ebook.ebookdescription,
       ebook.ebookprice,
       ebook.ebookreleasedat,
       ebook.ebookstatusid,
-      ebook.supplierid,
       ebookID,
     ];
   }
