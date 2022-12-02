@@ -252,7 +252,7 @@ const store = async function (req, res) {
         }
       });
     } catch (err) {
-      res.status(500).json({
+      res.json({
         error: true,
         statusCode: 0,
         message: "Upload không thành công",
@@ -318,7 +318,7 @@ const update = async function (req, res) {
         }
       });
     } catch (error) {
-      res.status(500).json({
+      res.json({
         error: true,
         statusCode: 0,
         message: "Upload không thành công",
@@ -370,7 +370,7 @@ const updateEbookContent = async function (req, res) {
 
     // Check if contentType not null => update to DB
     if (contentType === "") {
-      res.status(500).json({
+      res.json({
         error: true,
         statusCode: 0,
         message: "Hãy chọn nội dung cho ebook",
@@ -399,7 +399,7 @@ const updateEbookContent = async function (req, res) {
       );
     }
   } catch (error) {
-    res.status(500).json({
+    res.json({
       error: true,
       statusCode: 0,
       message: "Upload không thành công",
@@ -413,15 +413,15 @@ const addCategory = async function (req, res) {
   var categoriesID = req.body.categoriesID;
   Ebook.storeCategory(ebookID, categoriesID, (err, result) => {
     if (err) {
-      res.status(500).json({
+      res.json({
         error: true,
         statusCode: 0,
         message: "Thêm thể loại cho ebook không thành công",
       });
     } else {
-      res.status(500).json({
-        error: true,
-        statusCode: 0,
+      res.json({
+        error: false,
+        statusCode: 1,
         message: "Thêm thể loại cho ebook thành công",
       });
     }
@@ -454,15 +454,15 @@ const addAuthor = async function (req, res) {
   var authorsID = req.body.authorsID;
   Ebook.storeAuthor(ebookID, authorsID, (err, result) => {
     if (err) {
-      res.status(500).json({
+      res.json({
         error: true,
         statusCode: 0,
         message: "Thêm tác giả của ebook không thành công",
       });
     } else {
-      res.status(500).json({
-        error: true,
-        statusCode: 0,
+      res.json({
+        error: false,
+        statusCode: 1,
         message: "Thêm tác giả của ebook thành công",
       });
     }
