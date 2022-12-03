@@ -115,6 +115,21 @@ License.getLicenseByID = function getLicenseByID(licenseCode, result) {
   });
 };
 
+
+// Search license
+License.search = function searchLicense(col, val, result) {
+  const sql = `SELECT * FROM license WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%'`;
+
+  db.query(sql, async function (err, res) {
+    if (err) {
+      result(err, null);
+    } else {
+      const data = await resultData(res);
+      result(null, data);
+    }
+  });
+};
+
 // Store license
 License.store = function storeLicense(newLicense, result) {
   newLicense.licensecode = generateString(5);

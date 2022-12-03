@@ -1,5 +1,30 @@
 const License = require("../models/License");
 
+function handleResult(arrData) {
+  var resData = arrData.map((data) => {
+    var ebookInfo = data.ebook;
+    var customerInfo = data.customer;
+    // return licede
+    return {
+      licenseCode: data.licensecode,
+      licenseStatus: data.licensestatus,
+      licenseIsRent: data.licenseisrent,
+      licenseExpires: data.licenseexpires,
+      licenseCreatedAt: data.licensecreatedat,
+      ebook: {
+        ebookID: ebookInfo.ebookid,
+        ebookName: ebookInfo.ebookname,
+        ebookAvatar: ebookInfo.ebookavatar,
+      },
+      customer: {
+        customerID: customerInfo.customerid,
+        customerName: customerInfo.customername,
+      }
+    };
+  });
+  return resData;
+}
+
 // Show all license
 const allLicense = function (req, res) {
   License.getAll(function (err, licenses) {
@@ -10,27 +35,7 @@ const allLicense = function (req, res) {
         message: "Lỗi! Không truy xuất được dữ liệu",
       });
     } else {
-      var resData = licenses.map((data) => {
-        var ebookInfo = data.ebook;
-        var customerInfo = data.customer;
-        // return licede
-        return {
-          licenseCode: data.licensecode,
-          licenseStatus: data.licensestatus,
-          licenseIsRent: data.licenseisrent,
-          licenseExpires: data.licenseexpires,
-          licenseCreatedAt: data.licensecreatedat,
-          ebook: {
-            ebookID: ebookInfo.ebookid,
-            ebookName: ebookInfo.ebookname,
-            ebookAvatar: ebookInfo.ebookavatar,
-          },
-          customer: {
-            customerID: customerInfo.customerid,
-            customerName: customerInfo.customername,
-          }
-        };
-      });
+      var resData = handleResult(licenses)
       res.json(resData);
     }
   });
@@ -106,36 +111,35 @@ const getLicenseByID = function (req, res) {
         message: "Lỗi! Không tìm thấy license",
       });
     } else {
-      var resData = license.map((data) => {
-        var ebookInfo = data.ebook;
-        var customerInfo = data.customer;
-        // return licede
-        return {
-          licenseCode: data.licensecode,
-          licenseStatus: data.licensestatus,
-          licenseIsRent: data.licenseisrent,
-          licenseExpires: data.licenseexpires,
-          licenseCreatedAt: data.licensecreatedat,
-          ebook: {
-            ebookID: ebookInfo.ebookid,
-            ebookName: ebookInfo.ebookname,
-            ebookAvatar: ebookInfo.ebookavatar,
-          },
-          customer: {
-            customerID: customerInfo.customerid,
-            customerName: customerInfo.customername,
-          }
-        };
-      });
+      var resData = handleResult(license)
       res.json(resData);
     }
   })
 }
 
+// Search license
+const search = function (req, res) {
+  var col = req.query.type;
+  var val = req.query.input;
+  License.search(col, val, function (err, licenses) {
+    if (err || Object.keys(licenses).length === 0) {
+      res.json({
+        error: true,
+        statusCode: 0,
+        message: "Lỗi! Không tìm thấy license",
+      });
+    } else {
+      var resData = handleResult(licenses)
+      res.json(resData);
+    }
+  });
+};
+
 
 module.exports = {
     allLicense,
     getLicenseByID,
+    search,
     store,
     destroy,
 }
