@@ -151,7 +151,7 @@ const search = function (req, res) {
 };
 
 // Store new ebook
-// Slipt pdf file to small pdf
+// Split pdf file to small pdf
 const splitPDF = async (
   pdfFilePath,
   outputDirectory,
@@ -163,6 +163,7 @@ const splitPDF = async (
   if (pdf.getPageIndices().length < separatePage) {
     reject(err);
   }
+  // create array page of pdf split
   var pageMerge = [];
   for (var i = 0; i < separatePage; i++) {
     pageMerge.push(i);
@@ -171,8 +172,8 @@ const splitPDF = async (
   var copiedPages = await writePdf.copyPages(pdf, pageMerge);
   copiedPages.forEach((page) => writePdf.addPage(page));
   const bytes = await writePdf.save();
-  const outputPath2 = path.join(outputDirectory, fileNameSave);
-  await fs.promises.writeFile(outputPath2, bytes);
+  const outputPath = path.join(outputDirectory, fileNameSave);
+  await fs.promises.writeFile(outputPath, bytes);
 };
 
 const store = async function (req, res) {
