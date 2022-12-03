@@ -15,7 +15,7 @@ const CustomerAuth = function (customer) {
 async function hasCustomerStatus(customerID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT customerstatus.* FROM customer INNER JOIN customerstatus ON customer.customerstatusid = customerstatus.customerstatusid WHERE customer.customerid = ?",
+      "SELECT customerstatus.* FROM customer INNER JOIN customerstatus ON customer.customerstatusid = customerstatus.customerstatusid WHERE customer.customerid = ? ANd customerstatus.customerstatusdeletedat  IS NULL AND customer.customerstatusdeletedat = 0",
       [customerID],
       async function (err, resSub) {
         if (err) {
@@ -50,7 +50,7 @@ async function hasEbook(customerID) {
     const sql = `SELECT ebook.ebookid, ebook.ebookname, ebook.ebookavatar, license.* FROM customer 
         INNER JOIN license ON customer.customerid = license.customerid 
         INNER JOIN ebook ON license.ebookid = ebook.ebookid 
-        WHERE customer.customerid = ${customerID} AND (licenseexpires IS NULL OR datediff(licenseexpires, CURDATE()) > 0) AND ebook.ebookdeletedat IS NULL`;
+        WHERE customer.customerid = ${customerID} AND (licenseexpires IS NULL OR datediff(licenseexpires, CURDATE()) > 0) AND ebook.ebookdeletedat IS NULL OR ebook.ebookdeletedat = 0`;
     db.query(sql, [customerID], async function (err, resSub) {
         if (err) {
           reject(err);

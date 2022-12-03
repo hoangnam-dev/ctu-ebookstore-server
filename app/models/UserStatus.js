@@ -12,7 +12,7 @@ const UserStatus = function (userstatus) {
 // Get all userstatus
 UserStatus.getAll = function getAllUserStatus(result) {
   db.query(
-    "SELECT * FROM userstatus WHERE userstatusdeletedat IS NULL",
+    "SELECT * FROM userstatus WHERE userstatusdeletedat IS NULL OR userstatusdeletedat = 0",
     function (err, res) {
       if (err) {
         result(err, null);
@@ -25,7 +25,7 @@ UserStatus.getAll = function getAllUserStatus(result) {
 
 // Search userstatus
 UserStatus.search = function searchUserStatus(col, val, result) {
-  const sql = `SELECT * FROM userstatus WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND userstatusdeletedat IS NULL`;
+  const sql = `SELECT * FROM userstatus WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND userstatusdeletedat IS NULL OR userstatusdeletedat = 0`;
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);
@@ -38,7 +38,7 @@ UserStatus.search = function searchUserStatus(col, val, result) {
 // Get userstatus by ID
 UserStatus.getUserStatusByID = function getUserStatusByID(userstatusID, result) {
   let sql =
-    "SELECT * FROM userstatus WHERE userstatusid = ?";
+    "SELECT * FROM userstatus WHERE userstatusid = ? AND userstatusdeletedat IS NULL OR userstatusdeletedat = 0";
   db.query(sql, userstatusID, function (err, res) {
     if (err) {
       result(err, null);

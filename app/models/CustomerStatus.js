@@ -12,7 +12,7 @@ const CustomerStatus = function (customerstatus) {
 // Get all customerstatus
 CustomerStatus.getAll = function getAllCustomerStatus(result) {
   db.query(
-    "SELECT * FROM customerstatus WHERE customerstatusdeletedat IS NULL",
+    "SELECT * FROM customerstatus WHERE customerstatusdeletedat IS NULL OR customerstatusdeletedat = 0",
     function (err, res) {
       if (err) {
         result(err, null);
@@ -25,7 +25,7 @@ CustomerStatus.getAll = function getAllCustomerStatus(result) {
 
 // Search customerstatus
 CustomerStatus.search = function searchCustomerStatus(col, val, result) {
-  const sql = `SELECT * FROM customerstatus WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND customerstatusdeletedat IS NULL`;
+  const sql = `SELECT * FROM customerstatus WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND customerstatusdeletedat IS NULL OR customerstatusdeletedat = 0`;
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);

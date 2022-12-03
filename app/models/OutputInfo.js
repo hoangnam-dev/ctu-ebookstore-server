@@ -100,7 +100,7 @@ async function resultOutputInfo(res) {
 // Get all outputinfo
 OutputInfo.getAll = function getAllOutputInfo(result) {
   db.query(
-    "SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, outputinfo.supplierid, supplier.suppliername FROM outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE outputinfo.outputinfodeletedat IS NULL",
+    "SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, outputinfo.supplierid, supplier.suppliername FROM outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE outputinfo.outputinfodeletedat IS NULL OR outputinfo.outputinfodeletedat = 0",
     function (err, res) {
       if (err) {
         result(err, null);
@@ -117,7 +117,7 @@ OutputInfo.getOutputInfoByID = function getOutputInfoByID(
   result
 ) {
   db.query(
-    "SELECT * FROM outputinfo WHERE outputinfoid = ?",
+    "SELECT * FROM outputinfo WHERE outputinfoid = ? AND outputinfodeletedat IS NULL OR outputinfodeletedat = 0",
     outputinfoID,
     async function (err, res) {
       if (err) {
@@ -132,7 +132,7 @@ OutputInfo.getOutputInfoByID = function getOutputInfoByID(
 
 // Search outputinfo
 OutputInfo.search = function searchOutputInfo(col, val, result) {
-  const sql = `SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, supplier.suppliername FROM ebookstore.outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND outputinfodeletedat IS NULL`;
+  const sql = `SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, supplier.suppliername FROM ebookstore.outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND outputinfo.outputinfodeletedat IS NULL OR outputinfo.outputinfodeletedat = 0`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);

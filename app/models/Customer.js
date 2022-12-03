@@ -16,7 +16,7 @@ const Customer = function (customer) {
 async function hasCustomerStatus(customerID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT customerstatus.* FROM customer INNER JOIN customerstatus ON customer.customerstatusid = customerstatus.customerstatusid WHERE customer.customerid = ?",
+      "SELECT customerstatus.* FROM customer INNER JOIN customerstatus ON customer.customerstatusid = customerstatus.customerstatusid WHERE customer.customerid = ? AND customerstatus.customerstatusdeletedat IS NULL OR customerstatus.customerstatusdeletedat = 0",
       [customerID],
       async function (err, resSub) {
         if (err) {
@@ -55,7 +55,7 @@ async function resultCustomer(res) {
 
 // Get all customer
 Customer.getAll = function getAllCustomer(result) {
-  db.query("SELECT * FROM customer WHERE customerdeletedat IS NULL", async function (err, res) {
+  db.query("SELECT * FROM customer WHERE customerdeletedat IS NULL OR customerdeletedat = 0", async function (err, res) {
     if (err) {
       result(err, null);
     } else {
@@ -68,7 +68,7 @@ Customer.getAll = function getAllCustomer(result) {
 // Get customer by ID
 Customer.getCustomerByID = function getCustomerByID(customerID, result) {
   db.query(
-    "SELECT * FROM customer WHERE customerid = ?",
+    "SELECT * FROM customer WHERE customerid = ? AND customerdeletedat IS NULL OR customerdeletedat = 0",
     customerID,
     async function (err, res) {
       if (err) {
@@ -98,7 +98,7 @@ Customer.getPassword = function getPassword(customerID, result) {
 
 // Search customer
 Customer.search = function searchCustomer(col, val, result) {
-  const sql = `SELECT * FROM customer WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND customerdeletedat IS NULL`;
+  const sql = `SELECT * FROM customer WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND customerdeletedat IS NULL OR customerdeletedat = 0`;
 
   db.query(sql, async function (err, res) {
     if (err) {

@@ -15,7 +15,7 @@ const Supplier = function (supplier) {
 // Get all supplier
 Supplier.getAll = function getAllSupplier(result) {
   db.query(
-    "SELECT * FROM supplier WHERE supplierdeletedat IS NULL",
+    "SELECT * FROM supplier WHERE supplierdeletedat = 0 OR supplierdeletedat IS NULL",
     function (err, res) {
       if (err) {
         result(err, null);
@@ -28,7 +28,7 @@ Supplier.getAll = function getAllSupplier(result) {
 
 // Search supplier
 Supplier.search = function searchSupplier(col, val, result) {
-  const sql = `SELECT * FROM supplier WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND supplierdeletedat IS NULL`;
+  const sql = `SELECT * FROM supplier WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND supplierdeletedat IS NULL OR supplierdeletedat = 0`;
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);
@@ -41,7 +41,7 @@ Supplier.search = function searchSupplier(col, val, result) {
 // Get supplier by ID
 Supplier.getSupplierByID = function getSupplierByID(supplierID, result) {
   let sql =
-    "SELECT supplier.*, ward.districtid, district.provinceid FROM supplier INNER JOIN ward ON supplier.wardid = ward.wardid INNER JOIN district ON ward.districtid = district.districtid WHERE supplierid = ?";
+    "SELECT supplier.*, ward.districtid, district.provinceid FROM supplier INNER JOIN ward ON supplier.wardid = ward.wardid INNER JOIN district ON ward.districtid = district.districtid WHERE supplier.supplierid = ? AND supplier.supplierdeletedat IS NULL OR supplier.supplierdeletedat = 0";
   db.query(sql, supplierID, function (err, res) {
     if (err) {
       result(err, null);

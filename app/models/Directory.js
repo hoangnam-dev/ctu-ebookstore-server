@@ -12,7 +12,7 @@ const Directory = function (directory) {
 async function hasCategory(directoryID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT * FROM category WHERE category.directoryid = ? AND category.categorydeletedat IS NULL",
+      "SELECT * FROM category WHERE category.directoryid = ? AND category.categorydeletedat IS NULL OR category.categorydeletedat = 0",
       [directoryID],
       async function (err, resCategory) {
         if (err) {
@@ -52,7 +52,7 @@ async function resultDirectory(res) {
 // Get all directory
 Directory.getAll = function getAllDirectory(result) {
   db.query(
-    "SELECT * FROM directory WHERE directorydeletedat IS NULL",
+    "SELECT * FROM directory WHERE directorydeletedat IS NULL OR directorydeletedat = 0",
     async function (err, res) {
       if (err) {
         result(err, null);
@@ -67,7 +67,7 @@ Directory.getAll = function getAllDirectory(result) {
 // index
 Directory.index = function index(result) {
   db.query(
-    "SELECT directoryid, directoryname FROM directory WHERE directorydeletedat IS NULL",
+    "SELECT directoryid, directoryname FROM directory WHERE directorydeletedat IS NULL OR directorydeletedat = 0",
     function (err, res) {
       if (err) {
         result(err, null);
@@ -80,7 +80,7 @@ Directory.index = function index(result) {
 
 // Get directory by ID
 Directory.search = function search(directoryName, result) {
-  const sql = `SELECT * FROM directory WHERE REPLACE(directoryname, 'Đ', 'D') LIKE '%${directoryName}%' AND directorydeletedat IS NULL`;
+  const sql = `SELECT * FROM directory WHERE REPLACE(directoryname, 'Đ', 'D') LIKE '%${directoryName}%' AND directorydeletedat IS NULL OR directorydeletedat = 0`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
@@ -94,7 +94,7 @@ Directory.search = function search(directoryName, result) {
 // Get directory by ID
 Directory.getDirectoryByID = function getDirectoryByID(directoryID, result) {
   db.query(
-    "SELECT * FROM directory WHERE directoryid = ?",
+    "SELECT * FROM directory WHERE directoryid = ? AND directorydeletedat IS NULL OR directorydeletedat = 0",
     directoryID,
     async function (err, res) {
       if (err) {

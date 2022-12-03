@@ -12,7 +12,7 @@ const EbookStatus = function (ebookstatus) {
 // Get all ebookstatus
 EbookStatus.getAll = function getAllEbookStatus(result) {
   db.query(
-    "SELECT * FROM ebookstatus WHERE ebookstatusdeletedat IS NULL",
+    "SELECT * FROM ebookstatus WHERE ebookstatusdeletedat IS NULL OR ebookstatusdeletedat = 0",
     function (err, res) {
       if (err) {
         result(err, null);
@@ -25,7 +25,7 @@ EbookStatus.getAll = function getAllEbookStatus(result) {
 
 // Search ebookstatus
 EbookStatus.search = function searchEbookStatus(col, val, result) {
-  const sql = `SELECT * FROM ebookstatus WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND ebookstatusdeletedat IS NULL`;
+  const sql = `SELECT * FROM ebookstatus WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND ebookstatusdeletedat IS NULL OR ebookstatusdeletedat = 0`;
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);
@@ -38,7 +38,7 @@ EbookStatus.search = function searchEbookStatus(col, val, result) {
 // Get ebookstatus by ID
 EbookStatus.getEbookStatusByID = function getEbookStatusByID(ebookstatusID, result) {
   let sql =
-    "SELECT * FROM ebookstatus WHERE ebookstatusid = ?";
+    "SELECT * FROM ebookstatus WHERE ebookstatusid = ? AND ebookstatusdeletedat IS NULL OR ebookstatusdeletedat = 0";
   db.query(sql, ebookstatusID, function (err, res) {
     if (err) {
       result(err, null);

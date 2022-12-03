@@ -52,7 +52,7 @@ async function resultRole(res) {
 // Get all role
 Role.getAll = function getAllRole(result) {
   db.query(
-    "SELECT * FROM role WHERE roledeletedat IS NULL",
+    "SELECT * FROM role WHERE roledeletedat IS NULL OR roledeletedat = 0",
     async function (err, res) {
       if (err) {
         result(err, null);
@@ -67,7 +67,7 @@ Role.getAll = function getAllRole(result) {
 // Get role by ID
 Role.getRoleByID = function getRoleByID(roleID, result) {
   db.query(
-    "SELECT * FROM role WHERE roleid = ?",
+    "SELECT * FROM role WHERE roleid = ? AND roledeletedat IS NULL OR roledeletedat = 0",
     roleID,
     async function (err, res) {
       if (err) {
@@ -82,7 +82,7 @@ Role.getRoleByID = function getRoleByID(roleID, result) {
 
 // Search role
 Role.search = function searchRole(col, val, result) {
-  const sql = `SELECT * FROM role WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND roledeletedat IS NULL`;
+  const sql = `SELECT * FROM role WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND roledeletedat IS NULL OR roledeletedat = 0`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);

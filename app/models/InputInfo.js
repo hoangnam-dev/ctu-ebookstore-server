@@ -78,8 +78,8 @@ async function hasOutputInfo(outputinfoID) {
   });
 }
 
-// Ouputinfo result,
-async function resultOutputInfo(res) {
+// Inputinfo result,
+async function resultInputInfo(res) {
   let listInfo = res.map(async (res) => {
     var ebooks = [];
     var user = [];
@@ -127,7 +127,7 @@ async function resultOutputInfo(res) {
 // Get all inputinfo
 InputInfo.getAll = function getAllInputInfo(result) {
   db.query(
-    "SELECT * FROM inputinfo WHERE inputinfodeletedat IS NULL",
+    "SELECT * FROM inputinfo WHERE inputinfodeletedat IS NULL OR inputinfodeletedat = 0",
     function (err, res) {
       if (err) {
         result(err, null);
@@ -141,13 +141,13 @@ InputInfo.getAll = function getAllInputInfo(result) {
 // Get inputinfo by ID
 InputInfo.getInputInfoByID = function getInputInfoByID(inputinfoID, result) {
   db.query(
-    "SELECT * FROM inputinfo WHERE inputinfoid = ?",
+    "SELECT * FROM inputinfo WHERE inputinfoid = ? AND inputinfodeletedat IS NULL OR inputinfodeletedat = 0",
     inputinfoID,
     async function (err, res) {
       if (err) {
         result(err, null);
       } else {
-        const data = await resultOutputInfo(res);
+        const data = await resultInputInfo(res);
         result(null, data);
       }
     }
@@ -156,7 +156,7 @@ InputInfo.getInputInfoByID = function getInputInfoByID(inputinfoID, result) {
 
 // Search inputinfo
 InputInfo.search = function searchInputInfo(col, val, result) {
-  const sql = `SELECT * FROM inputinfo WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND inputinfodeletedat IS NULL`;
+  const sql = `SELECT * FROM inputinfo WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND inputinfodeletedat IS NULL OR inputinfodeletedat = 0`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
@@ -396,6 +396,7 @@ InputInfo.delete = async function deleteInputInfo(inputinfoID, inputTotalMoney, 
         if (err) {
           result(err, null);
         } else {
+          // update output info total money
           var totalMoneyOutput = await resultOutputTotalMoney(outputinfoID);
           totalMoneyOutput -= inputTotalMoney;
           db.query(
