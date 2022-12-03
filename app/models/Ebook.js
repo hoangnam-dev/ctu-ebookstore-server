@@ -38,7 +38,7 @@ async function hasAuthor(ebookID) {
 async function hasCategory(ebookID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT category.categoryid, category.categoryname FROM categoryofebook INNER JOIN category ON categoryofebook.categoryid = category.categoryid WHERE categoryofebook.ebookid = ?",
+      "SELECT category.categoryid, category.categoryname FROM categoryofebook INNER JOIN category ON categoryofebook.categoryid = category.categoryid WHERE categoryofebook.ebookid = ? AND category.categorydeletedat = 0 OR category.categorydeletedat IS NULL",
       [ebookID],
       async function (err, resSub) {
         if (err) {
@@ -72,7 +72,7 @@ async function hasSale(ebookID) {
 async function hasEbookStatus(ebookID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT ebookstatus.* FROM ebook INNER JOIN ebookstatus ON ebook.ebookstatusid = ebookstatus.ebookstatusid WHERE ebook.ebookid = ?",
+      "SELECT ebookstatus.* FROM ebook INNER JOIN ebookstatus ON ebook.ebookstatusid = ebookstatus.ebookstatusid WHERE ebook.ebookid = ? AND ebookstatus.ebookstatusdeletedat IS NULL OR ebookstatus.ebookstatusdeletedat = 0",
       [ebookID],
       async function (err, resSub) {
         if (err) {
@@ -167,7 +167,7 @@ async function resultEbook(res) {
 // Get all ebook
 Ebook.getAll = function getAllEbook(result) {
   db.query(
-    "SELECT ebookid, ebookname, ebookprice, ebookstatusid FROM ebook WHERE ebookdeletedat IS NULL",
+    "SELECT ebookid, ebookname, ebookprice, ebookstatusid FROM ebook WHERE ebookdeletedat IS NULL OR ebookdeletedat = 0",
     async function (err, res) {
       if (err) {
         result(err, null);
@@ -182,7 +182,7 @@ Ebook.getAll = function getAllEbook(result) {
 // Get ebook by ID
 Ebook.getEbookByID = function getEbookByID(ebookID, result) {
   db.query(
-    "SELECT * FROM ebook WHERE ebookid = ? AND ebookdeletedat IS NULL",
+    "SELECT * FROM ebook WHERE ebookid = ? AND ebookdeletedat IS NULL OR ebookdeletedat = 0 ",
     ebookID,
     async function (err, res) {
       if (err) {
@@ -216,7 +216,7 @@ Ebook.getEbookByDirectoryID = function getEbookByDirectoryID(
 
 // Search ebook
 Ebook.search = function searchEbook(col, val, result) {
-  const sql = `SELECT * FROM ebook WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND ebookdeletedat IS NULL`;
+  const sql = `SELECT * FROM ebook WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND ebookdeletedat IS NULL OR ebookdeletedat = 0`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
@@ -233,6 +233,7 @@ Ebook.getNewEbook = function getNewEbook(result) {
                     ebookstatus.ebookstatuscode, ebookstatus.ebookstatusname, ebookstatus.ebookstatuscolor
                 FROM ebook 
                 INNER JOIN ebookstatus ON ebook.ebookstatusid = ebookstatus.ebookstatusid
+                WHERE ebook.ebookdeletedat IS NULL OR ebook.ebookdeletedat = 0
                 ORDER BY ebookcreatedat DESC LIMIT 20`;
   db.query(sql, async function (err, res) {
     if(err) {
@@ -255,7 +256,7 @@ Ebook.getBestsellerEbook = function getBestsellerEbook(result) {
               INNER JOIN detailorder ON order_tbl.orderid = detailorder.orderid
               INNER JOIN ebook ON detailorder.ebookid = ebook.ebookid
               INNER JOIN ebookstatus ON ebook.ebookstatusid = ebookstatus.ebookstatusid
-              WHERE week(order_tbl.ordercreatedat) = week(curdate())
+              WHERE week(order_tbl.ordercreatedat) = week(curdate()) AND ebook.ebookdeletedat = 0 OR ebook.ebookdeletedat IS NULL
                   GROUP BY detailorder.ebookid
                   ORDER BY totalsale DESC
                   LIMIT 10`;
