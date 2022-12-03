@@ -81,7 +81,7 @@ const order = async (req, res) => {
     Order.store(newOrder, itemList, function (err, order) {
       if (err) {
         res.redirect(
-          `http://localhost:3000/checkout/failed?error=${order_error_code}`
+          `http://localhost:3002/checkout/failed?error=${order_error_code}`
         );
       } else {
         // url_redirect if transaction success
@@ -121,11 +121,11 @@ const order = async (req, res) => {
             Order.destroy(order, function (err, order) {
               if (err) {
                 res.redirect(
-                  `http://localhost:3000/checkout/failed?error=${cancel_error_code}`
+                  `http://localhost:3002/checkout/failed?error=${cancel_error_code}`
                 );
               } else {
                 res.redirect(
-                  `http://localhost:3000/checkout/success?success=${cancel_code}`
+                  `http://localhost:3002/checkout/success?success=${cancel_code}`
                 );
               }
             });
@@ -133,77 +133,16 @@ const order = async (req, res) => {
           } else {
             for (let i = 0; i < payment.links.length; i++) {
               if (payment.links[i].rel === "approval_url") {
-                // redirect to approval
-                // res.redirect(payment.links[i].href);
                 res.json({ forwardLink: payment.links[i].href });
               }
             }
           }
         });
-
-        // var saleQuantityMax;
-        // var saleQuantityCurrent;
-
-        // // Option 1: don't have promotion
-        // if (ebookSaleType === null && ebookSaleCode === null) {
-        //   // Payment and store order
-        // }
-
-        // // Option 2: sale in ebook price
-        // if (ebookSaleType !== null) {
-        //   if (ebookSaleType == "1") {
-        //     ebookPrice = ebookPrice - (ebookPrice * ebookSaleValue) / 100;
-        //   } else {
-        //     ebookPrice = ebookPrice - ebookSaleValue;
-        //   }
-        // }
-
-        // // Option 3: check have sale code
-        // if (ebookSaleCode !== null) {
-        //   Ebook.getPriceCurrent(ebookID, ebookSaleCode, function (err, data) {
-        //     if (err) {
-        //       return res.json({
-        //         error: true,
-        //         statusCode: 0,
-        //         message: "Lỗi không thể lấy thông tin ebook",
-        //       });
-        //     } else {
-        //       var saleQuantityCurrent = data.salequantitycurrent;
-        //       var saleQuantityMax = data.salequantitymax;
-        //       var saleType = data.saleType;
-        //       var saleValue = data.saleValue;
-
-        //       // Check sale code available quantity use
-        //       if (saleQuantityCurrent > saleQuantityMax) {
-        //         return res.json({
-        //           error: true,
-        //           statusCode: 0,
-        //           message: "Mã giám đã hết lượt sử dụng",
-        //         });
-        //       }
-
-        //       if (saleType == "1") {
-        //         amount = amount - (amount * saleValue) / 100;
-        //       } else {
-        //         amount = amount - saleValue;
-        //       }
-
-        //       // increment quantity current
-        //       saleQuantityCurrent = saleQuantityCurrent + 1;
-
-        //       console.log("have sale code");
-        //       console.log(amount);
-        //     }
-        //   });
-        // } else {
-        //   console.log("don't have sale code");
-        //   console.log(ebookPrice);
-        // }
       }
     });
   } catch (error) {
     res.redirect(
-      `http://localhost:3000/checkout/failed?error=${order_failed_code}`
+      `http://localhost:3002/checkout/failed?error=${order_failed_code}`
     );
   }
 };
@@ -241,11 +180,11 @@ const successPaypal = (req, res) => {
         Order.destroy(orderID, function (err, order) {
           if (err) {
             res.redirect(
-              `http://localhost:3000/checkout/failed?error=${cancel_error_code}`
+              `http://localhost:3002/checkout/failed?error=${cancel_error_code}`
             );
           } else {
             res.redirect(
-              `http://localhost:3000/checkout/success?success=${cancel_code}`
+              `http://localhost:3002/checkout/success?success=${cancel_code}`
             );
           }
         });
@@ -259,17 +198,17 @@ const successPaypal = (req, res) => {
           function (err, status) {
             if (err) {
               res.redirect(
-                `http://localhost:3000/checkout/failed?error=${order_error_code}&orderID=${orderID}`
+                `http://localhost:3002/checkout/failed?error=${order_error_code}&orderID=${orderID}`
               );
             } else {
               PaypalPayment.store(newTransation, function (err, transaction) {
                 if (err) {
                   res.redirect(
-                    `http://localhost:3000/checkout/failed?error=${payment_error_code}&orderID=${orderID}`
+                    `http://localhost:3002/checkout/failed?error=${payment_error_code}&orderID=${orderID}`
                   );
                 } else {
                   res.redirect(
-                    `http://localhost:3000/checkout/success?success=${success_code}`
+                    `http://localhost:3002/checkout/success?success=${success_code}`
                   );
                 }
               });
@@ -286,11 +225,11 @@ const cancelPaypal = (req, res) => {
   Order.destroy(orderID, function (err, order) {
     if (err) {
       res.redirect(
-        `http://localhost:3000/checkout/failed?error=${cancel_error_code}`
+        `http://localhost:3002/checkout/failed?error=${cancel_error_code}`
       );
     } else {
       res.redirect(
-        `http://localhost:3000/checkout/success?success=${cancel_code}`
+        `http://localhost:3002/checkout/success?success=${cancel_code}`
       );
     }
   });
