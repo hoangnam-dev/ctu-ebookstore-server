@@ -14,8 +14,6 @@ const inputInfoRouter = require("./inputinfo");
 const licenseRouter = require("./license");
 const orderRouter = require("./order");
 const outputInfoRouter = require("./outputinfo");
-const paymentRouter = require("./payment");
-const paymentTypeRouter = require("./paymenttype");
 const permissionRouter = require("./permission");
 const provinceRouter = require("./province");
 const roleRouter = require("./role");
@@ -83,12 +81,6 @@ function route(app) {
 
   // OutputInfo routes
   app.use("/api/outputinfos", outputInfoRouter);
-
-  // Payment routes
-  app.use("/api/payments", paymentRouter);
-
-  // PaymentType routes
-  app.use("/api/paymenttypes", paymentTypeRouter);
 
   // Permission routes
   app.use("/api/permissions", permissionRouter);
