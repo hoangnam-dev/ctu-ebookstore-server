@@ -25,7 +25,7 @@ const User = function (user) {
 async function hasRole(userID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT role.* FROM user INNER JOIN role ON user.roleid = role.roleid WHERE user.userid = ? and role.roledeletedat IS NULL OR userdeletedat = 0",
+      "SELECT role.* FROM user INNER JOIN role ON user.roleid = role.roleid WHERE user.userid = ? and (role.roledeletedat IS NULL OR userdeletedat = 0)",
       [userID],
       async function (err, resSub) {
         if (err) {
@@ -122,7 +122,7 @@ async function resultUser(res) {
 // Get all user
 User.getAll = function getAllUser(result) {
   db.query(
-    "SELECT userid, username, userphone, useremail FROM user WHERE userdeletedat IS NULL OR userdeletedat = 0",
+    "SELECT userid, username, userphone, useremail FROM user WHERE (userdeletedat IS NULL OR userdeletedat = 0)",
     async function (err, res) {
       if (err) {
         result(err, null);
@@ -149,7 +149,7 @@ User.checkUserName = function checkUserName(userName, result) {
 // Get user by ID
 User.getUserByID = function getUserByID(userID, result) {
   db.query(
-    "SELECT * FROM user WHERE userid = ? AND userdeletedat IS NULL OR userdeletedat = 0",
+    "SELECT * FROM user WHERE userid = ? AND (userdeletedat IS NULL OR userdeletedat = 0)",
     userID,
     async function (err, res) {
       if (err) {
@@ -171,7 +171,7 @@ User.search = function searchUser(col, val, roleID, statusID, result) {
   if(statusID !== undefined) {
     subWhere += ' AND userstatusid = ' + statusID;
   }
-  const sql = `SELECT * FROM user WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' ${subWhere} AND userdeletedat IS NULL OR userdeletedat = 0`;
+  const sql = `SELECT * FROM user WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' ${subWhere} AND (userdeletedat IS NULL OR userdeletedat = 0)`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);

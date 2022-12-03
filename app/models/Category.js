@@ -11,7 +11,7 @@ const Category = function(category) {
 
 // index
 Category.index = function index(result) {
-    db.query("SELECT categoryid, categoryname FROM category WHERE categorydeletedat IS NULL OR categorydeletedat = 0", function(err, res) {
+    db.query("SELECT categoryid, categoryname FROM category WHERE (categorydeletedat IS NULL OR categorydeletedat = 0)", function(err, res) {
         if(err) {
             result(err, null);
         } else {
@@ -22,7 +22,7 @@ Category.index = function index(result) {
 
 // Get all category
 Category.getAll = function getAllCategory(result) {
-    db.query("SELECT * FROM category WHERE categorydeletedat IS NULL OR categorydeletedat = 0", function(err, res) {
+    db.query("SELECT * FROM category WHERE (categorydeletedat IS NULL OR categorydeletedat = 0)", function(err, res) {
         if(err) {
             result(err, null);
         } else {
@@ -34,7 +34,7 @@ Category.getAll = function getAllCategory(result) {
 // Get category by ID
 Category.search = function search(categoryName, result) {
     const sql =
-    "SELECT * FROM category WHERE REPLACE(categoryname, 'Đ', 'D') LIKE '%" + categoryName + "%' AND categorydeletedat IS NULL OR categorydeletedat = 0";
+    "SELECT * FROM category WHERE REPLACE(categoryname, 'Đ', 'D') LIKE '%" + categoryName + "%' AND (categorydeletedat IS NULL OR categorydeletedat = 0)";
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);
@@ -46,7 +46,7 @@ Category.search = function search(categoryName, result) {
 
 // Get category by ID
 Category.getCategoryByID = function getCategoryByID(categoryID, result) {
-    db.query("SELECT * FROM category WHERE categoryid = ? AND categorydeletedat IS NULL OR categorydeletedat = 0", categoryID, function(err, res) {
+    db.query("SELECT * FROM category WHERE categoryid = ? AND (categorydeletedat IS NULL OR categorydeletedat = 0)", categoryID, function(err, res) {
         if(err) {
             result(err, null);
         } else {

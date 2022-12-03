@@ -22,7 +22,7 @@ const UserAuth = function (user) {
 async function hasRole(userID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT role.* FROM user INNER JOIN role ON user.roleid = role.roleid WHERE user.userid = ? AND role.roledeletedat IS NULL OR role.roledeletedat = 0",
+      "SELECT role.* FROM user INNER JOIN role ON user.roleid = role.roleid WHERE user.userid = ? AND (role.roledeletedat IS NULL OR role.roledeletedat = 0)",
       [userID],
       async function (err, resSub) {
         if (err) {

@@ -38,7 +38,7 @@ async function hasAuthor(ebookID) {
 async function hasCategory(ebookID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT category.categoryid, category.categoryname FROM categoryofebook INNER JOIN category ON categoryofebook.categoryid = category.categoryid WHERE categoryofebook.ebookid = ? AND category.categorydeletedat = 0 OR category.categorydeletedat IS NULL",
+      "SELECT category.categoryid, category.categoryname FROM categoryofebook INNER JOIN category ON categoryofebook.categoryid = category.categoryid WHERE categoryofebook.ebookid = ? AND (category.categorydeletedat = 0 OR category.categorydeletedat IS NULL)",
       [ebookID],
       async function (err, resSub) {
         if (err) {
@@ -72,7 +72,7 @@ async function hasSale(ebookID) {
 async function hasEbookStatus(ebookID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT ebookstatus.* FROM ebook INNER JOIN ebookstatus ON ebook.ebookstatusid = ebookstatus.ebookstatusid WHERE ebook.ebookid = ? AND ebookstatus.ebookstatusdeletedat IS NULL OR ebookstatus.ebookstatusdeletedat = 0",
+      "SELECT ebookstatus.* FROM ebook INNER JOIN ebookstatus ON ebook.ebookstatusid = ebookstatus.ebookstatusid WHERE ebook.ebookid = ? AND (ebookstatus.ebookstatusdeletedat IS NULL OR ebookstatus.ebookstatusdeletedat = 0)",
       [ebookID],
       async function (err, resSub) {
         if (err) {
@@ -167,7 +167,7 @@ async function resultEbook(res) {
 // Get all ebook
 Ebook.getAll = function getAllEbook(result) {
   db.query(
-    "SELECT ebookid, ebookname, ebookprice, ebookstatusid FROM ebook WHERE ebookdeletedat IS NULL OR ebookdeletedat = 0",
+    "SELECT ebookid, ebookname, ebookprice, ebookstatusid FROM ebook WHERE (ebookdeletedat IS NULL OR ebookdeletedat = 0)",
     async function (err, res) {
       if (err) {
         result(err, null);
@@ -182,7 +182,7 @@ Ebook.getAll = function getAllEbook(result) {
 // Get ebook by ID
 Ebook.getEbookByID = function getEbookByID(ebookID, result) {
   db.query(
-    "SELECT * FROM ebook WHERE ebookid = ? AND ebookdeletedat IS NULL OR ebookdeletedat = 0 ",
+    "SELECT * FROM ebook WHERE ebookid = ? AND (ebookdeletedat IS NULL OR ebookdeletedat = 0) ",
     ebookID,
     async function (err, res) {
       if (err) {
@@ -216,7 +216,7 @@ Ebook.getEbookByDirectoryID = function getEbookByDirectoryID(
 
 // Search ebook
 Ebook.search = function searchEbook(col, val, result) {
-  const sql = `SELECT * FROM ebook WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND ebookdeletedat IS NULL OR ebookdeletedat = 0`;
+  const sql = `SELECT * FROM ebook WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND (ebookdeletedat IS NULL OR ebookdeletedat = 0)`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);

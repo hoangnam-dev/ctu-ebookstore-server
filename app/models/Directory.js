@@ -94,7 +94,7 @@ Directory.search = function search(directoryName, result) {
 // Get directory by ID
 Directory.getDirectoryByID = function getDirectoryByID(directoryID, result) {
   db.query(
-    "SELECT * FROM directory WHERE directoryid = ? AND directorydeletedat IS NULL OR directorydeletedat = 0",
+    "SELECT * FROM directory WHERE directoryid = ? AND (directorydeletedat IS NULL OR directorydeletedat = 0)",
     directoryID,
     async function (err, res) {
       if (err) {

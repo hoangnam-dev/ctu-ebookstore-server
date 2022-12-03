@@ -127,7 +127,7 @@ async function resultInputInfo(res) {
 // Get all inputinfo
 InputInfo.getAll = function getAllInputInfo(result) {
   db.query(
-    "SELECT * FROM inputinfo WHERE inputinfodeletedat IS NULL OR inputinfodeletedat = 0",
+    "SELECT * FROM inputinfo WHERE (inputinfodeletedat IS NULL OR inputinfodeletedat = 0)",
     function (err, res) {
       if (err) {
         result(err, null);
@@ -141,7 +141,7 @@ InputInfo.getAll = function getAllInputInfo(result) {
 // Get inputinfo by ID
 InputInfo.getInputInfoByID = function getInputInfoByID(inputinfoID, result) {
   db.query(
-    "SELECT * FROM inputinfo WHERE inputinfoid = ? AND inputinfodeletedat IS NULL OR inputinfodeletedat = 0",
+    "SELECT * FROM inputinfo WHERE inputinfoid = ? AND (inputinfodeletedat IS NULL OR inputinfodeletedat = 0)",
     inputinfoID,
     async function (err, res) {
       if (err) {
@@ -156,7 +156,7 @@ InputInfo.getInputInfoByID = function getInputInfoByID(inputinfoID, result) {
 
 // Search inputinfo
 InputInfo.search = function searchInputInfo(col, val, result) {
-  const sql = `SELECT * FROM inputinfo WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND inputinfodeletedat IS NULL OR inputinfodeletedat = 0`;
+  const sql = `SELECT * FROM inputinfo WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND (inputinfodeletedat IS NULL OR inputinfodeletedat = 0)`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
@@ -171,7 +171,7 @@ InputInfo.search = function searchInputInfo(col, val, result) {
 async function getTotalMomeyInputInfo(outputinfoID) {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT SUM(inputinfototalmoney) as inputinfototalmoney  FROM inputinfo WHERE outputinfoid = ?",
+      "SELECT SUM(inputinfototalmoney) as inputinfototalmoney  FROM inputinfo WHERE outputinfoid = ? AND (inputinfodeletedat IS NULL OR inputinfodeletedat = 0)",
       [outputinfoID],
       async function (err, resSub) {
         if (err) {
