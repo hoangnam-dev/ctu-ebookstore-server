@@ -155,6 +155,7 @@ const search = function (req, res) {
 const splitPDF = async (
   pdfFilePath,
   outputDirectory,
+  startPage,
   separatePage,
   fileNameSave
 ) => {
@@ -164,8 +165,9 @@ const splitPDF = async (
     reject(err);
   }
   // create array page of pdf split
+  let start = parseFloat(startPage) - 1;
   var pageMerge = [];
-  for (var i = 0; i < separatePage; i++) {
+  for (var i = start; i < separatePage; i++) {
     pageMerge.push(i);
   }
 
@@ -183,6 +185,8 @@ const store = async function (req, res) {
   var categoriesID = [1, 2]; // test
   var authorsID = [1, 2]; // test
   var separatePage = req.body.separatePage;
+  var startPage = req.body.startPage;
+
   if (
     !newEbook.ebookname ||
     !newEbook.ebookprice ||
@@ -214,6 +218,13 @@ const store = async function (req, res) {
       }
       // Upload pdf
       if (req.pdfSaved !== undefined) {
+        if(!separatePage || startPage < 1 || (startPage > separatePage)) {
+          return res.json({
+            error: true,
+            statusCode: 0,
+            message: "Số trang cắt không hợp lệ",
+          });
+        }
         newEbook.ebookpdf = handleFilePath(
           "uploads/ebookPDF",
           req.pdfSaved
@@ -227,6 +238,7 @@ const store = async function (req, res) {
         splitPDF(
           pdfPath,
           appRoot + "/public/uploads/ebookPDF/pdf-review",
+          startPage,
           separatePage,
           req.pdfReviewSaved
         )
@@ -331,7 +343,9 @@ const update = async function (req, res) {
 const updateEbookContent = async function (req, res) {
   var newEbookContentLink = "";
   var ebookID = req.params.id;
+  var startPage = req.body.startPage;
   var separatePage = req.body.separatePage;
+
   var newEbookReviewLink = "";
   try {
     var contentType = "";
@@ -349,6 +363,13 @@ const updateEbookContent = async function (req, res) {
     }
     // Upload pdf
     if (req.pdfSaved !== undefined) {
+      if(!separatePage || startPage < 1 || (startPage > separatePage)) {
+        return res.json({
+          error: true,
+          statusCode: 0,
+          message: "Số trang cắt không hợp lệ",
+        });
+      }
       contentType = "pdf";
       newEbookContentLink = handleFilePath(
         "uploads/ebookPDF",
@@ -363,6 +384,7 @@ const updateEbookContent = async function (req, res) {
       splitPDF(
         pdfPath,
         appRoot + "/public/uploads/ebookPDF/pdf-review",
+        startPage,
         separatePage,
         req.pdfReviewSaved
       )
