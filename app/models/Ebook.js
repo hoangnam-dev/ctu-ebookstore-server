@@ -182,7 +182,7 @@ Ebook.getAll = function getAllEbook(result) {
 // Get ebook by ID
 Ebook.getEbookByID = function getEbookByID(ebookID, result) {
   db.query(
-    "SELECT * FROM ebook WHERE ebookid = ? AND (ebookdeletedat IS NULL OR ebookdeletedat = 0) ",
+    "SELECT * FROM ebook WHERE ebookid = ? AND (ebookdeletedat IS NULL OR ebookdeletedat = 0)",
     ebookID,
     async function (err, res) {
       if (err) {
@@ -416,6 +416,20 @@ Ebook.update = function updateEbook(ebookID, ebook, result) {
 };
 
 // Update ebook content
+Ebook.getEbookContent = function getEbookContent(ebookID, result) {
+  db.query(
+    "SELECT ebookepub, ebookpdf, ebookpdfreview FROM ebook WHERE ebookid = ? AND (ebookdeletedat IS NULL OR ebookdeletedat = 0)",
+    [ebookID],
+    function (err, res) {
+      if (err) {
+        console.log(err);
+        result(err, null);
+      } else {
+        result(null, res[0]);
+      }
+    }
+  );
+};
 Ebook.updateEbookContent = function updateEbookContent(
   ebookID,
   contentType,

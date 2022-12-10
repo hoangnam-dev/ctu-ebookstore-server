@@ -1,6 +1,5 @@
-const { express } = require("express");
+const express = require("express");
 const Ebook = require("../models/Ebook");
-const ImageEbook = require("../models/ImageEbook");
 const { cloudinary } = require("../../utils/cloudinary");
 const fs = require("fs");
 const path = require("path");
@@ -340,6 +339,15 @@ const update = async function (req, res) {
   }
 };
 // Update ebook content
+const getFileName = (localPath) => {
+  let splitIndex = localPath.lastIndexOf('/');
+  let fileName = localPath.slice(splitIndex+1)
+  return fileName;
+}
+const removeFile = (directory, fileName) => {
+  const publicPath = `D:\\Projects\\NodeJS\\CTU-EbookStore\\public\\uploads\\${directory}\\${fileName}`;
+  fs.unlink(publicPath);
+}
 const updateEbookContent = async function (req, res) {
   var newEbookContentLink = "";
   var ebookID = req.params.id;
@@ -347,80 +355,140 @@ const updateEbookContent = async function (req, res) {
   var separatePage = req.body.separatePage;
 
   var newEbookReviewLink = "";
+  const publicPath = process.env.PUBLIC_PATH || "D:/Projects/NodeJS/CTU-EbookStore/public/uploads"
   try {
-    var contentType = "";
-
-    // if file update is .epub => contentType = "epub"
-    // if file update is .pdf => contentType = "pdf"
-    
-    // Upload epub
-    if (req.ePubSaved !== undefined) {
-      contentType = "epub";
-      newEbookContentLink = handleFilePath(
-        "uploads/ebookEPUB",
-        req.ePubSaved 
-      );
-    }
-    // Upload pdf
-    if (req.pdfSaved !== undefined) {
-      if(!separatePage || startPage < 1 || (startPage > separatePage)) {
+    Ebook.getEbookContent(ebookID, (err, ebookContent) => {
+      if(err) {
         return res.json({
           error: true,
           statusCode: 0,
-          message: "Số trang cắt không hợp lệ",
+          message: "Lỗi truy xuất dữ liệu"
         });
-      }
-      contentType = "pdf";
-      newEbookContentLink = handleFilePath(
-        "uploads/ebookPDF",
-        req.pdfSaved
-      );
-      newEbookReviewLink = handleFilePath(
-        "uploads/ebookPDF/pdf-review",
-        req.pdfReviewSaved
-      );
-      var pdfPath = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
+      } 
+      else {
+        var contentType = "";
 
-      splitPDF(
-        pdfPath,
-        appRoot + "/public/uploads/ebookPDF/pdf-review",
-        startPage,
-        separatePage,
-        req.pdfReviewSaved
-      )
-        .then()
-    }
-
-    // Check if contentType not null => update to DB
-    if (contentType === "") {
-      res.json({
-        error: true,
-        statusCode: 0,
-        message: "Hãy chọn nội dung cho ebook",
-      });
-    } else {
-      Ebook.updateEbookContent(
-        ebookID,
-        contentType,
-        newEbookContentLink,
-        newEbookReviewLink,
-        function (err, ebook) {
-          if (err) {
-            res.json({
-              error: true,
-              statusCode: 0,
-              message: "Lỗi! Cập nhật ebook không thành công",
-            });
-          } else {
-            res.json({
-              error: false,
-              statusCode: 1,
-              message: "Cập nhật ebook thành công",
-            });
+        // if file update is .epub => contentType = "epub"
+        // if file update is .pdf => contentType = "pdf"
+        // Upload epub
+        if (req.ePubSaved !== undefined) {
+          contentType = "epub";
+          newEbookContentLink = handleFilePath(
+            "uploads/ebookEPUB",
+            req.ePubSaved 
+          );
+          if(ebookContent.ebookepub !== '') {
+            let fileName = getFileName(ebookContent.ebookepub);
+            let removePath = publicPath + "/ebookEPUB/" + fileName;
+            if(fs.existsSync(removePath)) {
+              fs.unlink(removePath, (errRemove) => {
+                if(errRemove) {
+                  console.log(errRemove);
+                  return res.json({
+                    error: true,
+                    statusCode: 0,
+                    message: "Xóa file ePUB cũ không thành công",
+                  });
+                }
+              });
+            }
           }
         }
-      );
-    }
+
+        // Upload pdf
+        if (req.pdfSaved !== undefined) {
+          if(!separatePage || startPage < 1 || (startPage > separatePage)) {
+            return res.json({
+              error: true,
+              statusCode: 0,
+              message: "Số trang cắt không hợp lệ",
+            });
+          }
+          contentType = "pdf";
+          newEbookContentLink = handleFilePath(
+            "uploads/ebookPDF",
+            req.pdfSaved
+          );
+          newEbookReviewLink = handleFilePath(
+            "uploads/ebookPDF/pdf-review",
+            req.pdfReviewSaved
+          );
+
+          // remove old file
+          if(ebookContent.ebookpdf !== '') {
+            let fileName = getFileName(ebookContent.ebookpdf);
+            let removePath = publicPath + "/ebookPDF/" + fileName;
+            if(fs.existsSync(removePath)) {
+              fs.unlink(removePath, (errRemove) => {
+                if (errRemove) {
+                  return res.json({
+                    error: true,
+                    statusCode: 0,
+                    message: "Xóa file PDF cũ không thành công",
+                  });
+                } else {
+                  let fileName = getFileName(ebookContent.ebookpdfreview);
+                  let removePath = publicPath + "/ebookPDF/pdf-review/" + fileName;
+                  if(fs.existsSync(removePath)) {
+                    fs.unlink(removePath, (errRemoveReview) => {
+                      if (errRemoveReview) {
+                        return res.json({
+                          error: true,
+                          statusCode: 0,
+                          message: "Xóa file PDF review cũ không thành công",
+                        });
+                      }
+                    });
+                  }
+                }
+              });
+            } 
+          }
+
+          // slipt pdf
+          var pdfPath = appRoot + "\\public\\uploads\\ebookPDF\\" + req.pdfSaved;
+          splitPDF(
+            pdfPath,
+            appRoot + "/public/uploads/ebookPDF/pdf-review",
+            startPage,
+            separatePage,
+            req.pdfReviewSaved
+          )
+            .then()
+        }
+    
+        // Check if contentType not null => update to DB
+        if (contentType === "") {
+          res.json({
+            error: true,
+            statusCode: 0,
+            message: "Hãy chọn nội dung cho ebook",
+          });
+        } else {
+          Ebook.updateEbookContent(
+            ebookID,
+            contentType,
+            newEbookContentLink,
+            newEbookReviewLink,
+            function (err, ebook) {
+              if (err) {
+                res.json({
+                  error: true,
+                  statusCode: 0,
+                  message: "Lỗi! Cập nhật ebook không thành công",
+                });
+              } else {
+                res.json({
+                  error: false,
+                  statusCode: 1,
+                  message: "Cập nhật ebook thành công",
+                });
+              }
+            }
+          );
+        }
+      }
+    })
   } catch (error) {
     res.json({
       error: true,
