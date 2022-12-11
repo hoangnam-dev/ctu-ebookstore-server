@@ -121,7 +121,7 @@ Order.getOrderByID = function getOrderByID(orderID, result) {
 // Search order
 Order.search = function searchOrder(orderID, result) {
   const sql =
-    `SELECT * FROM order_tbl WHERE orderid LIKE '%${orderID}%'`;
+    `SELECT * FROM order_tbl WHERE orderid LIKE '%${orderID}%' AND orderstatus = 1`;
   db.query(sql, function (err, res) {
     if (err) {
       result(err, null);
