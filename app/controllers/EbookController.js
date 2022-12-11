@@ -181,8 +181,8 @@ const store = async function (req, res) {
   var newEbook = new Ebook(req.body);
   // var categoriesID = req.body.categoriesID;
   // var authorsID = req.body.authorsID;
-  var categoriesID = [1, 2]; // test
-  var authorsID = [1, 2]; // test
+  // var categoriesID = [1, 2]; // test
+  // var authorsID = [1, 2]; // test
   var separatePage = req.body.separatePage;
   var startPage = req.body.startPage;
 

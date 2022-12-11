@@ -92,7 +92,7 @@ async function resultOrder(res) {
 
 // Get all order
 Order.getAll = function getAllOrder(result) {
-  db.query("SELECT * FROM order_tbl", async function (err, res) {
+  db.query("SELECT * FROM order_tbl WHERE orderstatus = 1", async function (err, res) {
     if (err) {
       result(err, null);
     } else {
