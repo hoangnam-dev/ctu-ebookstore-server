@@ -268,7 +268,7 @@ const store = async function (req, res) {
         message: "Upload không thành công",
       });
     }
-  }
+  } 
 };
 
 // Get ebook by ID
