@@ -110,6 +110,7 @@ const getSaleByID = function (req, res) {
         // return sale
         return {
           saleID: data.saleid,
+          saleName: data.salename,
           saleContent: data.salecontent,
           saleStartAt: data.salestartat,
           saleEndAt: data.saleendat,
