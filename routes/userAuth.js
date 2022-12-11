@@ -17,7 +17,7 @@ const {
 const jwtMiddlewares = require("../app/middlewares/jwt");
 
 router.post("/login", login);
-router.post("/refreshToken", jwtMiddlewares.verifyToken, refreshAccessToken);
+router.post("/refreshToken", refreshAccessToken);
 router.post("/profile", jwtMiddlewares.verifyToken, profile);
 router.post("/logout", jwtMiddlewares.verifyToken, logout);
 
