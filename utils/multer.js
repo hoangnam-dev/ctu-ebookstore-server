@@ -92,7 +92,7 @@ const uploadFileAndImages = async (req, res, next) => {
       if (req.files["ebookPDF"]) {
         // req.pdfSaved = "/pdf/" + req.files["ebookPDF"][0].filename;
         req.pdfSaved = req.files["ebookPDF"][0].filename;
-        req.pdfReviewSaved = Date.now()+'-review_'+req.files["ebookPDF"][0].filename;
+        req.pdfReviewSaved = 'review_'+req.files["ebookPDF"][0].filename+'-'+Date.now();
       } else {
         req.pdfSaved = undefined;
       }

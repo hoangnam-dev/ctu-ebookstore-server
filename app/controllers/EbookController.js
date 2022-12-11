@@ -179,10 +179,8 @@ const splitPDF = async (
 
 const store = async function (req, res) {
   var newEbook = new Ebook(req.body);
-  // var categoriesID = req.body.categoriesID;
-  // var authorsID = req.body.authorsID;
-  // var categoriesID = [1, 2]; // test
-  // var authorsID = [1, 2]; // test
+  var categoriesID = JSON.parse('['+req.body.categoriesID+']');
+  var authorsID = JSON.parse('['+req.body.authorsID+']');
   var separatePage = req.body.separatePage;
   var startPage = req.body.startPage;
 
@@ -294,8 +292,6 @@ const getEbookByID = function (req, res) {
 const update = async function (req, res) {
   var newEbook = new Ebook(req.body);
   var ebookID = req.params.id;
-  // var categoriesID = req.body.categoriesID;
-  // var authorsID = req.body.authorsID;
   if (!newEbook.ebookname || !newEbook.ebookprice || !newEbook.ebookstatusid) {
     res.json({
       error: true,
@@ -501,7 +497,7 @@ const updateEbookContent = async function (req, res) {
 // add Category
 const addCategory = async function (req, res) {
   var ebookID = req.params.id;
-  var categoriesID = req.body.categoriesID;
+  var categoriesID = JSON.parse('['+req.body.categoriesID+']');
   Ebook.storeCategory(ebookID, categoriesID, (err, result) => {
     if (err) {
       res.json({
@@ -542,7 +538,7 @@ const deleteCategory = async function (req, res) {
 // add Author
 const addAuthor = async function (req, res) {
   var ebookID = req.params.id;
-  var authorsID = req.body.authorsID;
+  var authorsID = JSON.parse('['+req.body.authorsID+']');
   Ebook.storeAuthor(ebookID, authorsID, (err, result) => {
     if (err) {
       res.json({
