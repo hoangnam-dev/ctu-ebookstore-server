@@ -14,10 +14,10 @@ const order = async (req, res) => {
   var amount = 0;
   var totalPrice = 0;
 
-  // var itemList = req.body.itemList;
-  // var orderNote = req.body.orderNote;
-  // var customerID = req.body.customerID;
-  // var orderNote = req.body.orderNote;
+  var itemList = req.body.itemList;
+  var orderNote = req.body.orderNote;
+  var customerID = req.body.customerID;
+  var orderNote = req.body.orderNote;
 
   // if customer borrow ebook
   // var expiresBorrow = req.body.expiresBorrow;
@@ -27,21 +27,28 @@ const order = async (req, res) => {
   // var borrowEbook = true;
   // var expiresBorrow = 2;
 
-  var orderNote = "test order";
-  var customerID = 3;
-  var itemList = [
-    {
-      ebookID: 1,
-      ebookName: "ebook1",
-      ebookPrice: 24000,
-    },
-    {
-      ebookID: 2,
-      ebookName: "ebook2",
-      ebookPrice: 24000,
-    },
-  ];
+  // var orderNote = "test order";
+  // var customerID = 3;
+  // var itemList = [
+  //   {
+  //     ebookID: 1,
+  //     ebookName: "ebook1",
+  //     ebookPrice: 24000,
+  //   },
+  //   {
+  //     ebookID: 2,
+  //     ebookName: "ebook2",
+  //     ebookPrice: 24000,
+  //   },
+  // ];
   try {
+    if(itemList.length == 0) {
+      return res.json({
+        error: false,
+        statusCode: order_error_code,
+        message: "Hãy chọn sản phẩm cần thanh toán",
+      });
+    }
     const currency = ratesData.rates[0].value.find(
       (item) => item.code === "USD"
     );
