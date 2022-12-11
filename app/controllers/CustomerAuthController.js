@@ -274,6 +274,7 @@ const refreshAccessToken = (req, res) => {
           message: "Lỗi! Không thể lấy thông tin khách hàng",
         });
       } else {
+        console.log(customerInfo);
         const newAccessToken = jwt.sign(
           {
             id: customerInfo[0].customerid,
