@@ -132,9 +132,10 @@ OutputInfo.getOutputInfoByID = function getOutputInfoByID(
 
 // Search outputinfo
 OutputInfo.search = function searchOutputInfo(col, val, result) {
-  const sql = `SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, supplier.suppliername FROM ebookstore.outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND (outputinfo.outputinfodeletedat IS NULL OR outputinfo.outputinfodeletedat = 0)`;
+  const sql = `SELECT outputinfo.outputinfoid, outputinfo.outputinfototalmoney, outputinfo.outputinfocreatedat, supplier.suppliername FROM outputinfo INNER JOIN supplier ON outputinfo.supplierid = supplier.supplierid WHERE REPLACE(${col}, 'Đ', 'D') LIKE '%${val}%' AND (outputinfo.outputinfodeletedat IS NULL OR outputinfo.outputinfodeletedat = 0)`;
   db.query(sql, async function (err, res) {
     if (err) {
+      console.log(err);
       result(err, null);
     } else {
       result(null, res);
