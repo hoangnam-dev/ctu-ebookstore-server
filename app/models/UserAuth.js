@@ -282,7 +282,7 @@ UserAuth.getRoleAndPermission = function getRoleAndPermission(
   roleCode,
   result
 ) {
-  const sql = `SELECT * FROM role WHERE rolecode = '${roleCode}' AND roledeletedat IS NULL OR roledeletedat = 0`;
+  const sql = `SELECT * FROM role WHERE rolecode = '${roleCode}' AND (roledeletedat IS NULL OR roledeletedat = 0)`;
   db.query(sql, async function (err, res) {
     if (err) {
       result(err, null);
