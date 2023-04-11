@@ -53,7 +53,7 @@ const login = (req, res) => {
               roleCode: role.rolecode,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "30m" }
+            { expiresIn: "30d" }
           );
 
           const refreshToken = jwt.sign(

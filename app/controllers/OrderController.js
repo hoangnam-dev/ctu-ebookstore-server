@@ -17,30 +17,8 @@ const order = async (req, res) => {
   var itemList = req.body.itemList;
   var orderNote = req.body.orderNote;
   var customerID = req.body.customerID;
-  var orderNote = req.body.orderNote;
+  var orderNote = req.body.orderNote || '';
 
-  // if customer borrow ebook
-  // var expiresBorrow = req.body.expiresBorrow;
-  // var borrowEbook = req.body.borrowEbook;
-
-  // Test with browser
-  // var borrowEbook = true;
-  // var expiresBorrow = 2;
-
-  // var orderNote = "test order";
-  // var customerID = 3;
-  // var itemList = [
-  //   {
-  //     ebookID: 1,
-  //     ebookName: "ebook1",
-  //     ebookPrice: 24000,
-  //   },
-  //   {
-  //     ebookID: 2,
-  //     ebookName: "ebook2",
-  //     ebookPrice: 24000,
-  //   },
-  // ];
   try {
     if(itemList.length == 0) {
       return res.json({
@@ -94,11 +72,7 @@ const order = async (req, res) => {
         // url_redirect if transaction success
         var url_success_redirect = `http://localhost:3001/api/orders/successPaypal?amount=${amount}&orderID=${order}&customerID=${customerID}`;
         var url_cancel_redirect = `http://localhost:3001/api/orders/cancelPaypal?orderID=${order}`;
-        // if(borrowEbook !== undefined) {
-        //   url_redirect = `http://localhost:3001/api/orders/success?amount=${amount}&orderID=${order}&customerID=${customerID}&expiresBorrow=${expiresBorrow}`;
-        // }
 
-        // create payment info json
         var create_payment_json = {
           intent: "sale",
           payer: {
@@ -117,7 +91,7 @@ const order = async (req, res) => {
                 currency: "USD",
                 total: amount.toString(),
               },
-              description: "This is the payment description.",
+              description: orderNote,
             },
           ],
         };
